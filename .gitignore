@@ -41,3 +41,4 @@ vignettes/*.pdf
 RMT_temp/
 *.csv
 .DS_Store
+*.graphml

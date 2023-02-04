@@ -19,4 +19,8 @@ Get RMT threshold for a correlation matrix
 t(otutab) -> totu
 c_net_cal(totu) -> corr
 RMT_threshold(corr$r)
+#0.65
+}
+\references{
+1.  J. Zhou, Y. Deng, F. Luo, Z. He, Q. Tu, X. Zhi, Functional Molecular Ecological Networks (2010), doi:10.1128/mBio.00169-10.
 }

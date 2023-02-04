@@ -24,5 +24,5 @@ Plot a community (modularity)
 \examples{
 data("c_net")
 modu_dect(co_net) -> co_net_modu
-modu_plot(co_net_modu, n_modu = 50)
+modu_plot(co_net_modu, n_modu = 20)
 }

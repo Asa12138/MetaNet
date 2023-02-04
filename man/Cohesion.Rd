@@ -23,7 +23,8 @@ Cohesion calculate
 }
 \examples{
 Cohesion(otutab[1:50,])->a
-stackplot(abs(t(a$Cohesion)),metadata,groupID = "Group")
+pctax::stackplot(abs(t(a$Cohesion)),metadata,groupID = "Group")
+a$Cohesion\%>\%transmute(`neg:pos`=neg/pos)\%>\%pcutils::group_box(.,"Group",metadata)
 }
 \references{
 1. Herren, C. M. & McMahon, K. Cohesion: a method for quantifying the connectivity of microbial communities. (2017) doi:10.1038/ismej.2017.91.

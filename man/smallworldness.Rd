@@ -12,3 +12,6 @@ smallworldness(go)
 \description{
 Calculate small-world coefficient
 }
+\examples{
+smallworldness(co_net)
+}

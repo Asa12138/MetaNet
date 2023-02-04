@@ -23,5 +23,4 @@ Plot a co-network
 data("c_net")
 c_net_plot(co_net)
 c_net_plot(co_net2)
-c_net_plot(co_net3)
 }

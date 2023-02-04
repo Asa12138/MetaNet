@@ -42,9 +42,11 @@ Layout with group nicely
 }
 \examples{
 data("c_net")
-modu_dect(co_net) -> co_net_modu
-g_lay(co_net_modu,group ="module" ,zoom2 = 5,layout2 =nicely())->oridata
+modu_dect(co_net,method="cluster_fast_greedy") -> co_net_modu
+g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 5,layout2 =nicely())->oridata
+#g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 5,layout1=data.frame(X=c(1,1,1,1,2,2,2,2,3,3,3,3,3.5),Y=c(1,2,3,4,1,2,3,4,1,2,3,4,2)),layout2 =nicely())->oridata
 modu_plot(co_net_modu,coors = oridata)
+
 g_lay_nice(co_net_modu,group ="module")->oridata
 modu_plot(co_net_modu,coors = oridata)
 

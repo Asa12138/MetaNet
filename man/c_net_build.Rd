@@ -24,7 +24,9 @@ Construct a network for table corr
 \examples{
 data("otutab")
 t(otutab) -> totu
+metadata[,3:10] -> env
 c_net_cal(totu) -> corr
-c_net_build(corr) -> co_net
-
+c_net_build(corr,r_thres = 0.63) -> co_net
+c_net_cal(totu,env) -> corr2
+c_net_build(corr2) -> co_net2
 }

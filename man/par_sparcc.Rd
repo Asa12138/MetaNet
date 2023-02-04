@@ -4,7 +4,7 @@
 \alias{par_sparcc}
 \title{SparCC correlation for a otutab}
 \usage{
-par_sparcc(totu, filename = "sparcc", threads = 4)
+par_sparcc(totu, filename = "sparcc", threads = 4, bootstrap = 100)
 }
 \arguments{
 \item{totu}{an t(otutab)}
@@ -12,6 +12,8 @@ par_sparcc(totu, filename = "sparcc", threads = 4)
 \item{filename}{saved file name}
 
 \item{threads}{default: 4}
+
+\item{bootstrap}{default:100, recommend not less than 100}
 }
 \value{
 list contain a correlation matrix and a bootstrap p_value matrix

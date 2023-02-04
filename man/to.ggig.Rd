@@ -4,12 +4,12 @@
 \alias{to.ggig}
 \title{Transfer a igraph object to a ggig}
 \usage{
-to.ggig(go, net_pars = NULL, coors = NULL)
+to.ggig(go, net_par_res = NULL, coors = NULL)
 }
 \arguments{
 \item{go}{igraph}
 
-\item{net_pars}{net_par() result}
+\item{net_par_res}{net_par() result}
 
 \item{coors}{coordinates for nodes,columns: name, X, Y}
 }
@@ -22,6 +22,6 @@ Transfer a igraph object to a ggig
 \examples{
 coors=layout_with_fr(co_net, niter=999,grid="nogrid")
 coors<-data.frame(name = V(co_net)$name,X=coors[,1],Y=coors[,2])
-to.ggig(co_net,coors)->ggig
+to.ggig(co_net,coors=coors)->ggig
 plot(ggig)
 }

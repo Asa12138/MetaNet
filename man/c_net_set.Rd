@@ -25,13 +25,12 @@ Set basic attributes from totu table
 }
 \examples{
 data("otutab")
-t(otutab[1:100, ]) -> totu
-c_net_cal(totu) -> corr
-metadata[,12:19] -> env
+t(otutab) -> totu
+metadata[,3:10] -> env
 
 data("c_net")
-co_net <- c_net_set(co_net, t(otutab), taxonomy \%>\% select(Phylum))
+co_net <- c_net_set(co_net, totu, taxonomy \%>\% dplyr::select(Phylum))
 
-c_net_set(co_net2, totu, taxonomy \%>\% select(Phylum), env) -> co_net2
+c_net_set(co_net2, totu, taxonomy \%>\% dplyr::select(Phylum), env) -> co_net2
 
 }

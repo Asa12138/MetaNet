@@ -16,7 +16,13 @@ robustness_test(go, partial = 0.5, step = 10, reps = 9, threads = 4)
 \arguments{
 \item{go}{a igraph object}
 
-\item{partial}{how much percent vertexes be removed}
+\item{partial}{how much percent vertexes be removed in total}
+
+\item{step}{how many nodes be removed each time?}
+
+\item{reps}{simulation number}
+
+\item{threads}{threads}
 
 \item{robust_res}{robustness_test() result (robustness class)}
 
