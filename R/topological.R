@@ -201,6 +201,7 @@ fit_power<-function(go){
   SSre <- sum((dat$count-fit)^2)
   SStot <- sum((dat$count-mean(dat$count))^2)
   R2 <- round(1 - SSre/SStot, 3)
+
   #bootstrap t get pvalue
   p_num <- 1
   dat_rand <- dat

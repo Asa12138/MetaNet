@@ -4,7 +4,13 @@
 \alias{c_net_cal}
 \title{Calculate spearman correlation for one or two t(otutab)}
 \usage{
-c_net_cal(totu, totu2 = NULL, filename = "occor", threads = 4)
+c_net_cal(
+  totu,
+  totu2 = NULL,
+  filename = "occor",
+  threads = 4,
+  p.adjust.method = NULL
+)
 }
 \arguments{
 \item{totu}{t(otutab)}
@@ -15,7 +21,7 @@ c_net_cal(totu, totu2 = NULL, filename = "occor", threads = 4)
 
 \item{threads}{parallel mode threads}
 
-\item{parallel}{open parallel mode?(default:F)}
+\item{p.adjust.method}{}
 }
 \value{
 a list with 2 elements:
