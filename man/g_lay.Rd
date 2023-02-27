@@ -11,7 +11,9 @@ g_lay(
   zoom1 = 20,
   zoom2 = 3,
   layout1 = in_circle(),
-  layout2 = in_circle()
+  layout2 = in_circle(),
+  show_big_lay = T,
+  ...
 )
 
 g_lay_nice(go, group = "module")

@@ -4,13 +4,30 @@
 \alias{c_net_lay}
 \title{Layout coordinates}
 \usage{
-c_net_lay(go, niter = 500)
+c_net_lay(
+  go,
+  method = igraph::with_fr(niter = 999, grid = "nogrid"),
+  order_by = NULL,
+  order_ls = NULL
+)
 }
 \arguments{
 \item{go}{igraph}
 
-\item{niter}{iterations number}
+\item{method}{see \code{\link[igarph]{layout_ }}, and as_line(),as_arc()}
+
+\item{order_by}{order nodes according to a node attribute}
+
+\item{order_ls}{manual the discrete variable with a vector, or continuous variable with "desc" to decreasing}
 }
 \description{
 Layout coordinates
+}
+\examples{
+c_net_lay(co_net)->coors
+c_net_plot(co_net,coors)
+c_net_plot(co_net,c_net_lay(co_net,in_circle()),vertex.size=2)
+c_net_plot(co_net,c_net_lay(co_net,in_circle(),order_by="v_class"),vertex.size=2)
+c_net_plot(co_net,c_net_lay(co_net,in_circle(),order_by="size",order_ls="desc"))
+c_net_plot(co_net,c_net_lay(co_net,as_polyarc(3),order_by="size",order_ls="desc"))
 }

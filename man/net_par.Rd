@@ -2,9 +2,12 @@
 % Please edit documentation in R/topological.R
 \name{net_par}
 \alias{net_par}
-\title{Calculate all indexs of a network}
+\alias{get_net_par}
+\title{Calculate all indexes of a network}
 \usage{
 net_par(go, mode = c("v", "e", "n", "all"), fast = T)
+
+get_net_par(go)
 }
 \arguments{
 \item{go}{a igraph object}
@@ -20,8 +23,9 @@ a 3-elements list
 \item{e_index}{indexs of each edge}
 }
 \description{
-Calculate all indexs of a network
+Calculate all indexes of a network
 }
 \examples{
 make_graph("Walther") \%>\% net_par()
+get_net_par(co_net)->co_net_with_par
 }

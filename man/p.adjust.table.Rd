@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate.R
 \name{p.adjust.table}
 \alias{p.adjust.table}
-\title{p.adjust apply on a table (matrix or data.frame)}
+\title{p.adjust apply on a correlation table (matrix or data.frame)}
 \usage{
 p.adjust.table(pp, method = "BH")
 }
@@ -15,7 +15,7 @@ p.adjust.table(pp, method = "BH")
 matrix
 }
 \description{
-p.adjust apply on a table (matrix or data.frame)
+p.adjust apply on a correlation table (matrix or data.frame)
 }
 \examples{
 matrix(abs(rnorm(100,0.01)),10,10)->pp

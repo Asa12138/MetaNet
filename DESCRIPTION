@@ -1,33 +1,43 @@
 Package: MetaNet
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Network analysis for large omics data
 Version: 0.1.0
 Author: Peng Chen
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Maintainer: Peng Chen <pengchen2001@zju.edu.cn>
+Description: Comprehensive network analysis package
+    Calculate correlation network fastly, accelerate lots of analysis by parallel computing.
+    Support for multi-omics data, search sub-nets fluently.
+    Handle bigger data, more than 10,000 nodes in each omics.
+    Offer various layout method for multi-omics network and some interfaces to other software (Gephi, Cytoscape, ggplot), easy to visualize.
+    Provide comprehensive topology indexes calculation，including ecological network stability.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: 
     dplyr,
     ggplot2 (>= 3.2.0),
-    ggpubr,
-    ggrepel,
-    ggthemes,
     graphics,
     grDevices,
     igraph,
     magrittr,
     methods,
-    pcutils,
     pheatmap,
-    RColorBrewer,
     reshape2,
     scales,
     stats,
     tibble,
     utils,
     foreach,
-    doSNOW
+    doSNOW,
+    pcutils,
+    vegan,
+    ggrepel,
+    ggpubr
+Remotes: 
+    github::Asa12138/pcutils
+Suggests:
+    RColorBrewer
 RoxygenNote: 7.2.3
+Depends: 
+    R (>= 3.5.0)
+

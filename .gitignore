@@ -39,6 +39,14 @@ vignettes/*.pdf
 .Renviron
 
 RMT_temp/
+net_res/
 *.csv
 .DS_Store
 *.graphml
+*.pdf
+*.jpg
+*.svg
+*.png
+*.gif
+test/
+temp*

@@ -2,25 +2,78 @@
 % Please edit documentation in R/plot.R
 \name{c_net_plot}
 \alias{c_net_plot}
-\title{Plot a co-network}
+\title{Plot a network}
 \usage{
-c_net_plot(go, coors = NULL, ...)
+c_net_plot(
+  go,
+  coors = NULL,
+  ...,
+  labels_num = 5,
+  legend_number = F,
+  legend = T,
+  lty_legend = F,
+  lty_legend_title = "Edge class",
+  size_legend = F,
+  size_legend_title = "Node Size",
+  edge_legend = T,
+  edge_legend_title = "Edge type",
+  edge_legend_order = NULL,
+  width_legend = F,
+  width_legend_title = "Edge width",
+  col_legend = T,
+  col_legend_order = NULL,
+  group_legend_title = NULL,
+  group_legend_order = NULL
+)
 }
 \arguments{
 \item{go}{a igraph object}
 
 \item{coors}{the coordinates you saved}
 
-\item{...}{additional parameters for plot.igraph()}
+\item{...}{additional parameters for \code{\link[igraph]{igraph.plotting}}}
+
+\item{labels_num}{show how many labels,>1 indicates number, <1 indicates fraction ,default:10}
+
+\item{legend_number}{legend with numbers}
+
+\item{legend}{all legends}
+
+\item{lty_legend}{logical}
+
+\item{lty_legend_title}{lty_legend_title}
+
+\item{size_legend}{logical}
+
+\item{size_legend_title}{size_legend_title}
+
+\item{edge_legend}{logical}
+
+\item{edge_legend_title}{edge_legend_title}
+
+\item{edge_legend_order}{edge_legend_order vector, e.g. c("positive","negative")}
+
+\item{width_legend}{logical}
+
+\item{width_legend_title}{width_legend_title}
+
+\item{col_legend}{logical}
+
+\item{col_legend_order}{col_legend_order vector,}
+
+\item{group_legend_title}{group_legend_title, length must same to the numbers of v_group}
+
+\item{group_legend_order}{group_legend_order vector}
 }
 \value{
 a network plot
 }
 \description{
-Plot a co-network
+Plot a network
 }
 \examples{
 data("c_net")
 c_net_plot(co_net)
+c_net_plot(co_net_rmt)
 c_net_plot(co_net2)
 }

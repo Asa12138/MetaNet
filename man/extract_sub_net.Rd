@@ -2,7 +2,7 @@
 % Please edit documentation in R/topological.R
 \name{extract_sub_net}
 \alias{extract_sub_net}
-\title{Extract sub-nwtwork from the whole network}
+\title{Extract sub-network from the whole network}
 \usage{
 extract_sub_net(a_net, otutab, threads = 4, save_net = F)
 }
@@ -19,12 +19,9 @@ extract_sub_net(a_net, otutab, threads = 4, save_net = F)
 a dataframe contains all sub_net parameters
 }
 \description{
-Extract sub-nwtwork from the whole network
+Extract sub-network from the whole network
 }
 \examples{
 data(otutab)
-c_net_cal(t(otutab))->corr
-corr$p.value<-p.adjust.table(corr$p.value)
-c_net_build(corr)->a_net
-extract_sub_net(a_net,otutab,save_net = "testnet")
+extract_sub_net(co_net,otutab,save_net = "sub_net")->sub_net_pars
 }

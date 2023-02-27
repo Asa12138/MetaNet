@@ -4,14 +4,14 @@
 \alias{to.ggig}
 \title{Transfer a igraph object to a ggig}
 \usage{
-to.ggig(go, net_par_res = NULL, coors = NULL)
+to.ggig(go, coors = NULL)
 }
 \arguments{
 \item{go}{igraph}
 
-\item{net_par_res}{net_par() result}
-
 \item{coors}{coordinates for nodes,columns: name, X, Y}
+
+\item{net_par_res}{net_par() result}
 }
 \value{
 ggig object
@@ -20,8 +20,9 @@ ggig object
 Transfer a igraph object to a ggig
 }
 \examples{
-coors=layout_with_fr(co_net, niter=999,grid="nogrid")
-coors<-data.frame(name = V(co_net)$name,X=coors[,1],Y=coors[,2])
+coors=c_net_lay(co_net)
 to.ggig(co_net,coors=coors)->ggig
+plot(ggig)
+to.ggig(multi1,coors=c_net_lay(multi1))->ggig
 plot(ggig)
 }

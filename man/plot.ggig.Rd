@@ -4,7 +4,27 @@
 \alias{plot.ggig}
 \title{Plot a ggig}
 \usage{
-\method{plot}{ggig}(ggig)
+\method{plot}{ggig}(
+  ggig,
+  coors = NULL,
+  ...,
+  labels_num = 0,
+  legend_number = F,
+  legend = T,
+  lty_legend = F,
+  lty_legend_title = "Edge class",
+  size_legend = F,
+  size_legend_title = "Node Size",
+  edge_legend = T,
+  edge_legend_title = "Edge type",
+  edge_legend_order = NULL,
+  width_legend = F,
+  width_legend_title = "Edge width",
+  col_legend = T,
+  col_legend_order = NULL,
+  class_legend_title = "Phylum",
+  group_legend_order = NULL
+)
 }
 \arguments{
 \item{ggig}{ggig object}

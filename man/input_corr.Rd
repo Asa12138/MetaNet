@@ -11,8 +11,9 @@ input_corr(filename)
 }
 \value{
 a list with 7 elements:
-\item{r}{spearman correlation}
-\item{p.value}{p.adjust.method = 'BH'}
+\item{r}{default: spearman correlation}
+\item{p.value}{}
+\item{p.adjust}{default p.adjust.method = NULL}
 }
 \description{
 Import corr from .csv file

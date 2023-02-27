@@ -9,7 +9,7 @@ anno_vertex(go, anno_tab)
 \arguments{
 \item{go}{a igraph object}
 
-\item{anno_tab}{a dataframe using to annotate(with rowname or a name column)}
+\item{anno_tab}{a dataframe using to annotate (with rowname or a name column)}
 }
 \value{
 a annotated igraph object
@@ -20,5 +20,5 @@ Use dataframe to annotate vertexes of a igraph
 \examples{
 data("c_net")
 data("otutab")
-anno_vertex(co_net, taxonomy)
+anno_vertex(co_net, taxonomy)->a
 }

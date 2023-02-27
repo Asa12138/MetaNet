@@ -4,7 +4,7 @@
 \alias{zp_analyse}
 \title{Zi-Pi calculate}
 \usage{
-zp_analyse(go, mode = 1)
+zp_analyse(go, mode = 2)
 }
 \arguments{
 \item{go}{igraph object after modu_dect()}
@@ -20,8 +20,9 @@ Zi-Pi calculate
 \examples{
 data("c_net")
 modu_dect(co_net) -> co_net_modu
-zp_analyse(co_net_modu,mode = 2)->co_net_modu
+zp_analyse(co_net_modu)->co_net_modu
 zp_plot(co_net_modu)
+zp_plot(co_net_modu,mode=3)
 }
 \references{
 1. Guimerà, R. & Amaral, L. Functional cartography of complex metabolic networks. (2005) doi:10.1038/nature03288.

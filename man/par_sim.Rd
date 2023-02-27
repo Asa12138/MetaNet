@@ -2,23 +2,26 @@
 % Please edit documentation in R/calculate.R
 \name{par_sim}
 \alias{par_sim}
-\title{Calulate distance for otutab}
+\title{Calculate distance for otutab}
 \usage{
-par_sim(totu, method = "bray")
+par_sim(totu, method = "bray", norm = T)
 }
 \arguments{
+\item{totu}{an t(otutab)}
+
 \item{method}{Dissimilarity index, partial match to "bray", "euclidean"...}
 
-\item{otutab}{an otutab data.frame, samples are columns, taxs are rows.}
-
-\item{spe_nwk}{a phylo tree}
+\item{norm}{hellinger normalization in tax (default:T)}
 }
 \value{
 dist
 }
 \description{
-Calulate distance for otutab
+Calculate distance for otutab
+}
+\examples{
+par_sim(totu)->sim_corr
 }
 \seealso{
-\code{\link[vegan]{vegdist};\link[picante]{unifrac}}
+\code{\link[vegan]{vegdist}}
 }

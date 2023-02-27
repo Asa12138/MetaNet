@@ -5,7 +5,7 @@
 \alias{plot.robustness}
 \title{Robustness_test for a network}
 \usage{
-robustness_test(go, partial = 0.5, step = 10, reps = 9, threads = 4)
+robustness_test(go, partial = 0.5, step = 10, reps = 9, threads = 3)
 
 \method{plot}{robustness}(
   robust_res,

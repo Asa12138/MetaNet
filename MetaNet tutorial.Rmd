@@ -1,0 +1,261 @@
+---
+title: "MetaNet tutorial"
+author: "pengchen"
+date: "2023-02-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+knitr::opts_knit$set(root.dir = "test")
+
+library(MetaNet)
+library(pcutils)
+```
+
+## R Markdown
+
+```{r data}
+#prepare your otutab
+data(otu_table_16S,package = "microeco")
+dim(otu_table_16S)
+
+#filter
+pctax::guolv(otu_table_16S,sum=20,exist=9)->otu_table_16S
+t(otu_table_16S)%>%as.data.frame()->totu
+#test different network construction package
+
+system.time(c_net_cal(totu)->net_1)#61.444s
+system.time(c_net_cal(totu,threads = 4)->net_1)#184.969s
+
+system.time(t1 <- trans_network$new(dataset = microtable$new(otu_table = otu_table_16S), 
+                        cor_method = "spearman",nThreads = 4,use_WGCNA_pearson_spearman = T))#>10min
+
+
+#7694 otus are too much for these packages, use less to test, 1072 otus
+pctax::guolv(otu_table_16S,sum=300,exist=20)->otu_table_16S
+t(otu_table_16S)%>%as.data.frame()->totu
+
+system.time({c_net_cal(totu)->corr;c_net_build(corr,r_thres = 0.7)->net_1})#1.172s
+#WGCNA
+system.time(net_2 <- trans_network$new(dataset = microtable$new(otu_table = otu_table_16S), 
+                        cor_method = "spearman",nThreads = 1,use_WGCNA_pearson_spearman = T))#17.84s
+#microeco,cor.test
+system.time(net_3 <- trans_network$new(dataset = microtable$new(otu_table = otu_table_16S), 
+                        cor_method = "spearman",nThreads = 1))#>8min
+#ggClusterNet, psych::corr.test
+phyloseq::phyloseq(OTU = phyloseq::otu_table(otu_table_16S, taxa_are_rows = TRUE))->ps
+system.time(ggClusterNet::corMicro(ps = ps,method = "spearman")->net_4)#>10min
+#NetCoMi
+system.time(net_5 <- trans_network$new(dataset = microtable$new(otu_table = otu_table_16S), 
+                        cor_method = "spearman",nThreads = 1,use_NetCoMi_pearson_spearman = T))#>5min
+
+library(ggplot2)
+test_res=tibble::tribble(
+        ~package,  ~`1`,  ~`2`,  ~`3`,  ~`4`,
+       "MetaNet", 1.172,  1.12, 1.087, 1.142,
+         "WGCNA", 17.84, 17.93, 18.03, 17.43,
+      "microeco",  4832,  4735,  4822,  4975,
+  "ggClusterNet",  6753,  6828,  6712,  6676,
+       "NetCoMi",  3312,  3189,  3167,  3210
+  )
+test_res=reshape2::melt(test_res,"package",variable.name = "test",value.name = "time")
+test_res$package=factor(test_res$package,levels = unique(test_res$package))
+ggplot(test_res,aes(package,`time`))+geom_boxplot()+
+  scale_y_log10()+labs(title = "spearman based network of 1072 otus")+
+  ggpubr::theme_pubr()
+
+library(ggpubr)
+ggbarplot(test_res,x = "package",y = "time",add = c("mean_se"),fill = "package")+
+  scale_fill_d3()+scale_y_log10()+
+  labs(title = "spearman based network of 1072 otus",y="time/s")
+
+```
+
+RMT,r阈值优化
+```{r}
+data("otutab")
+data("c_net")
+t(otutab) -> totu
+c_net_cal(totu) -> corr
+p.adjust.table(corr$p.value,method = "none")->corr$p.value
+
+c_net_build(corr,r_thres = 0.5)->net_1
+c_net_set(net_1,totu,taxonomy%>%select("Phylum"))->net_1
+c_net_lay(net_1,niter = 1999)->coors
+
+pdf("r_thres.pdf",width = 9)
+c_net_plot(net_1,coors,main="r_thres=0.5")
+
+net_ls=list()
+for (i in c(0.55,0.6,0.65,0.7,0.75,0.8)) {
+  c_net_build(corr,r_thres = i)->net_tmp
+  c_net_set(net_tmp,totu,taxonomy%>%select("Phylum"))->net_ls[[as.character(i)]]
+  c_net_plot(net_ls[[as.character(i)]],coors,main=paste0("r_thres=",i))
+}
+dev.off()
+
+#rmt decide r_threshold
+rmt(corr$r)#0.69
+corr$r->de_r
+de_r[abs(de_r)<0.69]=0
+RMThreshold::rm.matrix.validation(de_r)
+
+```
+
+```{r topology}
+fit_power(co_net_rmt)
+smallworldness(co_net_rmt)
+
+rand_net(co_net_rmt)
+rand_net_par(co_net_rmt,reps = 10)->randp
+
+net_par(co_net_rmt,fast = F)->pars
+
+compare_rand(pars,randp)
+
+links_stat(co_net_rmt)
+
+extract_sub_net(co_net,otutab,save_net = "sub_net")->sub_net_pars
+pheatmap::pheatmap(t(sub_net_pars),cluster_cols = F,scale = "row")
+
+```
+
+```{r}
+modu_dect(co_net) -> co_net_modu
+zp_analyse(co_net_modu)->co_net_modu
+zp_plot(co_net_modu)
+
+zp_plot(co_net_modu,label = F,mode = 3)
+
+
+```
+
+
+```{r}
+c_net_lay(co_net,niter = 1999)->coors
+
+pdf("net1.pdf",9,6)
+c_net_plot(co_net,coors)
+dev.off()
+
+to.ggig(co_net,coors = coors)->ggig
+plot(ggig)
+ggsave("net1_ggplot.pdf",width = 9,height = 8)
+
+output_gephi(co_net,"net1")
+
+g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 5,layout2 =nicely())->oridata
+modu_plot(co_net_modu,coors = oridata)
+g_lay_nice(co_net_modu,group ="module")->oridata
+c_net_plot(co_net_modu,coors = oridata)
+modu_plot(co_net_modu,coors = oridata)
+
+links_stat(co_net_modu)
+links_stat(co_net_modu,"module")
+```
+
+```{r stability}
+#分开构建网络
+net_g=lapply(levels(metadata$Group), \(i){
+  otutab[,rownames(filter(metadata,Group==!!i))]%>%t()->t_tmp
+  t_tmp[,colSums(t_tmp)>0]->t_tmp
+  c_net_cal(t_tmp)->c_tmp
+  p.adjust.table(c_tmp$p.value)->c_tmp$p.value
+  c_net_build(c_tmp,r_thres = 0.6,p_thres = 0.05,del_single = T)->n_tmp
+  c_net_set(n_tmp,t_tmp,taxonomy%>%select("Phylum"))
+})
+names(net_g)=levels(metadata$Group)
+c_net_plot(net_g$NS,main="NS")
+c_net_plot(net_g$WS,main="WS")
+c_net_plot(net_g$CS,main="CS")
+
+
+robust_res=lapply(levels(metadata$Group), \(i){
+  robustness_test(net_g[[i]],step=2)->tmp
+  data.frame(tmp,group=i)
+})
+names(robust_res)=levels(metadata$Group)
+do.call(rbind,robust_res)->robust_res
+
+  robust_res %>%
+    dplyr::select(i,group, c("ave_degree","nat_connectivity")) %>%
+    reshape2::melt(id.var = c("i","group")) -> pdat
+
+  pdat%>%group_by(i,variable,group)%>%summarise(mean=mean(value),sd=sd(value),se=sd/sqrt(length(value)))->sdd
+sdd$group=factor(sdd$group,levels = levels(metadata$Group))
+    p<-ggplot(sdd,aes(x=i, y=mean,col=group))+
+      geom_point(size=0.2,alpha=0.4)+
+      geom_smooth(se = F,method = "loess",formula = 'y ~ x')+
+      ggpmisc::stat_poly_eq(
+        aes(label = paste(after_stat(eq.label), after_stat(adj.rr.label), sep = '~~~~~')),
+        formula = y ~ x,  parse = TRUE,label.x = "right",
+        size = 3,
+      )+
+      facet_wrap(. ~ variable, scales = "free")
+
+  p+labs(x="Removed_nodes",y=NULL)+theme_classic()
+
+
+robustness_test(co_net,step=4)->robust_res
+plot(robust_res,index=c("ave_degree","nat_connectivity"),mode=1)
+plot(robust_res,index=c("ave_degree","nat_connectivity"),mode=2)
+
+
+Cohesion(otutab)->a
+pctax::stackplot(abs(t(a$Cohesion)),metadata,groupID = "Group")
+a$Cohesion%>%transmute(`neg:pos`=neg/pos)%>%pcutils::group_box(.,"Group",metadata)+ylab("neg:pos cohesion")
+
+vulnerability_res=lapply(levels(metadata$Group), \(i){
+  vulnerability(net_g[[i]],threads = 4)
+})
+
+data.frame(group=factor(levels(metadata$Group),levels = levels(metadata$Group)),vulnerability=sapply(vulnerability_res,max))%>%
+  ggplot(.,aes(group,vulnerability))+geom_col(aes(fill=group))
+
+vuln_res=lapply(levels(metadata$Group), \(i){
+  robustness(net_g[[i]],threads = 4)->tmp
+  data.frame(tmp,group=i)
+})
+
+vuln_res=do.call(rbind,vuln_res)
+vuln_res$group=factor(vuln_res$group,levels = levels(metadata$Group))
+vuln_res%>%ggplot(.,aes(group,num_nodes,col=group))+geom_boxplot()
+```
+
+```{r}
+qpcr2.12<-tibble::tribble(
+  ~group,   ~Cq,
+   "PC1",  36.8,
+   "PC1", 34.58,
+   "PC1", 38.07,
+   "PC2", 36.17,
+   "PC2", 36.54,
+   "PC2", 36.13,
+   "PC3", 36.65,
+   "PC3", 35.63,
+   "PC3", 36.96,
+   "PC4", 35.85,
+   "PC4", 35.12,
+   "PC4", 35.38,
+   "PC4", 35.93,
+   "PC5",  26.3,
+   "PC5", 26.27,
+   "PC5", 26.38,
+   "PC6", 26.75,
+   "PC6", 27.18,
+   "PC6", 26.94,
+   "PC7", 31.98,
+   "PC7", 29.64,
+   "PC7", 28.99,
+   "PC8", 30.98,
+   "PC8", 29.83,
+   "PC8", 30.32
+  )
+
+library(reshape2)
+library(dplyr)
+group_box(qpcr2.12[,"Cq",drop=F],group = qpcr2.12$group)
+group_by(qpcr2.12,group)%>%summarise(mean(Cq))%>%select(2)%>%View
+```
+

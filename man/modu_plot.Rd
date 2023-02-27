@@ -25,4 +25,7 @@ Plot a community (modularity)
 data("c_net")
 modu_dect(co_net) -> co_net_modu
 modu_plot(co_net_modu, n_modu = 20)
+g_lay_nice(co_net_modu,group ="module")->oridata
+modu_plot(co_net_modu,coors = oridata, n_modu = 20)
+plot(co_net_modu,coors=g_lay_nice(co_net_modu))
 }

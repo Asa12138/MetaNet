@@ -2,25 +2,48 @@
 % Please edit documentation in R/build.R
 \name{RMT_threshold}
 \alias{RMT_threshold}
+\alias{rmt}
 \title{Get RMT threshold for a correlation matrix}
 \usage{
-RMT_threshold(occor.r)
+RMT_threshold(
+  occor.r,
+  min_threshold = 0.5,
+  max_threshold = 0.9,
+  step = 0.02,
+  gif = F
+)
+
+rmt(occor.r, min_threshold = 0.5, max_threshold = 0.85, step = 0.01)
 }
 \arguments{
 \item{occor.r}{a correlation matrix}
+
+\item{min_threshold}{min_threshold}
+
+\item{max_threshold}{max_threshold}
+
+\item{step}{step}
+
+\item{gif}{render .gif file?}
 }
 \value{
 a r-threshold
 }
 \description{
 Get RMT threshold for a correlation matrix
+
+Get RMT threshold for a correlation matrix roughly
 }
 \examples{
 t(otutab) -> totu
 c_net_cal(totu) -> corr
-RMT_threshold(corr$r)
-#0.65
+rmt(corr$r)
+#0.69
+c_net_build(corr,r_thres=0.69) -> co_net_rmt
+RMT_threshold(corr$r,gif=T)->rmt_res
 }
 \references{
 1.  J. Zhou, Y. Deng, F. Luo, Z. He, Q. Tu, X. Zhi, Functional Molecular Ecological Networks (2010), doi:10.1128/mBio.00169-10.
+
+2. \link{https://matstat.org/content_en/RMT/RMThreshold_Intro.pdf}
 }

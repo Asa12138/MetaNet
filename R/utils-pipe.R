@@ -26,9 +26,26 @@ NULL
 #' @param rhs A function call using the magrittr semantics.
 NULL
 
-#' Library packages
-#' @name lib_ps
-#' @export
-#' @importFrom  pcutils lib_ps
-#' @keywords internal
+
+#' @import ggplot2
+#' @import igraph
+#' @importFrom igraph V
+#' @importFrom igraph E
+#' @importFrom pcutils lib_ps
+#' @importFrom pcutils get_cols
+#' @importFrom pcutils mmscale
+#' @importFrom vegan decostand
+#' @importFrom dplyr filter
+#' @importFrom dplyr select
+#' @importFrom dplyr left_join
+#' @importFrom dplyr arrange
+#' @importFrom dplyr count
+#' @importFrom dplyr group_by
+#' @importFrom dplyr summarise
+#' @importFrom dplyr rename
+#' @importFrom dplyr distinct
+#' @importFrom tibble rownames_to_column
+#' @importFrom tibble column_to_rownames
+#' @importFrom reshape2 acast
+#' @importFrom reshape2 melt
 NULL

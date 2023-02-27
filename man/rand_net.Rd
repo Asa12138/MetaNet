@@ -16,7 +16,6 @@ ggplot
 Degree distribution comparison with random network
 }
 \examples{
-
-rand_net(co_net)
+rand_net(co_net_rmt)
 rand_net_par(co_net)->a
 }

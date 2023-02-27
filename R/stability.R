@@ -15,10 +15,10 @@
 #' robustness_test(co_net,step=4)->robust_res
 #' class(robust_res)
 #' plot(robust_res,index="ave_degree",mode=2)
-robustness_test <- function(go, partial = 0.5,step=10,reps=9,threads=4) {
+robustness_test <- function(go, partial = 0.5,step=10,reps=9,threads=3) {
   lib_ps("igraph")
   cal_del<-\(go,partial,step,rep){
-    nodes <- length(V(go))
+    nodes <- length(igraph::V(go))
     floor(nodes * partial) -> del_i
     del_i_indexs <- data.frame()
     sequ=seq(0,del_i,step)
@@ -28,10 +28,10 @@ robustness_test <- function(go, partial = 0.5,step=10,reps=9,threads=4) {
       # remove i nodes in the network
       remove_node <- sample(1:nodes, i)
       dp <- igraph::delete.vertices(go, remove_node)
-      dp=delete.vertices(dp,V(dp)[degree(dp)==0])
+      dp=igraph::delete.vertices(dp,igraph::V(dp)[igraph::degree(dp)==0])
 
       # calculate network parameters
-      tmp_ind=(pctax::net_par(dp,mode = "n")$n_index)
+      tmp_ind=(MetaNet::net_par(dp,mode = "n")$n_index)
       del_i_indexs <- rbind(
         del_i_indexs,
         data.frame(tmp_ind, i = i)
@@ -40,26 +40,30 @@ robustness_test <- function(go, partial = 0.5,step=10,reps=9,threads=4) {
     return(data.frame(del_i_indexs,"rep"=rep))
   }
 
-  if(threads==1){
-    lapply(1:reps, \(i)cal_del(go,partial,step,i))->a
-    do.call(rbind,a)->del_i_indexs
+  #parallel
+  #main function
+  loop=function(i){
+    cal_del(go,partial,step,i)
   }
-  else if(threads>1){
-    #parallel
-    lib_ps("foreach","doSNOW")
-    pb <- txtProgressBar(max =reps, style = 3)
-    progress <- function(n) setTxtProgressBar(pb, n)
-    opts <- list(progress = progress)
+  {
+    if(threads>1){
+      lib_ps("foreach","doSNOW")
+      pb <- utils::txtProgressBar(max =reps, style = 3)
+      opts <- list(progress = function(n) utils::setTxtProgressBar(pb, n))
+      cl <- snow::makeCluster(threads)
+      doSNOW::registerDoSNOW(cl)
+      res <- foreach::foreach(i = 1:reps,.options.snow = opts) %dopar% {
+                                loop(i)
+                              }
+      snow::stopCluster(cl)
+      gc()
+    }
+    else {
+      res <-lapply(1:reps, loop)
+    }}
+  #simplify method
+  del_i_indexs=do.call(rbind,res)
 
-    cl <- makeCluster(threads)
-    registerDoSNOW(cl)
-    del_i_indexs<- foreach (i = 1:reps,.combine = "rbind",
-                            .options.snow = opts,
-                            .packages = c("igraph")) %dopar%{
-                              cal_del(go,partial,step,i)
-                            }
-    stopCluster(cl)
-  }
   class(del_i_indexs)<-c("robustness",class(del_i_indexs))
   return(del_i_indexs)
 }
@@ -84,15 +88,16 @@ plot.robustness<-function(robust_res, indexs = c("nat_connectivity", "ave_path_l
     reshape2::melt(id.var = "i") -> pdat
 
   pdat%>%group_by(i,variable)%>%summarise(mean=mean(value),sd=sd(value),se=sd/sqrt(length(value)))->sdd
+
   if(mode==1){
-    p <- ggplot(sdd, aes(x=i, y=mean,col=indexs)) +
+    p <- ggplot(sdd, aes(x=i, y=mean,col=variable)) +
       geom_line()+
       geom_errorbar(data = sdd,aes(ymax=mean+se,ymin=mean-se))+
       #geom_smooth(se = FALSE,method = "loess",formula = 'y ~ x') +
       facet_wrap(. ~ variable, scales = "free")
   }
   if(mode==2){
-    p<-ggplot(sdd,aes(x=i, y=mean,col=indexs))+
+    p<-ggplot(sdd,aes(x=i, y=mean,col=variable))+
       geom_point(size=0.2,alpha=0.4)+
       geom_smooth(se = F,method = "loess",formula = 'y ~ x')+
       ggpmisc::stat_poly_eq(
@@ -102,7 +107,7 @@ plot.robustness<-function(robust_res, indexs = c("nat_connectivity", "ave_path_l
       )+
       facet_wrap(. ~ variable, scales = "free")
   }
-
+  p=p+labs(x="Removed_nodes",y=NULL)+theme(legend.position = "none")
   return(p)
 }
 
@@ -188,14 +193,12 @@ Cohesion<-function(otutab,reps= 200,threads=4,mycor=NULL){
   cohesion.pos <- rel.d %*% connectedness.pos
   cohesion.neg <- rel.d %*% connectedness.neg
 
-  ####
   #### Combine vectors into one list and print
   output <- list(data.frame(neg=connectedness.neg, pos=connectedness.pos),
                  data.frame(neg=cohesion.neg, pos=cohesion.pos))
   names(output) <- c("Connectedness", "Cohesion")
   return(output)
 }
-
 
 #' Vulnerability
 #'
@@ -209,8 +212,9 @@ Cohesion<-function(otutab,reps= 200,threads=4,mycor=NULL){
 #' E is the global efficiency and Ei is the global efficiency after the removal of the node i and its entire links.
 vulnerability<-function(go,threads=4){
   if(is.null(V(go)$name))V(go)$name=V(go)
+
   if(threads==1){
-    lapply(V(go)$name,\(i)global_efficiency(delete_vertices(go,i)))->tmpls
+    lapply(V(go)$name,\(i)igraph::global_efficiency(igraph::delete_vertices(go,i)))->tmpls
     do.call(c,tmpls)->tmpv
   }
   else{
@@ -226,11 +230,12 @@ vulnerability<-function(go,threads=4){
     tmpv <- foreach(i = V(go)$name,.combine = "c",
                     .options.snow = opts,
                     .packages = c("igraph"))%dopar%{
-                      global_efficiency(delete_vertices(go,i))
+                      igraph::global_efficiency(igraph::delete_vertices(go,i))
                     }
     stopCluster(cl)
+    gc()
   }
-  (global_efficiency(go)-tmpv)/global_efficiency(go)
+  (igraph::global_efficiency(go)-tmpv)/igraph::global_efficiency(go)
 }
 
 #' Robustness after remove 50\% nodes or some hubs
@@ -251,7 +256,8 @@ robustness<-function(go,keystone=F,reps=9,threads=4){
   nodes <- length(V(go))
   floor(nodes * 0.5) -> del_i
   if(keystone){
-    as.data.frame(vertex.attributes(co_net_modu))->tmp_v
+    get_v(go)->tmp_v
+    if(!"module"%in%colnames(tmp_v))stop("no modules, please modu_dect() first")
     tmp_v%>%filter(roles=="Module hubs")%>%pull(name)->hubs
     floor(length(hubs)* 0.7) -> del_i
   }
@@ -282,10 +288,9 @@ robustness<-function(go,keystone=F,reps=9,threads=4){
                               dp=delete.vertices(dp,dead_s)
                             }
 
-                            tmp_ind=(pctax::net_par(dp,mode = "n")$n_index)
+                            tmp_ind=(MetaNet::net_par(dp,mode = "n")$n_index)
                             data.frame(tmp_ind, reps = i)
                           }
   stopCluster(cl)
   return(del_i_indexs)
 }
-

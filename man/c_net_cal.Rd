@@ -7,8 +7,8 @@
 c_net_cal(
   totu,
   totu2 = NULL,
+  method = "spearman",
   filename = "occor",
-  threads = 4,
   p.adjust.method = NULL
 )
 }
@@ -17,16 +17,17 @@ c_net_cal(
 
 \item{totu2}{t(otutab) or NULL}
 
+\item{method}{spearman, pearson}
+
 \item{filename}{the prefix of saved files}
 
-\item{threads}{parallel mode threads}
-
-\item{p.adjust.method}{}
+\item{p.adjust.method}{see \code{\link[stats]{p.adjust}}}
 }
 \value{
 a list with 2 elements:
-\item{r}{spearman correlation}
-\item{p.value}{p.adjust.method = 'NULL}
+\item{r}{default: spearman correlation}
+\item{p.value}{}
+\item{p.adjust}{default p.adjust.method = NULL}
 }
 \description{
 Calculate spearman correlation for one or two t(otutab)

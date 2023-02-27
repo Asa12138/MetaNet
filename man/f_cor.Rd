@@ -7,13 +7,7 @@
 \usage{
 f_cor(totu, totu2 = NULL, method = c("pearson", "spearman"))
 
-par_cor(
-  totu,
-  totu2 = NULL,
-  threads = 2,
-  method = c("spearman", "pearson")[1],
-  p.value = T
-)
+par_cor(totu, totu2 = NULL, threads = 2, method = c("spearman", "pearson"))
 }
 \arguments{
 \item{totu}{t(otutab)}
@@ -24,13 +18,13 @@ par_cor(
 }
 \value{
 a list with 2 elements:
-\item{r}{spearman correlation}
-\item{p.value}
+\item{r}{}
+\item{p.value}{}
 }
 \description{
 Fast correlation
 
-Parallel calculate spearman correlation for one t(otutab)
+Parallel calculate correlation
 }
 \examples{
 data("otutab")
