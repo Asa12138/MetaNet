@@ -13,9 +13,9 @@
 #' @examples
 #' g1=modu_net()
 #' get_n(g1)
-#' plot(g1)
-#' plot(g1,coors=g_lay(g1,zoom2 = 20))
-#' plot(g1,coors=g_lay_polyarc(g1,group = "module"))
+#' plot(g1,plot_module=T)
+#' plot(g1,plot_module=T,coors=g_lay(g1,zoom2 = 20))
+#' plot(g1,plot_module=T,coors=g_lay_polyarc(g1,group = "module"))
 #' plot(g1,coors=g_lay_polygon(g1,group = "module"))
 modu_net<-function(n_modu=3,n_node_in_modu=30,
                    intra_modu_density=0.3,
@@ -48,13 +48,14 @@ modu_net<-function(n_modu=3,n_node_in_modu=30,
 #'
 #' @param go a igraph object
 #' @param method cluster_method:("cluster_walktrap","cluster_edge_betweenness","cluster_fast_greedy","cluster_spinglass")
+#' @param n_modu transfer the modules less than n_modu to "others"
 #' @return a igraph object
 #' @export
 #'
 #' @examples
 #' data("c_net")
 #' modu_dect(co_net) -> co_net_modu
-modu_dect <- function(go, method = "cluster_fast_greedy") {
+modu_dect <- function(go, method = "cluster_fast_greedy",n_modu=0) {
   lib_ps("igraph")
   stopifnot(is_igraph(go))
   ms <- c("cluster_walktrap", "cluster_edge_betweenness", "cluster_fast_greedy", "cluster_spinglass")
@@ -67,20 +68,45 @@ modu_dect <- function(go, method = "cluster_fast_greedy") {
           "cluster_fast_greedy" = {wc <- igraph::cluster_fast_greedy(go,weights =NULL)},
           "cluster_spinglass" = {wc <- igraph::cluster_spinglass(go,weights =NULL)})
 
-  V(go)$module <- membership(wc)
+  V(go)$module <- membership(wc)%>%as.character()
+  V(go)$origin_module=V(go)$module
+  go=filter_n_modu(go,n_modu =n_modu)
   go=c_net_update(go)
-  graph.attributes(go)$n_type="module"
-  graph.attributes(go)$n_modu=length(unique(V(go)$module))
 
   graph_attr(go)$modularity<- modularity(wc)
   rand.g <- erdos.renyi.game(length(V(go)), length(E(go)),type = "gnm")
   rand_m=modularity(cluster_fast_greedy(rand.g))
   relative_modularity=(modularity(wc)-rand_m)/rand_m #relative modularity
   graph_attr(go)$relative_modularity=relative_modularity
-  go=anno_edge(go,get_v(go)[,c("name","module")])
-  E(go)$e_type=get_e(go)%>%select("module_from","module_to")%>%apply(.,1,\(i)ifelse(i[1]==i[2],"intra","inter"))
-  go=c_net_set(go,vertex_class = "module")
 
+  return(go)
+}
+
+as_group <- \(x){
+  x <- list(membership = x)
+  vids <- names(x$membership)
+  modus <- tapply(vids, x$membership, simplify = FALSE, function(x) x)
+  return(modus)
+}
+
+#' Filter some modules as others
+#'
+#' @param go module igraph
+#' @param n_modu transfer the modules less than n_modu to "others"
+#' @param keep_id keep modules ids, will not be "others"
+#'
+#' @export
+#'
+filter_n_modu<-function(go,n_modu=0,keep_id=NULL){
+  members=V(go)$origin_module
+  table(members)%>%sort(decreasing = T)->s_members
+
+  #filter modules whose nodes bigger than n_modu
+  keep_id1=names(s_members[s_members>n_modu])
+  keep_id=union(as.character(keep_id),as.character(keep_id1))
+  new_module=ifelse(members%in%keep_id,members,"others")
+
+  V(go)$module=new_module
   return(go)
 }
 

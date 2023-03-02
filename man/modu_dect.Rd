@@ -4,12 +4,14 @@
 \alias{modu_dect}
 \title{Detect the modules}
 \usage{
-modu_dect(go, method = "cluster_fast_greedy")
+modu_dect(go, method = "cluster_fast_greedy", n_modu = 0)
 }
 \arguments{
 \item{go}{a igraph object}
 
 \item{method}{cluster_method:("cluster_walktrap","cluster_edge_betweenness","cluster_fast_greedy","cluster_spinglass")}
+
+\item{n_modu}{transfer the modules less than n_modu to "others"}
 }
 \value{
 a igraph object

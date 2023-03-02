@@ -6,6 +6,7 @@
 #' @param order_by order nodes according to a node attribute
 #' @param order_ls manual the discrete variable with a vector, or continuous variable with "desc" to decreasing
 #'
+#' @return coordinates for nodes,columns: name, X, Y
 #' @export
 #' @examples
 #' c_net_lay(co_net)->coors
@@ -14,8 +15,8 @@
 #' c_net_plot(co_net,c_net_lay(co_net,in_circle(),order_by="v_class"),vertex.size=2)
 #' c_net_plot(co_net,c_net_lay(co_net,in_circle(),order_by="size",order_ls="desc"))
 #' c_net_plot(co_net,c_net_lay(co_net,as_polyarc(3),order_by="size",order_ls="desc"))
-c_net_lay<-function(go,method=igraph::with_fr(niter=999,grid ="nogrid"),order_by=NULL,order_ls=NULL){
-  set.seed(123)
+c_net_lay<-function(go,method=igraph::with_fr(niter=999,grid ="nogrid"),order_by=NULL,order_ls=NULL,seed=1234){
+  set.seed(seed)
   if(class(method)=="igraph_layout_spec")coors<-igraph::layout_(go,method)
   else if (class(method)=="function") coors=method(go)
   else stop("No valid method")
@@ -362,7 +363,7 @@ plot.metanet=function(go,...){
 #' @param go a igraph object
 #' @param coors the coordinates you saved
 #' @param ... additional parameters for \code{\link[igraph]{igraph.plotting}}
-#' @param labels_num show how many labels,>1 indicates number, <1 indicates fraction ,default:10
+#' @param labels_num show how many labels,>1 indicates number, <1 indicates fraction ,default:5
 #' @param legend_number legend with numbers
 #' @param legend all legends
 #' @param lty_legend logical
@@ -387,6 +388,7 @@ plot.metanet=function(go,...){
 #' c_net_plot(co_net)
 #' c_net_plot(co_net_rmt)
 #' c_net_plot(co_net2)
+#' c_net_plot(multi1)
 c_net_plot <- function(go, coors = NULL,...,labels_num=5,
                        legend_number=F,legend=T,
                        lty_legend=F,lty_legend_title="Edge class",
@@ -394,9 +396,20 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
                        edge_legend=T,edge_legend_title="Edge type",edge_legend_order=NULL,
                        width_legend=F,width_legend_title="Edge width",
                        col_legend=T,col_legend_order=NULL,
-                       group_legend_title=NULL,group_legend_order=NULL){
+                       group_legend_title=NULL,group_legend_order=NULL,
+                       plot_module=F,mark.groups=T,module_color=NULL){
   lib_ps("igraph")
   set.seed(1234)
+  #modules
+  if(plot_module){
+    if(!"module"%in%vertex_attr_names(go))stop("no modules, please modu_dect() first")
+    go=anno_edge(go,get_v(go)[,c("name","module")])
+    E(go)$e_type=get_e(go)%>%select("module_from","module_to")%>%
+      apply(.,1,\(i)ifelse(i[1]==i[2],"intra-module","inter-module"))
+    go=c_net_set(go,vertex_class = "module")
+    V(go)$color=ifelse(V(go)$module=="others","grey",V(go)$color)
+  }
+
   #get coordinates
   if (is.null(coors)) coors <- igraph::layout.fruchterman.reingold(go)
   else {
@@ -405,10 +418,6 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
 
   get_v(go)-> tmp_v
   get_e(go)->tmp_e
-  #show labels
-  if(labels_num>=1)tmp_v%>%dplyr::top_n(labels_num,size)%>%dplyr::pull(name)%>%head(labels_num)->toplabel
-  else tmp_v%>%dplyr::top_frac(labels_num,size)%>%dplyr::pull(name)%>%head(ceiling(labels_num*nrow(tmp_v)))->toplabel
-  tmp_v$label=ifelse(tmp_v$name%in%toplabel,tmp_v$name,NA)
 
   #get network type
   main="Network"
@@ -417,7 +426,6 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
             "single" = {main="Co-occurrence network"},
             "bipartite" = {main="Bipartite network"},
             "multi_full" ={main="Multi-omics network"},
-            "module"={main=paste0(get_n(go)$n_modu,"-modules network")},
             "skeleton" ={main=paste0(get_n(go)$skeleton," skeleton network")},
             default={main="Network"}
     )
@@ -429,9 +437,9 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
   for(i in unique(tmp_v$v_group)){
     node_size_text1=c(node_size_text1,min(tmp_v[tmp_v$v_group==i,"size"]))
     node_size_text2=c(node_size_text2,max(tmp_v[tmp_v$v_group==i,"size"]))
-    tmp_v[tmp_v$v_group==i,"size"]%<>%mmscale(.,2,10)
+    tmp_v[tmp_v$v_group==i,"size"]%<>%pcutils::mmscale(.,2,10)
   }
-  tmp_e$width=mmscale(tmp_e$width,0.5,1.5)
+  tmp_e$width=pcutils::mmscale(tmp_e$width,0.5,1.5)
 
   #some custom parameters
   params=list(...)
@@ -442,34 +450,57 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
   if("edge.color"%in%params_name)tmp_e$color=tidai(tmp_e$e_type,params[["edge.color"]])
   if("edge.lty"%in%params_name)tmp_e$lty=tidai(tmp_e$e_class,params[["edge.lty"]])
   if("edge.width"%in%params_name)tmp_e$width=params[["edge.width"]]
+  if("vertex.label"%in%params_name)tmp_e$label=params[["vertex.label"]]
+}
+  #show labels
+  {if(labels_num>=1){tmp_v%>%dplyr::top_n(labels_num,size)%>%dplyr::pull(name)%>%head(labels_num)->toplabel}
+  else {tmp_v%>%dplyr::top_frac(labels_num,size)%>%dplyr::pull(name)%>%head(ceiling(labels_num*nrow(tmp_v)))->toplabel}
+  tmp_v$label=ifelse(tmp_v$name%in%toplabel,tmp_v$label,NA)
+  }
+  #modules set
+{if(plot_module){
 
+    new_modu=as_group(setNames(tmp_v$module,tmp_v$name))
+    new_modu[["others"]]=NULL
+    module_color=pcutils::get_cols(length(new_modu))
+    module_color=setNames(module_color,names(new_modu))
+    module_color=module_color[names(module_color)!="others"]
+    main=paste0(length(module_color),"-modules network")
+  }
+  else {
+    new_modu=module_color=NULL
+  }}
+
+  #main plot
+  {
+    plot.igraph(go, layout = coors,
+                vertex.size=tmp_v$size,
+                vertex.color=tmp_v$color,
+                vertex.shape=tmp_v$shape,
+                edge.color=tmp_e$color,
+                edge.lty=tmp_e$lty,
+                edge.width=tmp_e$width,
+                mark.groups = new_modu,
+                mark.col = add_alpha(module_color[names(new_modu)],0.3),
+                mark.border =module_color[names(new_modu)],
+                ...,
+                main = main,
+                vertex.label.font = 1, vertex.label.color = "black",
+                vertex.label.cex = 0.08*tmp_v$size,
+                vertex.label=tmp_v$label,
+                edge.arrow.size=0.3,
+                edge.arrow.width=0.5,
+                edge.curved = F, margin = c(0, 0, 0, 0))
   }
 
-{ #main plot
-  plot.igraph(go, layout = coors,
-       vertex.size=tmp_v$size,
-       vertex.color=tmp_v$color,
-       vertex.shape=tmp_v$shape,
-       edge.color=tmp_e$color,
-       edge.lty=tmp_e$lty,
-       edge.width=tmp_e$width,
-       ...,
-       main = main,
-       vertex.label.font = 1, vertex.label.color = "black",
-       vertex.label.cex = 0.08*tmp_v$size,
-       vertex.label=tmp_v$label,
-       edge.arrow.size=0.3,
-       edge.arrow.width=0.5,
-       edge.curved = F, margin = c(0, 0, 0, 0)
-  )}
-
   if(!legend)return(message(""))
+
   #produce legends
   left_leg_hei=1
   right_leg_hei=1
-
+  right_leg_wid=1.2
   if(size_legend){
-    legend(1.4, right_leg_hei, cex = 0.7,title.font = 2,title = size_legend_title,title.adj = 0,
+    legend(right_leg_wid, right_leg_hei, cex = 0.7,title.font = 2,title = size_legend_title,title.adj = 0,
            legend = c(paste(node_size_text1,collapse = "/"),paste(node_size_text2,collapse = "/")),adj = 0,title.cex = 0.8,
            col="black", bty = "n",pch=21,pt.cex = c(min(tmp_v$size),max(tmp_v$size))/5)
     right_leg_hei=right_leg_hei-0.5
@@ -485,14 +516,14 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
       le_text= paste(edges,eee[edges],sep = ": ")
     }
     else le_text= edges
-    legend(1.3, right_leg_hei, cex = 0.7,title.font = 2,title = edge_legend_title,title.adj = 0,
+    legend(right_leg_wid, right_leg_hei, cex = 0.7,title.font = 2,title = edge_legend_title,title.adj = 0,
            legend = le_text,adj = 0,title.cex = 0.8,
            col=edge_cols[edges], bty = "n",  lty = 1)
     right_leg_hei=right_leg_hei-length(unique(tmp_e$color))*0.12-0.2
   }
 
   if(width_legend){
-    legend(1.4, right_leg_hei, cex = 0.7,title.font = 2,title = width_legend_title,title.adj = 0,
+    legend(right_leg_wid, right_leg_hei, cex = 0.7,title.font = 2,title = width_legend_title,title.adj = 0,
            legend = c(min(E(go)$width),max(E(go)$width))%>%round(.,3),adj = 0,title.cex = 0.8,
            col="black", bty = "n",  lty = 1,lwd = c(min(tmp_e$width),max(tmp_e$width)))
     right_leg_hei=right_leg_hei-0.5
@@ -508,7 +539,7 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
       le_text= paste(edges,eee[edges],sep = ": ")
     }
     else le_text= edges
-    legend(1.4,right_leg_hei, cex = 0.7,title.font = 2,title = lty_legend_title,title.adj = 0,
+    legend(right_leg_wid,right_leg_hei, cex = 0.7,title.font = 2,title = lty_legend_title,title.adj = 0,
            legend = le_text,adj = 0,title.cex = 0.8,
            col="black", bty = "n",  lty =edge_ltys[edges])
     }
@@ -536,7 +567,7 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
         le_text= paste(vclass,eee[vclass],sep = ": ")
       }
       else le_text= vclass
-      legend(-1.7, left_leg_hei, cex = 0.7, adj = 0,
+      legend(-1.9, left_leg_hei, cex = 0.7, adj = 0,
              legend = le_text,title.cex = 0.8,
              title =group_legend_title[g_i],title.font = 2,title.adj = 0,
              col = "black", pt.bg = node_cols[vclass], bty = "n", pch = pchls[node_shapes[vclass]])
@@ -559,7 +590,8 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
 #' to.ggig(co_net,coors=coors)->ggig
 #' plot(ggig)
 #' to.ggig(multi1,coors=c_net_lay(multi1))->ggig
-#' plot(ggig)
+#' plot(ggig,labels_num=0.3)
+#'
 to.ggig<-function(go,coors=NULL){
   list(n_index=get_n(go),v_index=get_v(go),e_index=get_e(go))->net_par_res
 
@@ -590,7 +622,7 @@ plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
                     edge_legend=T,edge_legend_title="Edge type",edge_legend_order=NULL,
                     width_legend=F,width_legend_title="Edge width",
                     col_legend=T,col_legend_order=NULL,
-                    class_legend_title="Phylum",group_legend_order=NULL){
+                    class_legend_title="Node class",group_legend_order=NULL){
   lib_ps("ggplot2","ggnewscale")
   ggig$v_index->tmp_v
   ggig$e_index->tmp_e
@@ -604,20 +636,16 @@ plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
     tmp_e%<>%dplyr::left_join(.,coors,by=c("from"="name"))%>%rename(X1=X,Y1=Y)%>%
       dplyr::left_join(.,coors,by=c("to"="name"))%>%rename(X2=X,Y2=Y)
   }
-  #show labels
-  if(labels_num>=1)tmp_v%>%dplyr::top_n(labels_num,size)%>%dplyr::pull(name)%>%head(labels_num)->toplabel
-  else tmp_v%>%dplyr::top_frac(labels_num,size)%>%dplyr::pull(name)%>%head(ceiling(labels_num*nrow(tmp_v)))->toplabel
-  tmp_v$label=ifelse(tmp_v$name%in%toplabel,tmp_v$name,NA)
 
   #get network type
   main="Network"
-  if(!is.null(get_n(go)$n_type)){
-    switch (get_n(go)$n_type,
+  if(!is.null(ggig$n_index$n_type)){
+    switch (ggig$n_index$n_type,
             "single" = {main="Co-occurrence network"},
             "bipartite" = {main="Bipartite network"},
             "multi_full" ={main="Multi-omics network"},
-            "module"={main=paste0(get_n(go)$n_modu,"-modules network")},
-            "skeleton" ={main=paste0(get_n(go)$skeleton," skeleton network")},
+            "module"={main=paste0(ggig$n_index$n_modu,"-modules network")},
+            "skeleton" ={main=paste0(ggig$n_index$skeleton," skeleton network")},
             default={main="Network"}
     )
   }
@@ -645,7 +673,12 @@ plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
     if("edge.color"%in%params_name)tmp_e$color=tidai(tmp_e$e_type,params[["edge.color"]])
     if("edge.lty"%in%params_name)tmp_e$lty=tidai(tmp_e$e_class,params[["edge.lty"]])
     if("edge.width"%in%params_name)tmp_e$width=params[["edge.width"]]
+    if("vertex.label"%in%params_name)tmp_e$label=params[["vertex.label"]]
   }
+  #show labels
+  if(labels_num>=1)tmp_v%>%dplyr::top_n(labels_num,size)%>%dplyr::pull(name)%>%head(labels_num)->toplabel
+  else tmp_v%>%dplyr::top_frac(labels_num,size)%>%dplyr::pull(name)%>%head(ceiling(labels_num*nrow(tmp_v)))->toplabel
+  tmp_v$label=ifelse(tmp_v$name%in%toplabel,tmp_v$label,NA)
 
   if(T){
     tmp_e$e_type=change_fac_lev(tmp_e$e_type,edge_legend_order)
@@ -699,20 +732,20 @@ plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
     geom_segment(aes(x = X1, y = Y1, xend = X2, yend = Y2,color = e_type,
                      linewidth = width,linetype=e_class),data = tmp_e,alpha=0.7) +#draw edges
     scale_color_manual(name=edge_legend_title,values =edge_cols,
-                       label=edge_text,guide=ifelse(edge_legend,"legend",F))+#edge colors
+                       label=edge_text,guide=ifelse(edge_legend,"legend","none"))+#edge colors
     scale_linetype_manual(name=lty_legend_title,values =edge_ltys,
-                          label=lty_text,guide=ifelse(lty_legend,"legend",F))+#edge linetype
+                          label=lty_text,guide=ifelse(lty_legend,"legend","none"))+#edge linetype
     scale_linewidth(name = width_legend_title,breaks =c(min(tmp_e$width),max(tmp_e$width)),range = c(0.5,1),
-                    labels =edge_width_text,guide=ifelse(width_legend,"legend",F))
+                    labels =edge_width_text,guide=ifelse(width_legend,"legend","none"))
 
   p1=p+
     geom_point(aes(X, Y,fill = v_class,size = size,shape=v_class), data = tmp_v) +#draw nodes
     #scale_shape_manual(values =setNames(pchls[node_shapes],vclass))+#node shape
     scale_shape_manual(values =node_shapes)+
     scale_fill_manual(name=class_legend_title,values =node_cols[vclass],
-                      labels=le_text,guide=ifelse(col_legend,"legend",F))+#node color
+                      labels=le_text,guide=ifelse(col_legend,"legend","none"))+#node color
     scale_size(name=size_legend_title,breaks = c(min(tmp_v$size),max(tmp_v$size)),
-               labels = node_size_text,guide=ifelse(size_legend,"legend",F))+#node size
+               labels = node_size_text,guide=ifelse(size_legend,"legend","none"))+#node size
 
     ggnewscale::new_scale("size")+
     geom_text(aes(X, Y,size = size,label=label),col="black",data = tmp_v,show.legend = F)+
@@ -733,154 +766,6 @@ plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
 
   if(!legend)return(p2+theme(legend.position = "none"))
   p2
-
-}
-
-#Deprecated
-plot.ggig1<-function(ggig,coors = NULL,...,labels_num=0,
-                    legend_number=F,legend=T,
-                    lty_legend=F,lty_legend_title="Edge class",
-                    size_legend=F,size_legend_title="Node Size",
-                    edge_legend=T,edge_legend_title="Edge type",edge_legend_order=NULL,
-                    width_legend=F,width_legend_title="Edge width",
-                    col_legend=T,col_legend_order=NULL,
-                    class_legend_title="Phylum"){
-  lib_ps("ggplot2","ggnewscale")
-  ggig$v_index->tmp_v
-  ggig$e_index->tmp_e
-  set.seed(1234)
-  #get coordinates
-  if (!is.null(coors)){
-    tmp_v$X=tmp_v$Y=NULL
-    tmp_e$X1=tmp_e$X2=tmp_e$Y1=tmp_e$Y2=NULL
-    #add coors
-    tmp_v%<>%dplyr::left_join(.,coors,by="name",suffix = c("", ".1"))
-    tmp_e%<>%dplyr::left_join(.,coors,by=c("from"="name"))%>%rename(X1=X,Y1=Y)%>%
-      dplyr::left_join(.,coors,by=c("to"="name"))%>%rename(X2=X,Y2=Y)
-  }
-  #show labels
-  if(labels_num>=1)tmp_v%>%dplyr::top_n(labels_num,size)%>%dplyr::pull(name)->toplabel
-  else tmp_v%>%dplyr::top_frac(labels_num,size)%>%dplyr::pull(name)->toplabel
-  tmp_v$label=ifelse(tmp_v$name%in%toplabel,tmp_v$name,NA)
-  #get network type
-  if(!is.null(ggig$n_index$n_type)){
-    switch (ggig$n_index$n_type,
-            "single" = {main="Co-occurrence network"},
-            "bipartite" = {main="Bipartite network"},
-            "multi_full" ={main="Multi-omics network"},
-            "skeleton" ={main=paste0(ggig$n_index$skeleton," skeleton network")},
-            default={main="Network"}
-    )
-  }
-  else main="Network"
-  #scale the size and width
-  {
-    node_size_text1=c()
-    node_size_text2=c()
-    for(i in unique(tmp_v$v_group)){
-      node_size_text1=c(node_size_text1,min(tmp_v[tmp_v$v_group==i,"size"]))
-      node_size_text2=c(node_size_text2,max(tmp_v[tmp_v$v_group==i,"size"]))
-      tmp_v[tmp_v$v_group==i,"size"]%<>%mmscale(.,2,10)
-    }
-    node_size_text=c(paste(node_size_text1,collapse = "/"),paste(node_size_text2,collapse = "/"))
-    edge_width_text=c(min(tmp_e$width),max(tmp_e$width))
-    tmp_e$width=mmscale(tmp_e$width,0.5,1)
-
-    #some custom parameters
-    params=list(...)
-    params_name=names(params)
-    if("vertex.size"%in%params_name)tmp_v$size=params[["vertex.size"]]
-    if("vertex.color"%in%params_name)tmp_v$color=tidai(tmp_v$v_class,params[["vertex.color"]])
-    if("vertex.shape"%in%params_name)tmp_v$shape=tidai(tmp_v$v_group,params[["vertex.shape"]])
-    if("edge.color"%in%params_name)tmp_e$color=tidai(tmp_e$e_type,params[["edge.color"]])
-    if("edge.lty"%in%params_name)tmp_e$lty=tidai(tmp_e$e_class,params[["edge.lty"]])
-    if("edge.width"%in%params_name)tmp_e$width=params[["edge.width"]]
-  }
-
-  if(T){
-    tmp_e$e_type=change_fac_lev(tmp_e$e_type,edge_legend_order)
-    edges=levels(tmp_e$e_type)
-    edge_cols=distinct(tmp_e,color,e_type)
-    edge_cols=setNames(edge_cols$color,edge_cols$e_type)
-    if(legend_number){
-      eee=table(tmp_e$e_type)
-      edge_text= paste(edges,eee[edges],sep = ": ")
-    }
-    else edge_text= edges}
-
-  if(T){
-    edges1=levels(factor(tmp_e$e_class))
-    edge_ltys=distinct(tmp_e,lty,e_class)
-    edge_ltys=setNames(edge_ltys$lty,edge_ltys$e_class)
-
-    if(legend_number){
-      eee=table(tmp_e$e_class)
-      lty_text= paste(edges1,eee[edges1],sep = ": ")
-    }
-    else lty_text= edges1}
-
-  if(T){
-    pchls=c("circle"=21,"square"=22)
-
-    for(g_i in vgroups){
-      tmp_v1=tmp_v[tmp_v$v_group==g_i,c("v_class","color","shape")]
-
-      vclass=change_fac_lev(tmp_v1$v_class,col_legend_order)
-      vclass=levels(vclass)}
-
-    tmp_v$v_class=change_fac_lev(tmp_v$v_class,col_legend_order)
-    vclass=levels(tmp_v$v_class)
-
-    node_cols=distinct(tmp_v,color,v_class)
-    node_cols=setNames(node_cols$color,node_cols$v_class)
-    node_shapes=distinct(tmp_v,shape,v_class)
-    node_shapes=setNames(node_shapes$shape,node_shapes$v_class)
-
-    if(legend_number){
-      eee=table(tmp_v$v_class)
-      le_text= paste(vclass,eee[vclass],sep = ": ")
-    }
-    else le_text= vclass
-  }
-
-  p <- ggplot() +
-    geom_segment(aes(x = X1, y = Y1, xend = X2, yend = Y2,color = e_type,
-                     linewidth = width,linetype=e_class),data = tmp_e,alpha=0.7) +#draw edges
-    scale_color_manual(name=edge_legend_title,values =edge_cols,
-                       label=edge_text,guide=ifelse(edge_legend,"legend",F))+#edge colors
-    scale_linetype_manual(name=lty_legend_title,values =edge_ltys,
-                          label=lty_text,guide=ifelse(lty_legend,"legend",F))+#edge linetype
-    scale_linewidth(name = width_legend_title,breaks =c(min(tmp_e$width),max(tmp_e$width)),range = c(0.5,1),
-                    labels =edge_width_text,guide=ifelse(width_legend,"legend",F))
-
-  p1=p+
-    geom_point(aes(X, Y,fill = v_class,size = size,shape=v_class), data = tmp_v) +#draw nodes
-    scale_shape_manual(values =setNames(pchls[node_shapes],vclass))+#node shape
-    scale_fill_manual(name=class_legend_title,values =node_cols[vclass],
-                      labels=le_text,guide=ifelse(col_legend,"legend",F))+#node color
-    scale_size(name=size_legend_title,breaks = c(min(tmp_v$size),max(tmp_v$size)),
-               labels = node_size_text,guide=ifelse(size_legend,"legend",F))+#node size
-
-    ggnewscale::new_scale("size")+
-    geom_text(aes(X, Y,size = size,label=label),col="black",data = tmp_v,show.legend = F)+
-    scale_size(range = c(1,3),guide = "none")+
-    guides(fill = guide_legend(override.aes = list(shape = pchls[node_shapes[vclass]])),
-           shape="none")
-
-  p2=p1+labs(title = main)+
-    scale_x_continuous(breaks = NULL) + scale_y_continuous(breaks = NULL) +
-    coord_fixed(ratio = 1)+
-    theme(panel.background = element_blank()) +
-    theme(axis.title.x = element_blank(), axis.title.y = element_blank()) +
-    theme(legend.background = element_rect(colour = NA),
-          legend.box.background = element_rect(colour = NA),
-          legend.key = element_rect(fill = NA)) +
-    theme(panel.background = element_rect(fill = "white",  colour = NA)) +
-    theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank())
-
-  if(!legend)return(p2+theme(legend.position = "none"))
-  p2
-
 }
 
 
@@ -902,7 +787,7 @@ input_gephi<-function(file){
   coors<-data.frame(name = tmp_v$name,X=coors[,1],Y=coors[,2])
   coors%>%mutate(X=mmscale(X,-40,40),Y=mmscale(Y,-40,40))->coors
   #transfrom color
-  rgb2code(tmp_v[,c("r","g","b")])%>%dplyr::pull(code)->tmp_v$color
+  pcutils::rgb2code(tmp_v[,c("r","g","b")])%>%dplyr::pull(code)->tmp_v$color
   E(gephi)$color=ifelse(E(gephi)$cor > 0, "#48A4F0", "#E85D5D")
   #scale size
   tmp_v$size=mmscale(tmp_v$size,1,5)
@@ -910,5 +795,47 @@ input_gephi<-function(file){
   #delete
   tmp_v%>%dplyr::select(-c("label","x","y","r","g","b","id"))%>%as.list()->vertex.attributes(gephi)
   edge.attributes(gephi)["Edge Label"]=edge.attributes(gephi)["id"]=NULL
+  gephi=c_net_update(gephi)
   return(list(go=gephi,coors=coors))
+}
+
+#' plot use networkD3
+#'
+#' @param go metanet
+#' @param v_class which attributes use to be v_class
+#' @param ... see \code{\link[forceNetwork]{networkD3}}
+#'
+#' @export
+#'
+#' @examples
+#' plot(co_net2)
+#' netD3plot(co_net2)
+netD3plot<-function(go,v_class="v_class",...){
+  flag="y"
+  if(length(V(go))>200){
+    print("Too big network, recommend using Gephi to layout,still use networkD3?")
+    flag=readline("yes/no(y/n):")}
+  if(tolower(flag)%in%c("yes","y")){
+    lib_ps("networkD3")
+    go=c_net_set(go,vertex_class = v_class)
+    get_v(go)->tmp_v
+    nodes=tmp_v[,c("name","v_class","size","color")]
+    colnames(nodes)=c("name","group","size","color")
+    nodes$size=pcutils::mmscale(nodes$size,2,40)
+
+    colors=unique(nodes$color)
+
+    get_e(go)->tmp_e
+    links=tmp_e[,c("from","to","width","color")]
+    links$width=pcutils::mmscale(links$width,0.5,1.5)
+    #give ids
+    links$IDsource <- match(links$from, nodes$name)-1
+    links$IDtarget <- match(links$to, nodes$name)-1
+    # Create force directed network plot
+    networkD3::forceNetwork(Links = links, Nodes = nodes,
+                            Source = 'IDsource', Target = 'IDtarget',linkColour = links$color,linkDistance=20,
+                            linkWidth= JS("function(d) { return (d.width); }"),charge = -5,
+                            NodeID = 'name', Group = 'group',Nodesize = 'size',
+                            colourScale = JS(paste0("d3.scaleOrdinal([`",paste(colors,collapse = '`,`'),"`])")),legend = T,...)
+  }
 }

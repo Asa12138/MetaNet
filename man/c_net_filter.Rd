@@ -19,5 +19,5 @@ Filter a network according to some attributes
 }
 \examples{
 
-c_net_filter(go,v_group=c("omic1","omic2"),e_class="intra")
+c_net_filter(multi1,v_group=c("omic1","omic2"),e_class="intra")
 }

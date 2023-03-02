@@ -1,5 +1,22 @@
-#'@title testdata (pc_otu class) for pc_tax package.
-#'@description MetaNet co_nets.
+#'@title Microbiota community data
+#'@description Microbiota community data
+#'
+#'@docType data
+#'@name otutab
+#'@usage otutab
+#'@format three co_nets
+#'\describe{
+#' \item{tbls}{contians otutable rawdata}
+#' \item{metas}{contians metadata}
+#' \item{otus}{contians taxomomy table}
+#'}
+#'
+#'
+#'
+NULL
+
+#'@title MetaNet networks
+#'@description MetaNet co_nets
 #'
 #'@docType data
 #'@name c_net
@@ -15,6 +32,39 @@
 #'
 NULL
 
+#'@title MetaNet networks
+#'@description MetaNet co_nets
+#'
+#'@docType data
+#'@name multi_test
+#'@usage c_net
+#'@format three co_nets
+#'\describe{
+#' \item{tbls}{contians otutable rawdata}
+#' \item{metas}{contians metadata}
+#' \item{otus}{contians taxomomy table}
+#'}
+#'
+#'
+#'
+NULL
+
+#'@title MetaNet networks
+#'@description MetaNet co_nets
+#'
+#'@docType data
+#'@name multi_net
+#'@usage c_net
+#'@format three co_nets
+#'\describe{
+#' \item{tbls}{contians otutable rawdata}
+#' \item{metas}{contians metadata}
+#' \item{otus}{contians taxomomy table}
+#'}
+#'
+#'
+#'
+NULL
 if(F){
   data("otutab")
   t(otutab) -> totu

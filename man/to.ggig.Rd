@@ -24,5 +24,6 @@ coors=c_net_lay(co_net)
 to.ggig(co_net,coors=coors)->ggig
 plot(ggig)
 to.ggig(multi1,coors=c_net_lay(multi1))->ggig
-plot(ggig)
+plot(ggig,labels_num=0.3)
+
 }

@@ -5,7 +5,7 @@
 \alias{skeleton_plot}
 \title{Get skeleton network according to a group}
 \usage{
-get_group_skeleton(go, Group = "v_class", count = NULL)
+get_group_skeleton(go, Group = "v_class", count = NULL, direct = F)
 
 skeleton_plot(tmp_go, ...)
 }

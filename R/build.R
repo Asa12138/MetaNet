@@ -146,6 +146,7 @@ c_net_build <- function(cor_res, r_thres = 0.6, p_thres = 0.05,use_p_adj=T, del_
 c_net_update<-function(go){
   #name
   if(!"name"%in%vertex_attr_names(go))V(go)$name=paste0("n",seq_len(length(go)))
+  if(!"label"%in%vertex_attr_names(go))V(go)$label=V(go)$name
   get_v(go)->tmp_v
   #v_size
   if(!"size"%in%colnames(tmp_v)){tmp_v$size=ceiling(60/sqrt(length(V(go))))+1}
@@ -157,7 +158,6 @@ c_net_update<-function(go){
   else {tmp_v$v_group="v_group1";tmp_v$shape="circle"}
 
   #v_color
-
   if(!"v_class"%in%colnames(tmp_v)){tmp_v$v_class="v_class1"}
   tmp_col=paste0(tmp_v$v_group,"-",tmp_v$v_class)
   tmp_v$color =tidai(tmp_col,pcutils::get_cols(nlevels(factor(tmp_col)),"col3"))
@@ -169,7 +169,7 @@ c_net_update<-function(go){
   edge.color <- droplevels(as.factor(E(go)$e_type))
 
   if(all(levels(edge.color)%in%c("negative","positive")))ncols=c(negative="#E85D5D",positive="#48A4F0")
-  else if(all(levels(edge.color)%in%c("inter","intra")))ncols=c(inter="#FA789A",intra="#A6CEE3")
+  else if(all(levels(edge.color)%in%c("inter-module","intra-module")))ncols=c("inter-module"="#FA789A","intra-module"="#A6CEE3")
   else ncols=pcutils::get_cols(nlevels(edge.color),"col2")
   E(go)$color=tidai(E(go)$e_type,ncols)
 
@@ -266,7 +266,7 @@ c_net_set <- function(go,...,vertex_group="v_group",vertex_class="v_class",verte
 tidai=\(x,y){
   tmp=y
   if(is.null(names(tmp))){
-    tmp=rep(tmp,len=length(unique(x)))
+    tmp=rep(unique(tmp),len=length(unique(x)))
     names(tmp)=unique(x)
   }
   return(unname(tmp[x]))
@@ -319,7 +319,7 @@ get_n=function(go){
 #'
 #' @examples
 #'
-#' c_net_filter(go,v_group=c("omic1","omic2"),e_class="intra")
+#' c_net_filter(multi1,v_group=c("omic1","omic2"),e_class="intra")
 c_net_filter<-function(go,...){
   f_ls=list(...)
   v_ls=list();e_ls=list()
@@ -334,6 +334,7 @@ c_net_filter<-function(go,...){
   }
   go1=filter_v(go,v_ls)
   go1=filter_e(go1,e_ls)
+  class(go1)=c("metanet","igraph")
   go1
 }
 
@@ -349,6 +350,7 @@ filter_v<-function(go,...){
 
   tmp_v$name->vid
   igraph::subgraph(go,vid)->go1
+  class(go1)=c("metanet","igraph")
   go1
 }
 
@@ -364,6 +366,7 @@ filter_e<-function(go,...){
 
   tmp_e$id->eid
   igraph::subgraph.edges(go,eid)->go1
+  class(go1)=c("metanet","igraph")
   go1
 }
 
@@ -522,7 +525,7 @@ RMT_threshold = function(occor.r, min_threshold = 0.5, max_threshold = 0.9, step
   res <- data.frame()
   for(i in seq_len(length(thres_seq))){
     threshold=thres_seq[i]
-    if(!quite)dabiao(paste0("Calculating",i,":  threshold =", signif(threshold,3)))
+    if(!quite)pcutils::dabiao(paste0("Calculating",i,":  threshold =", signif(threshold,3)))
     corr_r1 <- occor.r
     corr_r1[abs(corr_r1) < threshold] <- 0
     #calculate eigenvalues

@@ -23,7 +23,10 @@ c_net_plot(
   col_legend = T,
   col_legend_order = NULL,
   group_legend_title = NULL,
-  group_legend_order = NULL
+  group_legend_order = NULL,
+  plot_module = F,
+  mark.groups = T,
+  module_color = NULL
 )
 }
 \arguments{
@@ -33,7 +36,7 @@ c_net_plot(
 
 \item{...}{additional parameters for \code{\link[igraph]{igraph.plotting}}}
 
-\item{labels_num}{show how many labels,>1 indicates number, <1 indicates fraction ,default:10}
+\item{labels_num}{show how many labels,>1 indicates number, <1 indicates fraction ,default:5}
 
 \item{legend_number}{legend with numbers}
 
@@ -76,4 +79,5 @@ data("c_net")
 c_net_plot(co_net)
 c_net_plot(co_net_rmt)
 c_net_plot(co_net2)
+c_net_plot(multi1)
 }

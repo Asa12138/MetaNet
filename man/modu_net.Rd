@@ -29,8 +29,8 @@ Generate a n-modules network
 \examples{
 g1=modu_net()
 get_n(g1)
-plot(g1)
-plot(g1,coors=g_lay(g1,zoom2 = 20))
-plot(g1,coors=g_lay_polyarc(g1,group = "module"))
+plot(g1,plot_module=T)
+plot(g1,plot_module=T,coors=g_lay(g1,zoom2 = 20))
+plot(g1,plot_module=T,coors=g_lay_polyarc(g1,group = "module"))
 plot(g1,coors=g_lay_polygon(g1,group = "module"))
 }

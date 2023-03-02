@@ -9,7 +9,11 @@ multi_net_build(
   mode = "full",
   method = "spearman",
   filename = "multi-net",
-  p.adjust.method = NULL
+  p.adjust.method = NULL,
+  r_thres = 0.6,
+  p_thres = 0.05,
+  use_p_adj = T,
+  del_single = T
 )
 }
 \arguments{

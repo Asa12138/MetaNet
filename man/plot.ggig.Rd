@@ -22,7 +22,7 @@
   width_legend_title = "Edge width",
   col_legend = T,
   col_legend_order = NULL,
-  class_legend_title = "Phylum",
+  class_legend_title = "Node class",
   group_legend_order = NULL
 )
 }

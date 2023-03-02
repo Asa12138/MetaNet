@@ -8,7 +8,8 @@ c_net_lay(
   go,
   method = igraph::with_fr(niter = 999, grid = "nogrid"),
   order_by = NULL,
-  order_ls = NULL
+  order_ls = NULL,
+  seed = 1234
 )
 }
 \arguments{
@@ -19,6 +20,9 @@ c_net_lay(
 \item{order_by}{order nodes according to a node attribute}
 
 \item{order_ls}{manual the discrete variable with a vector, or continuous variable with "desc" to decreasing}
+}
+\value{
+coordinates for nodes,columns: name, X, Y
 }
 \description{
 Layout coordinates

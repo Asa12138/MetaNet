@@ -227,7 +227,7 @@ get_net_par<-function(go){
 #' x=tkplot(ske_net)
 #' da <- tkplot.getcoords(x)
 #' tkplot.close(x)
-get_group_skeleton=function(go,Group ="v_class",count=NULL){
+get_group_skeleton=function(go,Group ="v_class",count=NULL,direct=F){
   lib_ps("igraph")
   stopifnot(is_igraph(go))
   if(!Group%in%vertex_attr_names(go))stop("no Group named ",Group," !")
@@ -237,20 +237,20 @@ get_group_skeleton=function(go,Group ="v_class",count=NULL){
   nodeGroup$Group<-as.factor(nodeGroup$Group)
 #summary edges counts in each e_type
   suppressMessages(anno_edge(go,nodeGroup)%>%get_e()->edge)
-  if(is.null(count))edge$count=1
-  else edge$count=edge[,count]
+{  if(is.null(count))edge$count=1
+  else edge$count=edge[,count]}
   bb=data.frame()
   for (i in unique(edge$e_type)) {
-    bb=rbind(bb,data.frame(summ_2col(edge[edge$e_type==i,c("Group_from","Group_to","count")],direct = T),e_type=i))
+    bb=rbind(bb,data.frame(summ_2col(edge[edge$e_type==i,c("Group_from","Group_to","count")],direct = direct),e_type=i))
   }
-  tmp_go=igraph::graph_from_data_frame(bb,directed = F)
+  tmp_go=igraph::graph_from_data_frame(bb,directed = direct)
   nodeGroup=cbind_new(nodeGroup,data.frame(v_group=tmp_v$v_group))
   dplyr::distinct(nodeGroup,Group,v_group)%>%tibble::column_to_rownames("Group")->v_group_tab
 
   V(tmp_go)$v_group=v_group_tab[V(tmp_go)$name,"v_group"]
   V(tmp_go)$v_class=V(tmp_go)$name
   V(tmp_go)$size=aggregate(tmp_v$size,by=list(tmp_v[,Group]),sum)[["x"]]
-  V(tmp_go)$count=tmp_v%>%dplyr::group_by_(Group)%>%dplyr::count()%>%pull(n)
+  suppressWarnings({V(tmp_go)$count=tmp_v%>%dplyr::group_by_(Group)%>%dplyr::count()%>%pull(n)})
 
   tmp_go=c_net_update(tmp_go)
   get_e(tmp_go)->tmp_e
@@ -272,10 +272,12 @@ skeleton_plot<-function(tmp_go,...) {
   get_e(tmp_go)->tmp_e
   get_v(tmp_go)->tmp_v
   c_net_lay(tmp_go)->coors
+
   for (i in unique(tmp_e$e_type)) {
+
     tmp_go1=c_net_filter(tmp_go,e_type=i)
-    c_net_plot(tmp_go1,coors = coors,vertex.size=mmscale(V(tmp_go1)$size,10,16),
-               edge.width=mmscale(E(tmp_go1)$width,0.5,8),...,
+    c_net_plot(tmp_go1,coors = coors,vertex.size=pcutils::mmscale(V(tmp_go1)$size,10,16),
+               edge.width=pcutils::mmscale(E(tmp_go1)$width,0.5,8),...,
                lty_legend = F,legend_number = F,size_legend = F,col_legend = F)
 
     left_leg_hei=1
@@ -287,13 +289,14 @@ skeleton_plot<-function(tmp_go,...) {
         le_text= paste(tmp_v1$v_class,tmp_v1$count,sep = ": ")
       }
       else le_text= unique(tmp_v1$v_class)
-      legend(-1.7, left_leg_hei, cex = 0.7, adj = 0,
+      legend(-1.9, left_leg_hei, cex = 0.7, adj = 0,
              legend = le_text,title.cex = 0.8,
              title =g_i,title.font = 2,title.adj = 0,
              col = "black", pt.bg = unique(tmp_v1$color), bty = "n", pch = pchls[unique(tmp_v1$shape)])
       left_leg_hei=left_leg_hei-length(unique(tmp_v1$v_class))*0.12-0.2
     }
   }
+
 }
 
 #' Link summary of the network
@@ -317,12 +320,14 @@ links_stat<-function(go,group="v_class",inter="all",topN=6,number=F,direct=T,
                      col_legend_order=NULL,
                      group_legend_title=NULL,group_legend_order=NULL){
   pcutils::lib_ps("igraph","dplyr")
+  go=c_net_set(go,vertex_class = group)
   get_v(go)->v_index
-  v_index%>%select("name",!!group)->map
+  v_index%>%select("name","v_class")->map
+
   suppressMessages(anno_edge(go,map)%>%get_e()->edge)
 #statistics
   if(inter!="all")edge%>%filter(inter==!!inter)->edge
-  summ_2col(edge[,paste0(group,c("_from","_to"))],direct = direct)->bb
+  summ_2col(edge[,paste0("v_class",c("_from","_to"))],direct = direct)->bb
   colnames(bb)=c("from","to","count")
 
   group_by(bb,from)%>%summarise(n=sum(count))%>%arrange(-n)%>%top_n(topN,n)%>%pull(from)->nnn
@@ -411,7 +416,7 @@ if(F){
 #'
 #' @examples
 #' fit_power(co_net)
-fit_power<-function(go){
+fit_power<-function(go,pvalue=F){
   #igraph::degree distribution
   degree_dist <- table(igraph::degree(go))
   dat <- data.frame(degree = as.numeric(names(degree_dist)), count = as.numeric(degree_dist))
@@ -427,7 +432,7 @@ fit_power<-function(go){
   R2 <- round(1 - SSre/SStot, 3)
 
   #bootstrap t get pvalue
-  p_num <- 1
+if(pvalue){  p_num <- 1
   dat_rand <- dat
   for (i in 1:999) {
     dat_rand$count <- sample(dat_rand$count)
@@ -436,20 +441,26 @@ fit_power<-function(go){
     R2_rand <- 1 - SSre_rand/SStot_rand
     if (R2_rand > R2) p_num <- p_num + 1
   }
-  p_value <- p_num / (999+1)
+  p_value <- p_num / (999+1)}
 
   p <- ggplot(dat, aes(x = degree, y = count)) +
     geom_point() +theme_bw() +
     stat_smooth(method = 'nls', formula = y ~ a*x^b, method.args = list(start = list(a = 2, b = 1.5)), se = FALSE) +
     labs(x = 'Degree', y = 'Count')
 
-  label <- data.frame(
+{if(pvalue){  label <- data.frame(
     x=0.8*max(dat$degree),
     y=c(0.9,0.85,0.8)*max(dat$count),
     formula = c(sprintf('italic(Y) == %.3f*italic(X)^%.3f', a, b),
                 sprintf('italic(R^2) == %.3f', R2),
                 sprintf('italic(P) < %.3f', p_value))
-  )
+  )}
+else{  label <- data.frame(
+    x=0.8*max(dat$degree),
+    y=c(0.9,0.85)*max(dat$count),
+    formula = c(sprintf('italic(Y) == %.3f*italic(X)^%.3f', a, b),
+                sprintf('italic(R^2) == %.3f', R2))
+  )}}
 
   p + geom_text(aes(x=x,y=y,label = formula), data = label,parse = T)
 }

@@ -10,7 +10,8 @@ RMT_threshold(
   min_threshold = 0.5,
   max_threshold = 0.9,
   step = 0.02,
-  gif = F
+  gif = F,
+  quite = F
 )
 
 rmt(occor.r, min_threshold = 0.5, max_threshold = 0.85, step = 0.01)

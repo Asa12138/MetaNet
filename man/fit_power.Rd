@@ -4,7 +4,7 @@
 \alias{fit_power}
 \title{Fit power-law distribution for a igraph}
 \usage{
-fit_power(go)
+fit_power(go, pvalue = F)
 }
 \arguments{
 \item{go}{igraph}
