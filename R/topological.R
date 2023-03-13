@@ -13,7 +13,7 @@
 #' @examples
 #' data(otutab)
 #' extract_sub_net(co_net,otutab,save_net = "sub_net")->sub_net_pars
-extract_sub_net<-function(a_net,otutab,threads=4,save_net=F){
+extract_sub_net<-function(a_net,otutab,threads=1,save_net=F){
   lib_ps("igraph")
   V(a_net)$name->v_name
   reps=ncol(otutab)
@@ -55,10 +55,8 @@ extract_sub_net<-function(a_net,otutab,threads=4,save_net=F){
   sub_net_pars=do.call(rbind,sub_net_pars)
 
   rownames(sub_net_pars)<-colnames(otutab)
-  if(is.character(save_net)){
-    if(!dir.exists("net_res"))dir.create("net_res/")
-    save(sub_nets,file = paste0("net_res",save_net,".rda"))
-  }
+  save(sub_nets,file = paste0(save_net,".rda"))
+
   sub_net_pars
 }
 
@@ -203,8 +201,8 @@ cbind_new<-\(df,df1){
 #' @export
 #'
 #' @rdname net_par
-get_net_par<-function(go){
-  if(!is.null(graph_attr(go)[["net_par"]]))stop("already calculate net_pars")
+get_net_par<-function(go,force=F){
+  if(!force){if(!is.null(graph_attr(go)[["net_par"]]))stop("already calculate net_pars")}
   net_par(go,fast = F)->res
   graph_attr(go)<-as.list(res$n_index)
   graph_attr(go)[["net_par"]]=T
@@ -273,14 +271,29 @@ skeleton_plot<-function(tmp_go,...) {
   get_v(tmp_go)->tmp_v
   c_net_lay(tmp_go)->coors
 
-  for (i in unique(tmp_e$e_type)) {
+  #some
+  params=list(...)
+  params_name=names(params)
+  legend_position_default=c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1)
+  if(!"legend_position"%in%params_name)legend_position=legend_position_default
+  else {
+    if(is.null(names(legend_position)))legend_position=setNames(legend_position,names(legend_position_default)[seq_along(legend_position)])
+    legend_position=condance(data.frame(legend_position_default,tidai(names(legend_position_default),legend_position)))
+  }
+  if("vertex.color"%in%params_name)tmp_v$color=condance(data.frame(tmp_v$color,tidai(tmp_v$v_class,params[["vertex.color"]])))
+  if("legend_cex"%in%params_name)legend_cex=parms[["legend_cex"]]
+  else legend_cex=1
 
+  for (i in unique(tmp_e$e_type)) {
+    left_leg_x=legend_position["left_leg_x"]
+    left_leg_y=legend_position["left_leg_y"]
+
+    #main plot
     tmp_go1=c_net_filter(tmp_go,e_type=i)
     c_net_plot(tmp_go1,coors = coors,vertex.size=pcutils::mmscale(V(tmp_go1)$size,10,16),
-               edge.width=pcutils::mmscale(E(tmp_go1)$width,0.5,8),...,
-               lty_legend = F,legend_number = F,size_legend = F,col_legend = F)
-
-    left_leg_hei=1
+               edge.width=pcutils::mmscale(E(tmp_go1)$width,0.5,8),col_legend = F,...,
+               lty_legend = F,legend_number = F,size_legend = F)
+    #color legend
     pchls=c("circle"=21,"square"=22)
     for(i in 1:length(unique(tmp_v$v_group))){
       g_i=unique(tmp_v$v_group)[i]
@@ -289,14 +302,13 @@ skeleton_plot<-function(tmp_go,...) {
         le_text= paste(tmp_v1$v_class,tmp_v1$count,sep = ": ")
       }
       else le_text= unique(tmp_v1$v_class)
-      legend(-1.9, left_leg_hei, cex = 0.7, adj = 0,
-             legend = le_text,title.cex = 0.8,
+      legend(left_leg_x, left_leg_y, cex = 0.7*legend_cex, adj = 0,
+             legend = le_text,title.cex = 0.8*legend_cex,
              title =g_i,title.font = 2,title.adj = 0,
              col = "black", pt.bg = unique(tmp_v1$color), bty = "n", pch = pchls[unique(tmp_v1$shape)])
-      left_leg_hei=left_leg_hei-length(unique(tmp_v1$v_class))*0.12-0.2
+      left_leg_y=left_leg_y-(length(unique(tmp_v1$v_class))*0.12+0.2)*legend_cex
     }
   }
-
 }
 
 #' Link summary of the network
@@ -316,7 +328,9 @@ skeleton_plot<-function(tmp_go,...) {
 #'
 #' c_net_plot(co_net,g_lay_polyarc(co_net,"v_class"))
 #'
-links_stat<-function(go,group="v_class",inter="all",topN=6,number=F,direct=T,
+links_stat<-function(go,group="v_class",inter="all",topN=6,direct=T,
+                     legend_number=F,legend=T,legend_cex=1,
+                     legend_position=c(left_leg_x=-1.6,left_leg_y=1,right_leg_x=1.2,right_leg_y=1),
                      col_legend_order=NULL,
                      group_legend_title=NULL,group_legend_order=NULL){
   pcutils::lib_ps("igraph","dplyr")
@@ -337,70 +351,87 @@ links_stat<-function(go,group="v_class",inter="all",topN=6,number=F,direct=T,
   colors=setNames(unique(tmp_v$color),unique(tmp_v$v_class))
 #plot
   filter(bb,from%in%nnn,to%in%nnn)%>%pcutils::my_cicro(.,reorder = F,colors = colors)
-    {
-    left_leg_hei=1
-    pchls=c("circle"=21,"square"=22)
-    vgroups=change_fac_lev(tmp_v$v_group,group_legend_order)
-    vgroups=levels(vgroups)
-    if(is.null(group_legend_title))group_legend_title=setNames(vgroups,vgroups)
-    else if(is.null(names(group_legend_title)))group_legend_title=setNames(group_legend_title,vgroups)
+#legend
+  if(!legend)return(message(""))
 
-    for(g_i in vgroups){
-      tmp_v1=tmp_v[tmp_v$v_group==g_i,c("v_class","color","shape")]
+  #produce legends
+  legend_position_default=c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1)
+  if(is.null(legend_position))legend_position=legend_position_default
+  else {
+    if(is.null(names(legend_position)))legend_position=setNames(legend_position,names(legend_position_default)[seq_along(legend_position)])
+    legend_position=condance(data.frame(legend_position_default,tidai(names(legend_position_default),legend_position)))
+    names(legend_position)=names(legend_position_default)
+  }
+  left_leg_x=legend_position["left_leg_x"]
+  left_leg_y=legend_position["left_leg_y"]
+  right_leg_x=legend_position["right_leg_x"]
+  right_leg_y=legend_position["right_leg_y"]
 
-      vclass=change_fac_lev(tmp_v1$v_class,col_legend_order)
-      vclass=levels(vclass)
+  pchls=c("circle"=21,"square"=22)
+  vgroups=change_fac_lev(tmp_v$v_group,group_legend_order)
+  vgroups=levels(vgroups)
+  if(is.null(group_legend_title)){
+    if(length(vgroups)>1)group_legend_title=setNames(paste0(vgroups,"_",group),vgroups)
+    else group_legend_title=setNames(group,vgroups)
+    }
+  else if(is.null(names(group_legend_title)))group_legend_title=setNames(rep(group_legend_title,len=length(vgroups)),vgroups)
 
-      node_cols=distinct(tmp_v1,color,v_class)
-      node_cols=setNames(node_cols$color,node_cols$v_class)
-      node_shapes=distinct(tmp_v1,shape,v_class)
-      node_shapes=setNames(node_shapes$shape,node_shapes$v_class)
+  for(g_i in vgroups){
+    tmp_v1=tmp_v[tmp_v$v_group==g_i,c("v_class","color","shape")]
 
-      if(number){
-        eee=table(tmp_v1$v_class)
-        le_text= paste(vclass,eee[vclass],sep = ": ")
-      }
-      else le_text= vclass
-      legend(-1.7, left_leg_hei, cex = 0.8, adj = 0,
-             legend = le_text,title.cex = 1,
-             title =group_legend_title[g_i],title.font = 2,title.adj = 0,pt.cex = 2,
-             col = "black", pt.bg = node_cols[vclass], bty = "n", pch = pchls[node_shapes[vclass]])
+    vclass=change_fac_lev(tmp_v1$v_class,col_legend_order)
+    vclass=levels(vclass)
 
-      left_leg_hei=left_leg_hei-length(vclass)*0.12-0.2
-    }}
+    node_cols=distinct(tmp_v1,color,v_class)
+    node_cols=setNames(node_cols$color,node_cols$v_class)
+    node_shapes=distinct(tmp_v1,shape,v_class)
+    node_shapes=setNames(node_shapes$shape,node_shapes$v_class)
+
+    if(legend_number){
+      eee=table(tmp_v1$v_class)
+      le_text= paste(vclass,eee[vclass],sep = ": ")
+    }
+    else le_text= vclass
+    legend(left_leg_x, left_leg_y, cex = 0.7*legend_cex, adj = 0,
+           legend = le_text,title.cex = 0.8*legend_cex,
+           title =group_legend_title[g_i],title.font = 2,title.adj = 0,
+           col = "black", pt.bg = node_cols[vclass], bty = "n", pch = pchls[node_shapes[vclass]])
+
+    left_leg_y=left_leg_y-(length(vclass)*0.12+0.2)*legend_cex
+  }
 }
 
 #redundant，Deprecated
-links_stat2<-function(go,group="v_class",inter="positive",topN=5){
-  pcutils::lib_ps("igraph","dplyr")
+if(F){links_stat2<-function(go,group="v_class",inter="positive",topN=5){
+    pcutils::lib_ps("igraph","dplyr")
 
-  get_e(go)[,c("from","to","inter")]->edge
-  if(inter!="all")edge%>%filter(inter==!!inter)->edge
+    get_e(go)[,c("from","to","inter")]->edge
+    if(inter!="all")edge%>%filter(inter==!!inter)->edge
 
-  get_v(go)%>%select("name",!!group)->map
-  edge=left_join(edge,map,by=c("from"="name"))%>%rename("f_g"=!!group)
-  edge=left_join(edge,map,by=c("to"="name"))%>%rename("t_g"=!!group)
+    get_v(go)%>%select("name",!!group)->map
+    edge=left_join(edge,map,by=c("from"="name"))%>%rename("f_g"=!!group)
+    edge=left_join(edge,map,by=c("to"="name"))%>%rename("t_g"=!!group)
 
-  c(edge$f_g,edge$t_g)%>%unique()->all_g
-  expand.grid(all_g,all_g)->tab
-  group_by(edge,f_g,t_g)%>%count()->link
-  link=left_join(tab,link,by=c("Var1"="f_g","Var2"="t_g"))
+    c(edge$f_g,edge$t_g)%>%unique()->all_g
+    expand.grid(all_g,all_g)->tab
+    group_by(edge,f_g,t_g)%>%count()->link
+    link=left_join(tab,link,by=c("Var1"="f_g","Var2"="t_g"))
 
-  tab=reshape2::dcast(link, Var1~Var2, value.var = "n")%>%tibble::column_to_rownames("Var1")%>%as.matrix()
-  tab[is.na(tab)]=0
-  #tab=tab+t(tab)-diag(diag(tab))
+    tab=reshape2::dcast(link, Var1~Var2, value.var = "n")%>%tibble::column_to_rownames("Var1")%>%as.matrix()
+    tab[is.na(tab)]=0
+    #tab=tab+t(tab)-diag(diag(tab))
 
-  rowSums(tab)%>%sort(decreasing = T)%>%names()->s_name
-  tab=tab[s_name,s_name]
-  if(topN>ncol(tab))topN=ncol(tab)
-  tab=tab[seq_len(topN),seq_len(topN)]
+    rowSums(tab)%>%sort(decreasing = T)%>%names()->s_name
+    tab=tab[s_name,s_name]
+    if(topN>ncol(tab))topN=ncol(tab)
+    tab=tab[seq_len(topN),seq_len(topN)]
 
-  pcutils::lib_ps("circlize")
-  circlize::chordDiagram(tab,grid.col = pcutils::get_cols(topN))
-  #chorddiag::chorddiag(tab)
-  detach("package:circlize")
+    pcutils::lib_ps("circlize")
+    circlize::chordDiagram(tab,grid.col = pcutils::get_cols(topN))
+    #chorddiag::chorddiag(tab)
+    detach("package:circlize")
+  }
 }
-
 #try synteny plot
 if(F){
   #https://cran.r-project.org/web/packages/RIdeogram/vignettes/RIdeogram.html
@@ -523,11 +554,12 @@ rand_net<-function(go = go){
   data = rbind(data1,data2)
   p1 <- ggplot(data)+
     geom_point(aes(x = degree,y = freq,group =net,fill = net),pch = 21,size = 2) +
-    geom_smooth(aes(x = degree,y = freq,group =net,color = net),se=F)+
+    geom_smooth(aes(x = degree,y = freq,group =net,color = net),se=F,method = 'loess',formula = 'y ~ x')+
     labs(x="Degree",y="Proportion")+scale_color_manual(values = c("#F58B8B","#7AADF0"))+
     scale_fill_manual(values = c("#F58B8B","#7AADF0"))+
     ggpubr::theme_pubr()+theme(legend.position = c(0.8,0.9),legend.title = element_blank())
-  return(p1)
+  print(p1)
+  return(rand.g)
 }
 
 #' Net_pars of many random network
@@ -538,25 +570,36 @@ rand_net<-function(go = go){
 #'
 #' @export
 #' @rdname compare_rand
-rand_net_par<-function(go,reps=99,threads=4){
+rand_net_par<-function(go,reps=99,threads=1){
   #parallel
-  lib_ps("foreach","doSNOW")
-  pb <- txtProgressBar(max =reps, style = 3)
-  progress <- function(n) setTxtProgressBar(pb, n)
-  opts <- list(progress = progress)
+  #main function
+  loop=function(i){
+    #generate a random network
+    rand.g<- igraph::erdos.renyi.game(length(igraph::V(go)), length(igraph::E(go)),type = "gnm")
+    MetaNet::net_par(rand.g,mode = "n")[["n_index"]]->indexs
+    wc <- igraph::cluster_fast_greedy(rand.g)
+    indexs$modularity <- igraph::modularity(wc)
+    indexs
+  }
+  {
+    if(threads>1){
+      lib_ps("foreach","doSNOW")
+      pb <- utils::txtProgressBar(max =reps, style = 3)
+      opts <- list(progress = function(n) utils::setTxtProgressBar(pb, n))
+      cl <- snow::makeCluster(threads)
+      doSNOW::registerDoSNOW(cl)
+      res <- foreach::foreach(i = 1:reps,.options.snow = opts) %dopar% {
+                                loop(i)
+                              }
+      snow::stopCluster(cl)
+      gc()
+    }
+    else {
+      res <-lapply(1:reps, loop)
+    }}
+  #simplify method
+  rand_net_pars=do.call(rbind,res)
 
-  cl <- makeCluster(threads)
-  registerDoSNOW(cl)
-  rand_net_pars <- foreach(i = 1:reps,.options.snow = opts,
-                           .packages = c("igraph"),.combine = "rbind") %dopar% {
-                             #generate a random network
-                             rand.g<- erdos.renyi.game(length(V(go)), length(E(go)),type = "gnm")
-                             pctax::net_par(rand.g,mode = "n")[["n_index"]]->indexs
-                             wc <- igraph::cluster_fast_greedy(rand.g)
-                             indexs$modularity <- modularity(wc)
-                             indexs
-                           }
-  stopCluster(cl)
   if(F){
     ggplot(a,aes(x=clusteringC))+geom_histogram()+
       geom_vline(xintercept = transitivity(go), col = 'red')
@@ -589,6 +632,7 @@ compare_rand<-function(pars,randp,index=c("ave_path_len","clusteringC")){
     theme(legend.position = "none",axis.text.x = element_blank())
 }
 
+
 #' Calculate small-world coefficient
 #'
 #' @param go igraph
@@ -596,9 +640,11 @@ compare_rand<-function(pars,randp,index=c("ave_path_len","clusteringC")){
 #' @export
 #' @examples
 #' smallworldness(co_net)
-smallworldness<-function(go){
-  rand_net_par(go,reps = 99)->rands
-  small_world_coefficient=(transitivity(go)/mean(rands$clusteringC))/
-    (average.path.length(go)/mean(rands$ave_path_len))
+smallworldness<-function(go,reps=99,threads = 1){
+  rand_net_par(go,reps = reps,threads = threads )->rands
+  small_world_coefficient=(igraph::transitivity(go)/mean(rands$clusteringC))/
+    (igraph::average.path.length(go)/mean(rands$ave_path_len))
   small_world_coefficient
 }
+
+

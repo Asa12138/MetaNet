@@ -11,7 +11,7 @@ netD3plot(go, v_class = "v_class", ...)
 
 \item{v_class}{which attributes use to be v_class}
 
-\item{...}{see \code{\link[forceNetwork]{networkD3}}}
+\item{...}{see \code{\link[networkD3]{forceNetwork}}}
 }
 \description{
 plot use networkD3

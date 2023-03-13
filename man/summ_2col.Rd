@@ -15,7 +15,7 @@ summ_2col(df, from = 1, to = 2, count = 3, direct = F)
 
 \item{count}{(optional) weight column, if no, each equal to 1}
 
-\item{direct}{consider direct? defualt: F}
+\item{direct}{consider direct? default: F}
 }
 \description{
 Summaries two columns information

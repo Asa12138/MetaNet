@@ -4,7 +4,7 @@
 \alias{guolv}
 \title{Filter your data}
 \usage{
-guolv(tab, sum = 10, exist = 1)
+guolv(tab, sum = 0, exist = 1)
 }
 \arguments{
 \item{tab}{dataframe}

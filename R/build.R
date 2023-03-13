@@ -40,10 +40,11 @@ multi_net_build<-function(...,mode="full",method = "spearman",
     # set edges from_to
     suppressMessages(anno_edge(multi_net,tmp_v[,c("name","v_group")])->multi_net)
     # set edge intra-inter
-    E(multi_net)$e_class <- get_e(multi_net)[,c("v_group_from","v_group_to")] %>%
-      apply(., 1, \(x)ifelse(all_same(x), "intra", "inter"))
+    if(F){E(multi_net)$e_class <- get_e(multi_net)[,c("v_group_from","v_group_to")] %>%
+      apply(., 1, \(x)ifelse(all_same(x), "intra", "inter"))}
+    tmp_e=igraph::edge.attributes(multi_net)
+    E(multi_net)$e_class=ifelse(tmp_e$v_group_from==tmp_e$v_group_to, "intra", "inter")
     c_net_update(multi_net)->multi_net
-
   }
   multi_net
 }
@@ -124,8 +125,11 @@ c_net_build <- function(cor_res, r_thres = 0.6, p_thres = 0.05,use_p_adj=T, del_
   go.weight <- E(go)$weight
   E(go)$cor <- go.weight
   E(go)$weight <- abs(go.weight)
-  if("p.adjust"%in%names(cor_res))E(go)$p.adjust <-get_e(go)%>%select(from,to)%>%apply(., 1, \(x)cor_res$p.adjust[x[1],x[2]])
-  if("p.value"%in%names(cor_res))E(go)$p.value <-get_e(go)%>%select(from,to)%>%apply(., 1, \(x)cor_res$p.value[x[1],x[2]])
+  #time-consuming
+  if(F){
+    if("p.adjust"%in%names(cor_res))E(go)$p.adjust <-get_e(go)%>%select(from,to)%>%apply(., 1, \(x)cor_res$p.adjust[x[1],x[2]])
+    if("p.value"%in%names(cor_res))E(go)$p.value <-get_e(go)%>%select(from,to)%>%apply(., 1, \(x)cor_res$p.value[x[1],x[2]])
+  }
 
   # set edges type
   E(go)$e_type<-ifelse(go.weight > 0, "positive", "negative")
@@ -134,16 +138,19 @@ c_net_build <- function(cor_res, r_thres = 0.6, p_thres = 0.05,use_p_adj=T, del_
 
   # set edges from_to
   anno_edge(go,get_v(go)[,c("name","v_group")])->go
+
   # set edge intra-inter
-  E(go)$e_class <- get_e(go)[,c("v_group_from","v_group_to")] %>%
-    apply(., 1, \(x)ifelse(all_same(x), "intra", "inter"))
+if(F){E(go)$e_class <- get_e(go)[,c("v_group_from","v_group_to")] %>%
+    apply(., 1, \(x)ifelse(all_same(x), "intra", "inter"))}
+  tmp_e=igraph::edge.attributes(go)
+  E(go)$e_class=ifelse(tmp_e$v_group_from==tmp_e$v_group_to, "intra", "inter")
   c_net_update(go)->go
 
   return(go)
 }
 
 #' @export
-c_net_update<-function(go){
+c_net_update<-function(go,node_break=5,edge_break=5){
   #name
   if(!"name"%in%vertex_attr_names(go))V(go)$name=paste0("n",seq_len(length(go)))
   if(!"label"%in%vertex_attr_names(go))V(go)$label=V(go)$name
@@ -159,19 +166,31 @@ c_net_update<-function(go){
 
   #v_color
   if(!"v_class"%in%colnames(tmp_v)){tmp_v$v_class="v_class1"}
-  tmp_col=paste0(tmp_v$v_group,"-",tmp_v$v_class)
-  tmp_v$color =tidai(tmp_col,pcutils::get_cols(nlevels(factor(tmp_col)),"col3"))
+  if(is.numeric(tmp_v$v_class)){
+    tmp_v$color=as.character(cut(tmp_v$v_class,breaks = node_break,
+                             labels=pcutils::get_cols(node_break,RColorBrewer::brewer.pal(n = 9, name = "PuBu")[3:9])))
+    tmp_v$v_class=as.character(cut(tmp_v$v_class,breaks = node_break))
+  }
+  else{tmp_col=paste0(tmp_v$v_group,"-",tmp_v$v_class)
+  tmp_v$color =tidai(tmp_col,pcutils::get_cols(nlevels(factor(tmp_col)),"col3"),fac = T)}
 
   as.list(tmp_v)->vertex_attr(go)
 
   #e_color
   if(!"e_type"%in%edge_attr_names(go)){E(go)$e_type="e_type1"}
-  edge.color <- droplevels(as.factor(E(go)$e_type))
-
-  if(all(levels(edge.color)%in%c("negative","positive")))ncols=c(negative="#E85D5D",positive="#48A4F0")
-  else if(all(levels(edge.color)%in%c("inter-module","intra-module")))ncols=c("inter-module"="#FA789A","intra-module"="#A6CEE3")
-  else ncols=pcutils::get_cols(nlevels(edge.color),"col2")
-  E(go)$color=tidai(E(go)$e_type,ncols)
+  #分割
+  if(is.numeric(E(go)$e_type)){
+    E(go)$color=as.character(cut(E(go)$e_type,breaks = edge_break,
+                             labels=pcutils::get_cols(edge_break,RColorBrewer::brewer.pal(n = 9, name = "Greens")))[3:9])
+    E(go)$e_type=as.character(cut(E(go)$e_type,breaks = edge_break))
+  }
+  else{
+    edge.color <- droplevels(as.factor(E(go)$e_type))
+    if(all(levels(edge.color)%in%c("negative","positive")))ncols=c(negative="#E85D5D",positive="#48A4F0")
+    else if(all(levels(edge.color)%in%c("inter-module","intra-module")))ncols=c("inter-module"="#FA789A","intra-module"="#A6CEE3")
+    else ncols=pcutils::get_cols(nlevels(edge.color),"col2")
+    E(go)$color=tidai(E(go)$e_type,ncols,fac = T)
+  }
 
   #e_lty
   if(!"e_class"%in%edge_attr_names(go)){E(go)$e_class="e_class1"}
@@ -246,40 +265,48 @@ c_net_set <- function(go,...,vertex_group="v_group",vertex_class="v_class",verte
   get_v(go)->v_index
   get_e(go)->e_index
 #set something
-  vec_equal=\(x,y){
-    if (length(x)!=length(y))return(F)
-    all(x==y)
-  }
 
-  if(!vec_equal(vertex_group,"v_group"))select(v_index,v_group,!!vertex_group)%>%condance->V(go)$v_group
-  if(!vec_equal(vertex_class,"v_class"))select(v_index,v_class,!!vertex_class)%>%condance->V(go)$v_class
-  if(!vec_equal(vertex_size,"size"))select(v_index,size,!!vertex_size)%>%condance->V(go)$size
-  if(!vec_equal(edge_type,"e_type"))select(e_index,e_type,!!edge_type)%>%condance->E(go)$e_type
-  if(!vec_equal(edge_class,"e_class"))select(e_index,e_class,!!edge_class)%>%condance->E(go)$e_class
-  if(!vec_equal(edge_width,"width"))select(e_index,width,!!edge_width)%>%condance->E(go)$width
+  if(!setequal(vertex_group,"v_group"))select(v_index,v_group,!!vertex_group)%>%condance->v_index$v_group
+  if(!setequal(vertex_class,"v_class"))select(v_index,v_class,!!vertex_class)%>%condance->v_index$v_class
+  if(!setequal(vertex_size,"size"))select(v_index,size,!!vertex_size)%>%condance->v_index$size
+  if(!setequal(edge_type,"e_type"))select(e_index,e_type,!!edge_type)%>%condance->e_index$e_type
+  if(!setequal(edge_class,"e_class"))select(e_index,e_class,!!edge_class)%>%condance->e_index$e_class
+  if(!setequal(edge_width,"width"))select(e_index,width,!!edge_width)%>%condance->e_index$width
+  as.list(v_index)->vertex.attributes(go)
+  as.list(e_index)->edge.attributes(go)
 
   c_net_update(go)->go
   return(go)
 }
 
 
-tidai=\(x,y){
+tidai=\(x,y,fac=F){
+  if(is.null(y))return(x)
   tmp=y
   if(is.null(names(tmp))){
     tmp=rep(unique(tmp),len=length(unique(x)))
-    names(tmp)=unique(x)
+    if(fac)names(tmp)=levels(factor(x))
+    else names(tmp)=unique(x)
   }
-  return(unname(tmp[x]))
+  if(is.null(names(x)))return(unname(tmp[x]))
+  return(setNames(unname(tmp[x]),names(x)))
 }
+
 all_same <- \(x){
   return(all(x == x[1]))
 }
 condance<-\(aa){
-  apply(aa, 1, \(x){
-  tmp=x[!is.na(x)]
-  if(length(tmp)==0)return(NA)
-  return(tmp[length(tmp)])
-})}
+  if(any(is.na(aa[,length(aa)]))){
+    res=apply(aa, 1, \(x){
+    tmp=x[!is.na(x)]
+    if(length(tmp)==0)return(NA)
+    return(tmp[length(tmp)])
+    })}
+  else res=aa[,length(aa)]
+  res
+}
+
+
 change_fac_lev<-\(x,level=NULL){
   ordervec=factor(x)
   if(!is.null(level)){
@@ -297,15 +324,24 @@ get_v=function(go){
 }
 #' @export
 get_e=function(go){
+  tmp_e=cbind_new(igraph::as_data_frame(go),data.frame(id=seq_len(igraph::ecount(go))))
+  dplyr::select(tmp_e,id,dplyr::everything())
+}
+get_e1=function(go){
   tmp_e=cbind_new(igraph::as_data_frame(go),as.data.frame(igraph::edge_attr(go)))
   tmp_e=cbind_new(tmp_e,data.frame(id=1:nrow(tmp_e)))
-  dplyr::select(tmp_e,id,everything())
+  dplyr::select(tmp_e,id,dplyr::everything())
 }
+
 #' @export
 get_n=function(go){
   gls=igraph::graph.attributes(go)
-  gls=lapply(gls,\(x)ifelse(is.data.frame(x),"data.frame",
-                        ifelse(length(x)>1,paste(x,collapse = ";"),x)))
+  gls=lapply(gls,\(x){
+    if(inherits(x,"data.frame"))return(paste0(ncol(x),"-columns df"))
+    if(is.list(x))return(paste0(length(x),"-elements ",class(x)))
+    if(length(x)>1)return(paste0(length(x),"-elements vector"))
+    return(x)
+  })
   as.data.frame(gls)
 }
 
@@ -320,7 +356,7 @@ get_n=function(go){
 #' @examples
 #'
 #' c_net_filter(multi1,v_group=c("omic1","omic2"),e_class="intra")
-c_net_filter<-function(go,...){
+c_net_filter<-function(go,...,exclude=F){
   f_ls=list(...)
   v_ls=list();e_ls=list()
   for (i in names(f_ls)) {
@@ -332,20 +368,21 @@ c_net_filter<-function(go,...){
       e_ls[[i]]=f_ls[[i]]
     }
   }
-  go1=filter_v(go,v_ls)
-  go1=filter_e(go1,e_ls)
+  go1=filter_v(go,v_ls,exclude=exclude)
+  go1=filter_e(go1,e_ls,exclude=exclude)
   class(go1)=c("metanet","igraph")
   go1
 }
 
 #' @export
-filter_v<-function(go,...){
+filter_v<-function(go,...,exclude=F){
   f_ls=list(...)
   if(is.list(f_ls[[1]]))f_ls=f_ls[[1]]
   get_v(go)->tmp_v
   for (i in names(f_ls)) {
     if(!i%in%colnames(tmp_v)){warning(i," do not in vertex_attributes, skip");next}
-    tmp_v=tmp_v[tmp_v[[i]]%in%f_ls[[i]],]
+    if(exclude)tmp_v=tmp_v[!tmp_v[[i]]%in%f_ls[[i]],]
+    else tmp_v=tmp_v[tmp_v[[i]]%in%f_ls[[i]],]
   }
 
   tmp_v$name->vid
@@ -355,13 +392,14 @@ filter_v<-function(go,...){
 }
 
 #' @export
-filter_e<-function(go,...){
+filter_e<-function(go,...,exclude=F){
   f_ls=list(...)
   if(is.list(f_ls[[1]]))f_ls=f_ls[[1]]
   get_e(go)->tmp_e
   for (i in names(f_ls)) {
     if(!i%in%colnames(tmp_e)){warning(i," do not in edge_attributes, skip");next}
-    tmp_e=tmp_e[tmp_e[[i]]%in%f_ls[[i]],]
+    if(exclude)tmp_e=tmp_e[!tmp_e[[i]]%in%f_ls[[i]],]
+    else tmp_e=tmp_e[tmp_e[[i]]%in%f_ls[[i]],]
   }
 
   tmp_e$id->eid
@@ -376,6 +414,7 @@ filter_e<-function(go,...){
 #' @param go a igraph object
 #' @param anno_tab a dataframe using to annotate (with rowname or a name column)
 #' @return a annotated igraph object
+#' @aliases anno_node
 #' @export
 #'
 #' @examples
@@ -446,9 +485,9 @@ c_net_save<-function(go,filename="net",format="data.frame"){
     get_e(go)%>%select(-1)%>%write.csv(.,paste0(filename,"_edges.csv"),row.names = F)
   }
   if(format=="graphml"){
-    igraph::write.graph(go,paste0(file,".graphml"),format = "graphml")
+    igraph::write.graph(go,paste0(filename,".graphml"),format = "graphml")
   }
-  print(paste0(file," saved sucessfully!"))
+  print(paste0(filename," saved sucessfully!"))
 }
 
 
@@ -457,7 +496,7 @@ c_net_save<-function(go,filename="net",format="data.frame"){
 #' @param from first column name or index
 #' @param to second column name or index
 #' @param count (optional) weight column, if no, each equal to 1
-#' @param direct consider direct? defualt: F
+#' @param direct consider direct? default: F
 #'
 #' @export
 #' @examples
@@ -568,13 +607,13 @@ RMT_threshold = function(occor.r, min_threshold = 0.5, max_threshold = 0.9, step
     nnsdpois <- density(NNSD(poisson_d))
     chival <- sum((nnsdw$y - nnsdpois$y)^2/nnsdpois$y/1e3)}
 
-    #maximum likehood
+    #maximum likelihood
     evs = ev.spacing[ev.spacing != 0]
     N = length(evs)
     log_LE = -sum(evs)/N
     log_LW = log(pi/2) + sum(log(evs))/N - 0.25 * pi * sum(evs^2)/N
 
-    #save pngs
+    #save png
     {
       histo <- hist(ev.spacing, breaks = seq(min(ev.spacing),max(ev.spacing), len = 51), plot = F)
       png(paste0("RMT_temp/rmt_nnsd",i,".png"),height = 600,width = 700,res = 130)
@@ -584,12 +623,12 @@ RMT_threshold = function(occor.r, min_threshold = 0.5, max_threshold = 0.9, step
     }
     res=rbind(res,data.frame(threshold,p_ks_test,log_sse,log_LW,log_LE))
   }
+  message(paste("The Intermediate files saved in ./RMT_temp/ ."))
   #transfer to gif
   if(gif){
     lib_ps("gifski")
     gifski::gifski(paste0("RMT_temp/rmt_nnsd",seq_len(length(thres_seq)),".png"),gif_file = "RMT_temp/rmt_nnsd.gif")
   }
-  message(paste("The Intermediate files saved in ./RMT_temp/ ."))
   class(res)=c("rmt_res",class(res))
   return(res)
 }

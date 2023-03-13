@@ -24,13 +24,13 @@ modu_net(
 n-modules metanet
 }
 \description{
-Generate a n-modules network
+this is just a random generation method, the module number of result is not exactly the n_modu, you can change the inter_modu_density and intra_modu_density to get the proper result.
 }
 \examples{
 g1=modu_net()
 get_n(g1)
-plot(g1,plot_module=T)
-plot(g1,plot_module=T,coors=g_lay(g1,zoom2 = 20))
-plot(g1,plot_module=T,coors=g_lay_polyarc(g1,group = "module"))
+plot(g1)
+plot(g1,coors=g_lay(g1,zoom2 = 20))
+plot(g1,coors=g_lay_polyarc(g1,group = "module"))
 plot(g1,coors=g_lay_polygon(g1,group = "module"))
 }

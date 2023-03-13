@@ -11,6 +11,9 @@ c_net_plot(
   labels_num = 5,
   legend_number = F,
   legend = T,
+  legend_cex = 1,
+  legend_position = c(left_leg_x = -1.9, left_leg_y = 1, right_leg_x = 1.2, right_leg_y =
+    1),
   lty_legend = F,
   lty_legend_title = "Edge class",
   size_legend = F,
@@ -25,8 +28,9 @@ c_net_plot(
   group_legend_title = NULL,
   group_legend_order = NULL,
   plot_module = F,
-  mark.groups = T,
-  module_color = NULL
+  mark_groups = T,
+  mark_color = NULL,
+  seed = 1234
 )
 }
 \arguments{
@@ -41,6 +45,10 @@ c_net_plot(
 \item{legend_number}{legend with numbers}
 
 \item{legend}{all legends}
+
+\item{legend_cex}{character expansion factor relative to current par("cex"), default: 1}
+
+\item{legend_position}{legend_position, default: c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1)}
 
 \item{lty_legend}{logical}
 
@@ -67,6 +75,14 @@ c_net_plot(
 \item{group_legend_title}{group_legend_title, length must same to the numbers of v_group}
 
 \item{group_legend_order}{group_legend_order vector}
+
+\item{plot_module}{logical, plot module?}
+
+\item{mark_groups}{logical, mark the modules?}
+
+\item{mark_color}{mark colors}
+
+\item{seed}{random seed, default:1234, make sure each plot is the same.}
 }
 \value{
 a network plot

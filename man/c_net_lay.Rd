@@ -15,11 +15,13 @@ c_net_lay(
 \arguments{
 \item{go}{igraph}
 
-\item{method}{see \code{\link[igarph]{layout_ }}, and as_line(),as_arc()}
+\item{method}{as_star(), as_tree(), in_circle(), nicely(), on_grid(), on_sphere(),randomly(), with_dh(), with_fr(), with_gem(), with_graphopt(), with_kk(),with_lgl(), with_mds(),as_line(), as_arc(), as_polygon(), as_polyarc(). see \code{\link[igarph]{layout_}}.}
 
 \item{order_by}{order nodes according to a node attribute}
 
 \item{order_ls}{manual the discrete variable with a vector, or continuous variable with "desc" to decreasing}
+
+\item{seed}{random seed}
 }
 \value{
 coordinates for nodes,columns: name, X, Y
@@ -33,5 +35,5 @@ c_net_plot(co_net,coors)
 c_net_plot(co_net,c_net_lay(co_net,in_circle()),vertex.size=2)
 c_net_plot(co_net,c_net_lay(co_net,in_circle(),order_by="v_class"),vertex.size=2)
 c_net_plot(co_net,c_net_lay(co_net,in_circle(),order_by="size",order_ls="desc"))
-c_net_plot(co_net,c_net_lay(co_net,as_polyarc(3),order_by="size",order_ls="desc"))
+c_net_plot(co_net,c_net_lay(co_net,as_polygon(3),order_by="v_class"))
 }

@@ -43,7 +43,7 @@ trans<-function(df,method = "normalize",margin=2,...){
 #' @examples
 #'data(otutab)
 #'guolv(otutab)
-guolv<-function(tab,sum=10,exist=1){
+guolv<-function(tab,sum=0,exist=1){
   tab[rowSums(tab)>sum,]->tab
   tab[rowSums(tab>0)>exist,]->tab
   return(tab)
@@ -105,19 +105,18 @@ c_net_cal <- function(totu, totu2 = NULL,method = "spearman", filename = "occor"
   # corr<-par_cor(totu,totu2,threads = threads,method = "spearman")
   # }
   if(is.null(totu2))diag(corr$r)=0
-  r <- corr$r
-  p.value<-corr$p.value
-  p.adjust=p.value
+
   if(!is.null(p.adjust.method))p.adjust<-p.adjust.table(corr$p.value,p.adjust.method)
+  else p.adjust=corr$p.value
 
   # save the correlation result
   if(is.character(filename)){
     #if(!dir.exists("net_res"))dir.create("net_res/")
-    write.csv(round(r,5), paste0(filename, "_r.csv"))
-    write.csv(round(p.value, 5), paste0(filename, "_p.csv"))
+    write.csv(round(corr$r,5), paste0(filename, "_r.csv"))
+    write.csv(round(corr$p.value, 5), paste0(filename, "_p.csv"))
     write.csv(round(p.adjust, 5), paste0(filename, "_p_adj.csv"))
   }
-  return(list(r = r, p.value = p.value,p.adjust=p.adjust))
+  return(list(r = corr$r, p.value = corr$p.value,p.adjust=p.adjust))
 }
 
 #' Import corr from .csv file

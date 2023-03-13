@@ -4,10 +4,12 @@
 \alias{as_polyarc}
 \title{Layout as a poly_arc}
 \usage{
-as_polyarc(n = 3)
+as_polyarc(n = 3, space = pi/3)
 }
 \arguments{
 \item{n}{how many arcs of this poly_arc}
+
+\item{space}{the space between each arc, default: pi/3}
 }
 \value{
 A two-column matrix, each row giving the coordinates of a vertex, according to the ids of the vertex ids.

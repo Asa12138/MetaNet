@@ -8,11 +8,11 @@
 g_lay(
   go,
   group = "module",
-  zoom1 = 20,
-  zoom2 = 3,
   layout1 = in_circle(),
+  zoom1 = 20,
   layout2 = in_circle(),
-  show_big_lay = T,
+  zoom2 = 3,
+  show_big_lay = F,
   ...
 )
 
@@ -23,16 +23,15 @@ g_lay_nice(go, group = "module")
 
 \item{group}{group name (default:module)}
 
+\item{layout1}{layout1 method, one of
+{1.a dataframe or matrix: rowname is group, two columns are X and Y}
+{2.function: layout method for \code{\link{c_net_lay}} default: in_circle()}}
+
 \item{zoom1}{big network layout size}
 
+\item{layout2}{one of functions: layout method for \code{\link{c_net_lay}}, or a list of functions.}
+
 \item{zoom2}{average sub_network layout size}
-
-\item{layout1}{layout1 method, one of
-{1.numeric: use adjusted circle}
-{2.a dataframe: rowname is group, two columns are X and Y}
-{3.function: \code{\link[igraph]{layout_}} default: in_circle()}}
-
-\item{layout2}{one of \code{\link[igraph]{layout_}}}
 }
 \value{
 coors
@@ -45,11 +44,11 @@ Layout with group nicely
 \examples{
 data("c_net")
 modu_dect(co_net,method="cluster_fast_greedy") -> co_net_modu
-g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 5,layout2 =nicely())->oridata
+g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 1:5,layout2 =as_line())->oridata
 #g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 5,layout1=data.frame(X=c(1,1,1,1,2,2,2,2,3,3,3,3,3.5),Y=c(1,2,3,4,1,2,3,4,1,2,3,4,2)),layout2 =nicely())->oridata
-modu_plot(co_net_modu,coors = oridata)
+plot(co_net_modu,coors = oridata)
 
 g_lay_nice(co_net_modu,group ="module")->oridata
-modu_plot(co_net_modu,coors = oridata)
+plot(co_net_modu,coors = oridata)
 
 }
