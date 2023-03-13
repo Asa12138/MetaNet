@@ -4,14 +4,16 @@
 \alias{filter_n_modu}
 \title{Filter some modules as others}
 \usage{
-filter_n_modu(go, n_modu = 0, keep_id = NULL)
+filter_n_modu(go_m, n_modu = 0, keep_id = NULL, delete = F)
 }
 \arguments{
-\item{go}{module igraph}
+\item{go_m}{module igraph}
 
 \item{n_modu}{transfer the modules less than n_modu to "others"}
 
 \item{keep_id}{keep modules ids, will not be "others"}
+
+\item{delete}{logical, delete others modules? default:F, the others module will be "others".}
 }
 \description{
 Filter some modules as others

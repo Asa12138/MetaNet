@@ -2,6 +2,7 @@
 % Please edit documentation in R/build.R
 \name{anno_vertex}
 \alias{anno_vertex}
+\alias{anno_node}
 \title{Use dataframe to annotate vertexes of a igraph}
 \usage{
 anno_vertex(go, anno_tab)

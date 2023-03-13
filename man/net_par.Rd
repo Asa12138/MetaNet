@@ -7,7 +7,7 @@
 \usage{
 net_par(go, mode = c("v", "e", "n", "all"), fast = T)
 
-get_net_par(go)
+get_net_par(go, force = F)
 }
 \arguments{
 \item{go}{a igraph object}

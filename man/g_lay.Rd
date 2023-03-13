@@ -31,7 +31,7 @@ g_lay_nice(go, group = "module")
 
 \item{layout2}{one of functions: layout method for \code{\link{c_net_lay}}, or a list of functions.}
 
-\item{zoom2}{average sub_network layout size}
+\item{zoom2}{average sub_network layout size, or numeric vector, or "auto"}
 }
 \value{
 coors

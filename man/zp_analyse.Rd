@@ -4,12 +4,14 @@
 \alias{zp_analyse}
 \title{Zi-Pi calculate}
 \usage{
-zp_analyse(go, mode = 2)
+zp_analyse(go, mode = 2, use_origin = T)
 }
 \arguments{
 \item{go}{igraph object after modu_dect()}
 
 \item{mode}{use 7-group (mode=1) or 4-group (mode=2)}
+
+\item{use_origin}{use origin_module, default:T, if F, use module}
 }
 \value{
 igraph

@@ -5,12 +5,18 @@
 \alias{g_lay_polyarc}
 \title{Layout with group as a polygon}
 \usage{
-g_lay_polygon(go, group = "v_group", group2 = "v_class", group2_order = NULL)
+g_lay_polygon(
+  go,
+  group = "v_group",
+  group2 = NULL,
+  group2_order = NULL,
+  line_curved = 0.5
+)
 
 g_lay_polyarc(
   go,
   group = "v_group",
-  group2 = "v_class",
+  group2 = NULL,
   group2_order = NULL,
   space = pi/4
 )

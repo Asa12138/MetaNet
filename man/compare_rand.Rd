@@ -5,7 +5,7 @@
 \alias{compare_rand}
 \title{Net_pars of many random network}
 \usage{
-rand_net_par(go, reps = 99, threads = 4)
+rand_net_par(go, reps = 99, threads = 1)
 
 compare_rand(pars, randp, index = c("ave_path_len", "clusteringC"))
 }

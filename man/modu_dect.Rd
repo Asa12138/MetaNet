@@ -4,7 +4,7 @@
 \alias{modu_dect}
 \title{Detect the modules}
 \usage{
-modu_dect(go, method = "cluster_fast_greedy", n_modu = 0)
+modu_dect(go, method = "cluster_fast_greedy", n_modu = 0, delete = F)
 }
 \arguments{
 \item{go}{a igraph object}

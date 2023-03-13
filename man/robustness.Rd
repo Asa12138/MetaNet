@@ -2,21 +2,21 @@
 % Please edit documentation in R/stability.R
 \name{robustness}
 \alias{robustness}
-\title{Robustness after remove 50\% nodes or some hubs}
+\title{Robustness after remove 50\% nodes or some hubs, need the network contains "cor" attribute.}
 \usage{
-robustness(go, keystone = F, reps = 9, threads = 4)
+robustness(go_ls, keystone = F, reps = 9, threads = 1)
 }
 \arguments{
-\item{go}{igraph}
-
 \item{keystone}{remove 70\% keystone (default:False)}
 
 \item{reps}{simulation time}
 
 \item{threads}{threads}
+
+\item{go}{igraph}
 }
 \description{
-Robustness after remove 50\% nodes or some hubs
+Robustness after remove 50\% nodes or some hubs, need the network contains "cor" attribute.
 }
 \examples{
 robustness(co_net)

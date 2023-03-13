@@ -4,7 +4,7 @@
 \alias{extract_sub_net}
 \title{Extract sub-network from the whole network}
 \usage{
-extract_sub_net(a_net, otutab, threads = 4, save_net = F)
+extract_sub_net(a_net, otutab, threads = 1, save_net = F)
 }
 \arguments{
 \item{a_net}{the whole network}

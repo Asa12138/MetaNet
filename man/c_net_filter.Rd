@@ -4,7 +4,7 @@
 \alias{c_net_filter}
 \title{Filter a network according to some attributes}
 \usage{
-c_net_filter(go, ...)
+c_net_filter(go, ..., exclude = F)
 }
 \arguments{
 \item{go}{igraph}

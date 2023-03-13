@@ -9,8 +9,12 @@ links_stat(
   group = "v_class",
   inter = "all",
   topN = 6,
-  number = F,
   direct = T,
+  legend_number = F,
+  legend = T,
+  legend_cex = 1,
+  legend_position = c(left_leg_x = -1.6, left_leg_y = 1, right_leg_x = 1.2, right_leg_y =
+    1),
   col_legend_order = NULL,
   group_legend_title = NULL,
   group_legend_order = NULL

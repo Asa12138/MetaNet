@@ -485,6 +485,7 @@ c_net_save<-function(go,filename="net",format="data.frame"){
     get_e(go)%>%select(-1)%>%write.csv(.,paste0(filename,"_edges.csv"),row.names = F)
   }
   if(format=="graphml"){
+    E(go)$id=NULL
     igraph::write.graph(go,paste0(filename,".graphml"),format = "graphml")
   }
   print(paste0(filename," saved sucessfully!"))

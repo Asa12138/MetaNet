@@ -4,7 +4,7 @@
 \alias{as_polygon}
 \title{Layout as a polygon}
 \usage{
-as_polygon(n = 3)
+as_polygon(n = 3, line_curved = 0.5)
 }
 \arguments{
 \item{n}{how many edges of this polygon}

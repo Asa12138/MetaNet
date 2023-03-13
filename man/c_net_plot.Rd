@@ -28,7 +28,7 @@ c_net_plot(
   group_legend_title = NULL,
   group_legend_order = NULL,
   plot_module = F,
-  mark_groups = T,
+  mark_module = F,
   mark_color = NULL,
   seed = 1234
 )
@@ -78,7 +78,7 @@ c_net_plot(
 
 \item{plot_module}{logical, plot module?}
 
-\item{mark_groups}{logical, mark the modules?}
+\item{mark_module}{logical, mark the modules?}
 
 \item{mark_color}{mark colors}
 

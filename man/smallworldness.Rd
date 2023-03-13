@@ -4,7 +4,7 @@
 \alias{smallworldness}
 \title{Calculate small-world coefficient}
 \usage{
-smallworldness(go)
+smallworldness(go, reps = 99, threads = 1)
 }
 \arguments{
 \item{go}{igraph}

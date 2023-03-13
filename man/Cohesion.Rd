@@ -4,7 +4,7 @@
 \alias{Cohesion}
 \title{Cohesion calculate}
 \usage{
-Cohesion(otutab, reps = 200, threads = 4, mycor = NULL)
+Cohesion(otutab, reps = 200, threads = 1, mycor = NULL)
 }
 \arguments{
 \item{otutab}{otutab}
