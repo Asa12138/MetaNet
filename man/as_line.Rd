@@ -17,4 +17,5 @@ Layout as a line
 }
 \examples{
 as_line()(co_net)
+c_net_plot(co_net,coors=as_line(pi/2))
 }

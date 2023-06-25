@@ -19,4 +19,5 @@ Layout as a arc
 }
 \examples{
 as_arc()(co_net)
+c_net_plot(co_net,coors=as_arc(pi/2),rescale=FALSE)
 }

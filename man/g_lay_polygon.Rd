@@ -29,6 +29,10 @@ g_lay_polyarc(
 \item{group2}{group2 name, will order nodes in each group according to group2_order (default:v_class)}
 
 \item{group2_order}{group2_order}
+
+\item{line_curved}{line_curved 0~1}
+
+\item{space}{the space between each arc, default: pi/3}
 }
 \value{
 coors

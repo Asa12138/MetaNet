@@ -4,10 +4,18 @@
 \alias{c_net_from_edgelist}
 \title{Construct a network from Edge_list dataframe}
 \usage{
-c_net_from_edgelist(edgelist, direct = F, e_type = NULL, e_class = NULL)
+c_net_from_edgelist(
+  edgelist,
+  vertex = NULL,
+  direct = FALSE,
+  e_type = NULL,
+  e_class = NULL
+)
 }
 \arguments{
 \item{edgelist}{first is source, second is target, others are annotation}
+
+\item{vertex}{vertex metadata}
 
 \item{direct}{logical}
 
@@ -17,4 +25,9 @@ c_net_from_edgelist(edgelist, direct = F, e_type = NULL, e_class = NULL)
 }
 \description{
 Construct a network from Edge_list dataframe
+}
+\examples{
+data(edgelist)
+edge_net=c_net_from_edgelist(arc_count,vertex = arc_taxonomy)
+c_net_plot(edge_net)
 }

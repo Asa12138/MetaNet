@@ -14,9 +14,9 @@ c_net_lay(
 )
 }
 \arguments{
-\item{go}{igraph}
+\item{go}{igraph or metanet}
 
-\item{method}{as_star(), as_tree(), in_circle(), nicely(), on_grid(), on_sphere(),randomly(), with_dh(), with_fr(), with_gem(), with_graphopt(), with_kk(),with_lgl(), with_mds(),as_line(), as_arc(), as_polygon(), as_polyarc(). see \code{\link[igarph]{layout_}}.}
+\item{method}{as_star(), as_tree(), in_circle(), nicely(), on_grid(), on_sphere(),randomly(), with_dh(), with_fr(), with_gem(), with_graphopt(), with_kk(),with_lgl(), with_mds(),as_line(), as_arc(), as_polygon(), as_polyarc(). see \code{\link[igraph]{layout_}}.}
 
 \item{order_by}{order nodes according to a node attribute}
 
@@ -33,6 +33,7 @@ coordinates for nodes,columns: name, X, Y
 Layout coordinates
 }
 \examples{
+library(igraph)
 c_net_lay(co_net)->coors
 c_net_plot(co_net,coors)
 c_net_plot(co_net,c_net_lay(co_net,in_circle()),vertex.size=2)

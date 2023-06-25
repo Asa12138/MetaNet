@@ -18,6 +18,6 @@ matrix
 p.adjust apply on a correlation table (matrix or data.frame)
 }
 \examples{
-matrix(abs(rnorm(100,0.01)),10,10)->pp
+matrix(abs(rnorm(100, 0.01)), 10, 10) -> pp
 p.adjust.table(pp)
 }

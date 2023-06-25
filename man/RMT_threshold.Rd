@@ -8,10 +8,10 @@
 RMT_threshold(
   occor.r,
   min_threshold = 0.5,
-  max_threshold = 0.9,
+  max_threshold = 0.8,
   step = 0.02,
-  gif = F,
-  quite = F
+  gif = FALSE,
+  verbose = FALSE
 )
 
 rmt(occor.r, min_threshold = 0.5, max_threshold = 0.85, step = 0.01)
@@ -25,7 +25,9 @@ rmt(occor.r, min_threshold = 0.5, max_threshold = 0.85, step = 0.01)
 
 \item{step}{step}
 
-\item{gif}{render .gif file?}
+\item{gif}{render a .gif file?}
+
+\item{verbose}{verbose}
 }
 \value{
 a r-threshold
@@ -36,15 +38,22 @@ Get RMT threshold for a correlation matrix
 Get RMT threshold for a correlation matrix roughly
 }
 \examples{
+\donttest{
+\dontrun{
 t(otutab) -> totu
 c_net_cal(totu) -> corr
-rmt(corr$r)
+rmt(corr)
 #0.69
 c_net_build(corr,r_thres=0.69) -> co_net_rmt
-RMT_threshold(corr$r,gif=T)->rmt_res
+RMT_threshold(corr$r,gif=TRUE)->rmt_res
+}}
 }
 \references{
-1.  J. Zhou, Y. Deng, F. Luo, Z. He, Q. Tu, X. Zhi, Functional Molecular Ecological Networks (2010), doi:10.1128/mBio.00169-10.
+\enumerate{
+\item J. Zhou, Y. Deng, FALSE. Luo, Z. He, Q. Tu, X. Zhi, Functional Molecular Ecological Networks (2010), doi:10.1128/mBio.00169-10.
+}
 
-2. \link{https://matstat.org/content_en/RMT/RMThreshold_Intro.pdf}
+\enumerate{
+\item \code{https://matstat.org/content_en/RMT/RMThreshold_Intro.pdf}
+}
 }

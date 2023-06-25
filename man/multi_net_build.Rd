@@ -12,8 +12,8 @@ multi_net_build(
   p.adjust.method = NULL,
   r_thres = 0.6,
   p_thres = 0.05,
-  use_p_adj = T,
-  del_single = T
+  use_p_adj = TRUE,
+  del_single = TRUE
 )
 }
 \arguments{
@@ -23,9 +23,17 @@ multi_net_build(
 
 \item{method}{spearman, pearson}
 
-\item{filename}{the prefix of saved files}
+\item{filename}{the prefix of saved .corr file or FALSE}
 
 \item{p.adjust.method}{see \code{\link[stats]{p.adjust}}}
+
+\item{r_thres}{r_threshold (default: >0.6)}
+
+\item{p_thres}{p_threshold (default: <0.05)}
+
+\item{use_p_adj}{use the p.adjust instead of p-value (default: TRUE)}
+
+\item{del_single}{should delete single vertexes?}
 }
 \value{
 metanet
@@ -35,11 +43,10 @@ Multi-omics network build
 }
 \examples{
 data("multi_test")
-multi_net_build(micro,metab,transc)->multi1
+multi_net_build(micro,metab,transc,filename=FALSE)->multi1
 multi1=c_net_set(multi1,micro_g,metab_g,transc_g,vertex_class = c("Phylum","kingdom","type"))
-multi1=c_net_set(multi1,data.frame("Abundance1"=colSums(micro)),data.frame("Abundance2"=colSums(metab)),data.frame("Abundance3"=colSums(transc)),vertex_size =paste0("Abundance",1:3))
+multi1=c_net_set(multi1,data.frame("Abundance1"=colSums(micro)),
+   data.frame("Abundance2"=colSums(metab)),data.frame("Abundance3"=colSums(transc)),
+   vertex_size =paste0("Abundance",1:3))
 c_net_plot(multi1)
-multi1=c_net_set(multi1,vertex_class = c("kingdom","type"))
-c_net_plot(multi1)
-
 }

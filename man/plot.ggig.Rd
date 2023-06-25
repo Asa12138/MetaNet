@@ -5,29 +5,65 @@
 \title{Plot a ggig}
 \usage{
 \method{plot}{ggig}(
-  ggig,
+  x,
   coors = NULL,
   ...,
   labels_num = 0,
-  legend_number = F,
-  legend = T,
-  lty_legend = F,
+  legend_number = FALSE,
+  legend = TRUE,
+  lty_legend = FALSE,
   lty_legend_title = "Edge class",
-  size_legend = F,
+  size_legend = FALSE,
   size_legend_title = "Node Size",
-  edge_legend = T,
+  edge_legend = TRUE,
   edge_legend_title = "Edge type",
   edge_legend_order = NULL,
-  width_legend = F,
+  width_legend = FALSE,
   width_legend_title = "Edge width",
-  col_legend = T,
+  col_legend = TRUE,
   col_legend_order = NULL,
-  class_legend_title = "Node class",
+  group_legend_title = "Node class",
   group_legend_order = NULL
 )
 }
 \arguments{
-\item{ggig}{ggig object}
+\item{x}{ggig object}
+
+\item{coors}{the coordinates you saved}
+
+\item{...}{additional parameters}
+
+\item{labels_num}{show how many labels,>1 indicates number, <1 indicates fraction ,default:5}
+
+\item{legend_number}{legend with numbers}
+
+\item{legend}{all legends}
+
+\item{lty_legend}{logical}
+
+\item{lty_legend_title}{lty_legend_title}
+
+\item{size_legend}{logical}
+
+\item{size_legend_title}{size_legend_title}
+
+\item{edge_legend}{logical}
+
+\item{edge_legend_title}{edge_legend_title}
+
+\item{edge_legend_order}{edge_legend_order vector, e.g. c("positive","negative")}
+
+\item{width_legend}{logical}
+
+\item{width_legend_title}{width_legend_title}
+
+\item{col_legend}{logical}
+
+\item{col_legend_order}{col_legend_order vector,}
+
+\item{group_legend_title}{group_legend_title, length must same to the numbers of v_group}
+
+\item{group_legend_order}{group_legend_order vector}
 }
 \value{
 ggplot

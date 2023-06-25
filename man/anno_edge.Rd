@@ -7,7 +7,7 @@
 anno_edge(go, anno_tab)
 }
 \arguments{
-\item{go}{a igraph object}
+\item{go}{metanet a igraph object}
 
 \item{anno_tab}{a dataframe using to annotate (with rowname or a name column)}
 }
@@ -19,6 +19,6 @@ Use dataframe to annotate edges of a igraph
 }
 \examples{
 data("c_net")
-data("otutab")
+data("otutab",package="pcutils")
 anno_edge(co_net, taxonomy)->a
 }

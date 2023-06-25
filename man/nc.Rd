@@ -7,7 +7,7 @@
 nc(p)
 }
 \arguments{
-\item{p}{a igraph object}
+\item{p}{a igraph or metanet object}
 }
 \value{
 natural_connectivity (numeric)
@@ -16,8 +16,8 @@ natural_connectivity (numeric)
 Calculate natural_connectivity
 }
 \examples{
-make_ring(10) \%>\% nc()
+igraph::make_ring(10) \%>\% nc()
 }
 \references{
-\code{\link[ggClusterNet]{nc}}
+\code{`nc` in `ggClusterNet`}
 }

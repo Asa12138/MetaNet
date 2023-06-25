@@ -16,28 +16,37 @@ c_net_set(
 )
 }
 \arguments{
-\item{go}{a igraph object}
+\item{go}{metanet a igraph object}
 
-\item{...}{some dataframes to annotate go}
+\item{...}{some data.frames to annotate go}
+
+\item{vertex_group}{choose which column to be vertex_group (map to vertex_shape)}
 
 \item{vertex_class}{choose which column to be vertex_class (map to vertex_color)}
 
 \item{vertex_size}{choose which column to be vertex_size (map to vertex_size)}
+
+\item{edge_type}{choose which column to be edge_type (map to edge_color)}
+
+\item{edge_class}{choose which column to be edge_class (map to edge_linetype)}
+
+\item{edge_width}{choose which column to be edge_width (map to edge_width)}
 }
 \value{
-a igraph object
+a metanet object
 }
 \description{
 Set basic attributes from totu table
 }
 \examples{
-data("otutab")
+data("otutab",package="pcutils")
 t(otutab) -> totu
 metadata[,3:10] -> env
 
 data("c_net")
-co_net<-c_net_set(co_net,taxonomy,data.frame("Abundance"=colSums(totu)),vertex_class="Phylum",vertex_size="Abundance")
-co_net_rmt<-c_net_set(co_net_rmt,taxonomy,data.frame("Abundance"=colSums(totu)),vertex_class="Phylum",vertex_size="Abundance")
-co_net2<-c_net_set(co_net2,taxonomy,data.frame(name=colnames(env),env=colnames(env)),vertex_class=c("Phylum","env"))
+co_net<-c_net_set(co_net,taxonomy,data.frame("Abundance"=colSums(totu)),
+   vertex_class="Phylum",vertex_size="Abundance")
+co_net2<-c_net_set(co_net2,taxonomy,data.frame(name=colnames(env),env=colnames(env)),
+   vertex_class=c("Phylum","env"))
 co_net2<-c_net_set(co_net2,data.frame("Abundance"=colSums(totu)),vertex_size="Abundance")
 }

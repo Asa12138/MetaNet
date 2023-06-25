@@ -2,25 +2,44 @@
 % Please edit documentation in R/stability.R
 \name{robustness}
 \alias{robustness}
-\title{Robustness after remove 50\% nodes or some hubs, need the network contains "cor" attribute.}
+\alias{plot.robustness}
+\title{Robustness after remove 50\%\% nodes or some hubs, need the metanet contains "cor" attribute.}
 \usage{
-robustness(go_ls, keystone = F, reps = 9, threads = 1)
+robustness(go_ls, keystone = FALSE, reps = 9, threads = 1)
+
+\method{plot}{robustness}(x, indexes = "num_nodes", ...)
 }
 \arguments{
-\item{keystone}{remove 70\% keystone (default:False)}
+\item{go_ls}{a igraph object or igraph list.}
+
+\item{keystone}{remove 70\%\% keystones instead of remove 50\%\% nodes (default: False)}
 
 \item{reps}{simulation time}
 
 \item{threads}{threads}
 
-\item{go}{igraph}
+\item{x}{\code{robustness()} result (robustness object)}
+
+\item{indexes}{indexes selected to show}
+
+\item{...}{additional arguments for \code{\link[pcutils]{group_box}}}
+}
+\value{
+a ggplot
 }
 \description{
-Robustness after remove 50\% nodes or some hubs, need the network contains "cor" attribute.
+Robustness after remove 50\%\% nodes or some hubs, need the metanet contains "cor" attribute.
+
+Plot robustness
 }
 \examples{
-robustness(co_net)
+\donttest{
+\dontrun{
+robustness(co_net)->robustness_res
+plot.robustness(robustness_res)
 modu_dect(co_net) -> co_net_modu
 zp_analyse(co_net_modu,mode = 2)->co_net_modu
-robustness(co_net_modu,keystone=T)
+robustness(co_net_modu,keystone=TRUE)->robustness_res
+plot.robustness(robustness_res)
+}}
 }

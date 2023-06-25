@@ -8,34 +8,37 @@ c_net_cal(
   totu,
   totu2 = NULL,
   method = "spearman",
-  filename = "occor",
-  p.adjust.method = NULL
+  filename = FALSE,
+  p.adjust.method = NULL,
+  threads = 1
 )
 }
 \arguments{
 \item{totu}{t(otutab)}
 
-\item{totu2}{t(otutab) or NULL}
+\item{totu2}{t(otutab2) or NULL}
 
 \item{method}{spearman, pearson}
 
-\item{filename}{the prefix of saved files}
+\item{filename}{the prefix of saved .corr file or FALSE}
 
 \item{p.adjust.method}{see \code{\link[stats]{p.adjust}}}
+
+\item{threads}{threads, default: 1.}
 }
 \value{
-a list with 2 elements:
+a corr list with 3 elements:
 \item{r}{default: spearman correlation}
-\item{p.value}{}
+\item{p.value}{default: p-value of spearman correlation}
 \item{p.adjust}{default p.adjust.method = NULL}
 }
 \description{
 Calculate spearman correlation for one or two t(otutab)
 }
 \examples{
-data("otutab")
+data("otutab", package = "pcutils")
 t(otutab) -> totu
 c_net_cal(totu) -> corr
-metadata[,3:10] -> env
+metadata[, 3:10] -> env
 c_net_cal(totu, env) -> corr2
 }

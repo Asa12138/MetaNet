@@ -8,6 +8,8 @@ as_polygon(n = 3, line_curved = 0.5)
 }
 \arguments{
 \item{n}{how many edges of this polygon}
+
+\item{line_curved}{line_curved 0~0.5}
 }
 \value{
 A two-column matrix, each row giving the coordinates of a vertex, according to the ids of the vertex ids.

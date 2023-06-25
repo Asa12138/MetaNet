@@ -4,17 +4,24 @@
 \alias{filter_n_modu}
 \title{Filter some modules as others}
 \usage{
-filter_n_modu(go_m, n_modu = 0, keep_id = NULL, delete = F)
+filter_n_modu(go_m, n_modu = 0, keep_id = NULL, delete = FALSE)
 }
 \arguments{
-\item{go_m}{module igraph}
+\item{go_m}{module metanet}
 
 \item{n_modu}{transfer the modules less than n_modu to "others"}
 
 \item{keep_id}{keep modules ids, will not be "others"}
 
-\item{delete}{logical, delete others modules? default:F, the others module will be "others".}
+\item{delete}{logical, delete others modules? default:FALSE, the others module will be "others".}
 }
 \description{
 Filter some modules as others
+}
+\examples{
+data("c_net")
+modu_dect(co_net,n_modu=30) -> co_net_modu
+plot_module_tree(co_net_modu)
+combine_n_modu(co_net_modu,20) -> co_net_modu1
+plot_module_tree(co_net_modu1)
 }

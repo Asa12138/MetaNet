@@ -7,11 +7,9 @@
 to.ggig(go, coors = NULL)
 }
 \arguments{
-\item{go}{igraph}
+\item{go}{igraph or meatnet}
 
 \item{coors}{coordinates for nodes,columns: name, X, Y}
-
-\item{net_par_res}{net_par() result}
 }
 \value{
 ggig object

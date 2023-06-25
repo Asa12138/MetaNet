@@ -9,32 +9,32 @@ c_net_plot(
   coors = NULL,
   ...,
   labels_num = 5,
-  legend_number = F,
-  legend = T,
+  legend_number = FALSE,
+  legend = TRUE,
   legend_cex = 1,
   legend_position = c(left_leg_x = -1.9, left_leg_y = 1, right_leg_x = 1.2, right_leg_y =
     1),
-  lty_legend = F,
+  lty_legend = FALSE,
   lty_legend_title = "Edge class",
-  size_legend = F,
+  size_legend = FALSE,
   size_legend_title = "Node Size",
-  edge_legend = T,
+  edge_legend = TRUE,
   edge_legend_title = "Edge type",
   edge_legend_order = NULL,
-  width_legend = F,
+  width_legend = FALSE,
   width_legend_title = "Edge width",
-  col_legend = T,
+  col_legend = TRUE,
   col_legend_order = NULL,
   group_legend_title = NULL,
   group_legend_order = NULL,
-  plot_module = F,
-  mark_module = F,
+  plot_module = FALSE,
+  mark_module = FALSE,
   mark_color = NULL,
   seed = 1234
 )
 }
 \arguments{
-\item{go}{a igraph object}
+\item{go}{a igraph or metanet object}
 
 \item{coors}{the coordinates you saved}
 
@@ -93,7 +93,6 @@ Plot a network
 \examples{
 data("c_net")
 c_net_plot(co_net)
-c_net_plot(co_net_rmt)
 c_net_plot(co_net2)
 c_net_plot(multi1)
 }

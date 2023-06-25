@@ -4,7 +4,7 @@
 \alias{summ_2col}
 \title{Summaries two columns information}
 \usage{
-summ_2col(df, from = 1, to = 2, count = 3, direct = F)
+summ_2col(df, from = 1, to = 2, count = 3, direct = FALSE)
 }
 \arguments{
 \item{df}{dataframe}
@@ -15,14 +15,14 @@ summ_2col(df, from = 1, to = 2, count = 3, direct = F)
 
 \item{count}{(optional) weight column, if no, each equal to 1}
 
-\item{direct}{consider direct? default: F}
+\item{direct}{consider direct? default: FALSE}
 }
 \description{
 Summaries two columns information
 }
 \examples{
-test=data.frame(a=sample(letters[1:4],10,replace = T),b=sample(letters[1:4],10,replace = T))
-summ_2col(test,direct=T)
-summ_2col(test,direct=F)
-summ_2col(test,direct=T)\%>\%my_sankey()
+test=data.frame(a=sample(letters[1:4],10,replace = TRUE),b=sample(letters[1:4],10,replace = TRUE))
+summ_2col(test,direct=TRUE)
+summ_2col(test,direct=FALSE)
+summ_2col(test,direct=TRUE)\%>\%pcutils::my_sankey(.,"gg")
 }

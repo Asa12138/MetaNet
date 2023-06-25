@@ -2,15 +2,26 @@
 % Please edit documentation in R/modules.R
 \name{combine_n_modu}
 \alias{combine_n_modu}
+\alias{plot_module_tree}
 \title{Combine or cut modules to modu_num}
 \usage{
 combine_n_modu(go_m, modu_num = 5)
+
+plot_module_tree(go_m, module = "module", community = NULL, label.size = 2)
 }
 \arguments{
-\item{go_m}{network}
+\item{go_m}{module metanet}
 
 \item{modu_num}{number of modules}
+
+\item{module}{which column name is module. default: "module"}
+
+\item{community}{community object, default: NULL, use the community of go_m}
+
+\item{label.size}{label.size}
 }
 \description{
 Combine or cut modules to modu_num
+
+Plot module tree
 }

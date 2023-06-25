@@ -6,6 +6,9 @@
 \usage{
 to_module_net(go)
 }
+\arguments{
+\item{go}{metanet}
+}
 \description{
 Transformation a network to a module network
 }

@@ -2,12 +2,9 @@
 % Please edit documentation in R/calculate.R
 \name{f_cor}
 \alias{f_cor}
-\alias{par_cor}
 \title{Fast correlation}
 \usage{
 f_cor(totu, totu2 = NULL, method = c("pearson", "spearman"))
-
-par_cor(totu, totu2 = NULL, threads = 2, method = c("spearman", "pearson"))
 }
 \arguments{
 \item{totu}{t(otutab)}
@@ -18,16 +15,14 @@ par_cor(totu, totu2 = NULL, threads = 2, method = c("spearman", "pearson"))
 }
 \value{
 a list with 2 elements:
-\item{r}{}
-\item{p.value}{}
+\item{r}{default: spearman correlation}
+\item{p.value}{default: p-value of spearman correlation}
 }
 \description{
 Fast correlation
-
-Parallel calculate correlation
 }
 \examples{
-data("otutab")
+data("otutab", package = "pcutils")
 t(otutab[1:100, ]) -> totu
-f_cor(totu,method="spearman") -> corr
+f_cor(totu, method = "spearman") -> corr
 }

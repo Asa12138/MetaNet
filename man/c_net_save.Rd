@@ -7,11 +7,11 @@
 c_net_save(go, filename = "net", format = "data.frame")
 }
 \arguments{
-\item{go}{network}
+\item{go}{metanet network}
 
 \item{filename}{filename}
 
-\item{format}{"data.frame"}
+\item{format}{"data.frame","graphml"}
 }
 \description{
 Save network file

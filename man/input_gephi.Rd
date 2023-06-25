@@ -16,6 +16,9 @@ list contains the igraph object and coordinates
 Input a graphml file exported by Gephi
 }
 \examples{
+\donttest{
+\dontrun{
 input_gephi("test.graphml")->gephi
 c_net_plot(gephi$go,gephi$coors)
+}}
 }

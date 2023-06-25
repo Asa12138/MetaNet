@@ -4,10 +4,12 @@
 \alias{fit_power}
 \title{Fit power-law distribution for a igraph}
 \usage{
-fit_power(go, pvalue = F)
+fit_power(go, p.value = FALSE)
 }
 \arguments{
 \item{go}{igraph}
+
+\item{p.value}{calculate p.value}
 }
 \value{
 ggplot

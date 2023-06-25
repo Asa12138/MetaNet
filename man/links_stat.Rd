@@ -9,9 +9,9 @@ links_stat(
   group = "v_class",
   inter = "all",
   topN = 6,
-  direct = T,
-  legend_number = F,
-  legend = T,
+  colors = NULL,
+  legend_number = FALSE,
+  legend = TRUE,
   legend_cex = 1,
   legend_position = c(left_leg_x = -1.6, left_leg_y = 1, right_leg_x = 1.2, right_leg_y =
     1),
@@ -28,6 +28,22 @@ links_stat(
 \item{inter}{"positive", "negative", "all"}
 
 \item{topN}{topN of group, default:5}
+
+\item{colors}{colors}
+
+\item{legend_number}{legend with numbers}
+
+\item{legend}{all legends}
+
+\item{legend_cex}{character expansion factor relative to current par("cex"), default: 1}
+
+\item{legend_position}{legend_position, default: c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1)}
+
+\item{col_legend_order}{col_legend_order vector,}
+
+\item{group_legend_title}{group_legend_title, length must same to the numbers of v_group}
+
+\item{group_legend_order}{group_legend_order vector}
 }
 \value{
 plot
@@ -37,9 +53,7 @@ Link summary of the network
 }
 \examples{
 links_stat(co_net,topN=10)
-modu_dect(co_net) -> co_net_modu
-links_stat(co_net_modu,group="module")
-
-c_net_plot(co_net,g_lay_polyarc(co_net,"v_class"))
-
+#modu_dect(co_net) -> co_net_modu
+#links_stat(co_net_modu,group="module")
+#c_net_plot(co_net,g_lay_polyarc(co_net,"v_class"))
 }

@@ -4,10 +4,12 @@
 \alias{plot.metanet}
 \title{Plot a metanet}
 \usage{
-\method{plot}{metanet}(go, ...)
+\method{plot}{metanet}(x, ...)
 }
 \arguments{
-\item{go}{metanet object}
+\item{x}{metanet object}
+
+\item{...}{add}
 }
 \description{
 Plot a metanet

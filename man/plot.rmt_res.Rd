@@ -4,7 +4,12 @@
 \alias{plot.rmt_res}
 \title{Plot a rmt_res}
 \usage{
-\method{plot}{rmt_res}(res)
+\method{plot}{rmt_res}(x, ...)
+}
+\arguments{
+\item{x}{rmt_res}
+
+\item{...}{Additional arguments}
 }
 \value{
 ggplot

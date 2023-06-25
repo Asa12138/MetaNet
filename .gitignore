@@ -19,6 +19,7 @@
 
 # RStudio files
 .Rproj.user/
+*\.Rproj$
 
 # produced vignettes
 vignettes/*.html
@@ -40,6 +41,9 @@ vignettes/*.pdf
 
 RMT_temp/
 net_res/
+MetaNet_tutorial.Rmd
+
+*.corr
 *.csv
 .DS_Store
 *.graphml
@@ -50,3 +54,7 @@ net_res/
 *.gif
 test/
 temp*
+*.docx
+article
+article/
+inst/doc

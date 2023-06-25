@@ -2,9 +2,12 @@
 % Please edit documentation in R/stability.R
 \name{Cohesion}
 \alias{Cohesion}
+\alias{plot.cohesion}
 \title{Cohesion calculate}
 \usage{
 Cohesion(otutab, reps = 200, threads = 1, mycor = NULL)
+
+\method{plot}{cohesion}(x, group, metadata, mode = 1, ...)
 }
 \arguments{
 \item{otutab}{otutab}
@@ -13,19 +16,38 @@ Cohesion(otutab, reps = 200, threads = 1, mycor = NULL)
 
 \item{threads}{threads}
 
-\item{mycor}{a correlation matrix you want to use, skip the null model build}
+\item{mycor}{a correlation matrix you want to use, skip the null model build when mycor is not NULL, default: NULL}
+
+\item{x}{\code{Cohesion()} result (cohesion object)}
+
+\item{group}{group name in colnames(metadata)}
+
+\item{metadata}{metadata}
+
+\item{mode}{plot mode, 1~2}
+
+\item{...}{additional arguments for \code{\link[pcutils]{group_box}} (mode=1) or \code{\link[pcutils]{group_box}} (mode=2)}
 }
 \value{
-a list with two dataframe
+Cohesion object: a list with two dataframe
+
+a ggplot
 }
 \description{
 Cohesion calculate
+
+Plot cohesion
 }
 \examples{
-Cohesion(otutab[1:50,])->a
-pctax::stackplot(abs(t(a$Cohesion)),metadata,groupID = "Group")
-a$Cohesion\%>\%transmute(`neg:pos`=neg/pos)\%>\%pcutils::group_box(.,"Group",metadata)
+\donttest{
+\dontrun{
+Cohesion(otutab[1:50,])->cohesion_res
+plot.cohesion(cohesion_res,group = "Group",metadata = metadata,mode = 1)
+plot.cohesion(cohesion_res,group = "Group",metadata = metadata,mode = 2)
+}}
 }
 \references{
-1. Herren, C. M. & McMahon, K. Cohesion: a method for quantifying the connectivity of microbial communities. (2017) doi:10.1038/ismej.2017.91.
+\enumerate{
+\item Herren, C. M. & McMahon, K. Cohesion: a method for quantifying the connectivity of microbial communities. (2017) doi:10.1038/ismej.2017.91.
+}
 }

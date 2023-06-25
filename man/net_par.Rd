@@ -2,19 +2,21 @@
 % Please edit documentation in R/topological.R
 \name{net_par}
 \alias{net_par}
-\alias{get_net_par}
+\alias{c_net_index}
 \title{Calculate all indexes of a network}
 \usage{
-net_par(go, mode = c("v", "e", "n", "all"), fast = T)
+net_par(go, mode = c("v", "e", "n", "all"), fast = TRUE)
 
-get_net_par(go, force = F)
+c_net_index(go, force = FALSE)
 }
 \arguments{
-\item{go}{a igraph object}
+\item{go}{igraph or metanet}
 
 \item{mode}{calculate what? c("v", "e", "n", "all")}
 
 \item{fast}{less indexes for faster calculate ?}
+
+\item{force}{replace exist net_par}
 }
 \value{
 a 3-elements list
@@ -24,8 +26,10 @@ a 3-elements list
 }
 \description{
 Calculate all indexes of a network
+
+Add topological indexes for a network
 }
 \examples{
-make_graph("Walther") \%>\% net_par()
-get_net_par(co_net)->co_net_with_par
+igraph::make_graph("Walther") \%>\% net_par()
+c_net_index(co_net)->co_net_with_par
 }

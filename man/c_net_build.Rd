@@ -5,36 +5,37 @@
 \title{Construct a network from correlation table}
 \usage{
 c_net_build(
-  cor_res,
+  corr,
   r_thres = 0.6,
   p_thres = 0.05,
-  use_p_adj = T,
-  del_single = T
+  use_p_adj = TRUE,
+  del_single = TRUE
 )
 }
 \arguments{
-\item{cor_res}{result of c_net_cal()}
+\item{corr}{result of \code{c_net_cal}}
 
-\item{r_thres}{r_threshold (default:>0.6)}
+\item{r_thres}{r_threshold (default: >0.6)}
 
-\item{p_thres}{p_threshold (default:<0.05)}
+\item{p_thres}{p_threshold (default: <0.05)}
 
-\item{use_p_adj}{use the p.adjust instead of p-value (default: T)}
+\item{use_p_adj}{use the p.adjust instead of p-value (default: TRUE)}
 
 \item{del_single}{should delete single vertexes?}
 }
 \value{
-an igraph object
+an metanet object
 }
 \description{
 Construct a network from correlation table
 }
 \examples{
-data("otutab")
+data("otutab",package="pcutils")
 t(otutab) -> totu
 metadata[,3:10] -> env
 c_net_cal(totu) -> corr
 c_net_build(corr,r_thres=0.65) -> co_net
+
 c_net_cal(totu,env) -> corr2
 c_net_build(corr2) -> co_net2
 }

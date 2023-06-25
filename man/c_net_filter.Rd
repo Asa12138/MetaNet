@@ -4,12 +4,14 @@
 \alias{c_net_filter}
 \title{Filter a network according to some attributes}
 \usage{
-c_net_filter(go, ..., exclude = F)
+c_net_filter(go, ..., mode = "v")
 }
 \arguments{
-\item{go}{igraph}
+\item{go}{metanet}
 
 \item{...}{some attributes of vertex and edge}
+
+\item{mode}{"v" or "e"}
 }
 \value{
 igraph
@@ -18,6 +20,6 @@ igraph
 Filter a network according to some attributes
 }
 \examples{
-
-c_net_filter(multi1,v_group=c("omic1","omic2"),e_class="intra")
+data("multi_net")
+c_net_filter(multi1,v_group\%in\%c("omic1","omic2"))
 }

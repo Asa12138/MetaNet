@@ -4,16 +4,16 @@
 \alias{extract_sub_net}
 \title{Extract sub-network from the whole network}
 \usage{
-extract_sub_net(a_net, otutab, threads = 1, save_net = F)
+extract_sub_net(a_net, otutab, threads = 1, save_net = FALSE)
 }
 \arguments{
 \item{a_net}{the whole network}
 
 \item{otutab}{otutab, these columns will be extract}
 
-\item{threads}{threads, default:4}
+\item{threads}{threads, default: 1}
 
-\item{save_net}{should save these sub_nets? F or a filename}
+\item{save_net}{should save these sub_nets? FALSE or a filename}
 }
 \value{
 a dataframe contains all sub_net parameters
@@ -22,6 +22,6 @@ a dataframe contains all sub_net parameters
 Extract sub-network from the whole network
 }
 \examples{
-data(otutab)
-extract_sub_net(co_net,otutab,save_net = "sub_net")->sub_net_pars
+data(otutab,package="pcutils")
+extract_sub_net(co_net,otutab)->sub_net_pars
 }

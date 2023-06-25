@@ -4,14 +4,14 @@
 \alias{par_sim}
 \title{Calculate distance for otutab}
 \usage{
-par_sim(totu, method = "bray", norm = T)
+par_sim(totu, method = "bray", norm = TRUE)
 }
 \arguments{
-\item{totu}{an t(otutab)}
+\item{totu}{t(otutab)}
 
 \item{method}{Dissimilarity index, partial match to "bray", "euclidean"...}
 
-\item{norm}{hellinger normalization in tax (default:T)}
+\item{norm}{hellinger normalization in tax (default:TRUE)}
 }
 \value{
 dist
@@ -20,7 +20,9 @@ dist
 Calculate distance for otutab
 }
 \examples{
-par_sim(totu)->sim_corr
+data("otutab", package = "pcutils")
+t(otutab) -> totu
+par_sim(totu) -> sim_corr
 }
 \seealso{
 \code{\link[vegan]{vegdist}}

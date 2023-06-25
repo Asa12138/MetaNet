@@ -1,77 +1,95 @@
-#'@title Microbiota community data
-#'@description Microbiota community data
+#'@title MetaNet networks
+#'@description MetaNet co_nets
 #'
 #'@docType data
-#'@name otutab
-#'@usage otutab
-#'@format three co_nets
-#'\describe{
-#' \item{tbls}{contians otutable rawdata}
-#' \item{metas}{contians metadata}
-#' \item{otus}{contians taxomomy table}
-#'}
-#'
-#'
-#'
+#'@name co_net
 NULL
 
 #'@title MetaNet networks
 #'@description MetaNet co_nets
 #'
 #'@docType data
-#'@name c_net
-#'@usage c_net
-#'@format three co_nets
-#'\describe{
-#' \item{tbls}{contians otutable rawdata}
-#' \item{metas}{contians metadata}
-#' \item{otus}{contians taxomomy table}
-#'}
-#'
-#'
-#'
+#'@name co_net2
 NULL
 
 #'@title MetaNet networks
 #'@description MetaNet co_nets
 #'
 #'@docType data
-#'@name multi_test
-#'@usage c_net
-#'@format three co_nets
-#'\describe{
-#' \item{tbls}{contians otutable rawdata}
-#' \item{metas}{contians metadata}
-#' \item{otus}{contians taxomomy table}
-#'}
+#'@name co_net_rmt
+NULL
+
+#'@title Edgelist
+#'@description Edgelist for `c_net_from_edgelist()`
 #'
+#'@docType data
+#'@name arc_count
 #'
+NULL
+
+#'@title Edgelist
+#'@description Edgelist for `c_net_from_edgelist()`
 #'
+#'@docType data
+#'@name arc_taxonomy
+#'
+NULL
+
+#'@title MetaNet networks metadata
+#'@description MetaNet co_nets
+#'
+#'@docType data
+#'@name metab_g
+NULL
+
+#'@title MetaNet networks metadata
+#'@description MetaNet co_nets
+#'
+#'@docType data
+#'@name transc_g
+NULL
+
+#'@title MetaNet networks metadata
+#'@description MetaNet co_nets
+#'
+#'@docType data
+#'@name micro_g
+NULL
+
+#'@title MetaNet networks abundance
+#'@description MetaNet co_nets
+#'
+#'@docType data
+#'@name metab
+NULL
+
+#'@title MetaNet networks abundance
+#'@description MetaNet co_nets
+#'
+#'@docType data
+#'@name micro
+NULL
+
+#'@title MetaNet networks abundance
+#'@description MetaNet co_nets
+#'
+#'@docType data
+#'@name transc
 NULL
 
 #'@title MetaNet networks
 #'@description MetaNet co_nets
 #'
 #'@docType data
-#'@name multi_net
-#'@usage c_net
-#'@format three co_nets
-#'\describe{
-#' \item{tbls}{contians otutable rawdata}
-#' \item{metas}{contians metadata}
-#' \item{otus}{contians taxomomy table}
-#'}
-#'
-#'
-#'
+#'@name multi1
 NULL
+
 if(F){
-  data("otutab")
+  # data("otutab",package = "pcutils")
   t(otutab) -> totu
   metadata[,3:10] -> env
   c_net_cal(totu) -> corr
   c_net_build(corr,r_thres=0.65) -> co_net
   c_net_cal(totu,env) -> corr2
   c_net_build(corr2) -> co_net2
-
 }

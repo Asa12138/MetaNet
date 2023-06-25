@@ -1,8 +1,8 @@
 #========3.layout========
 #' Layout coordinates
 #'
-#' @param go igraph
-#' @param method as_star(), as_tree(), in_circle(), nicely(), on_grid(), on_sphere(),randomly(), with_dh(), with_fr(), with_gem(), with_graphopt(), with_kk(),with_lgl(), with_mds(),as_line(), as_arc(), as_polygon(), as_polyarc(). see \code{\link[igarph]{layout_}}.
+#' @param go igraph or metanet
+#' @param method as_star(), as_tree(), in_circle(), nicely(), on_grid(), on_sphere(),randomly(), with_dh(), with_fr(), with_gem(), with_graphopt(), with_kk(),with_lgl(), with_mds(),as_line(), as_arc(), as_polygon(), as_polyarc(). see \code{\link[igraph]{layout_}}.
 #' @param order_by order nodes according to a node attribute
 #' @param order_ls manual the discrete variable with a vector, or continuous variable with "desc" to decreasing
 #' @param seed random seed
@@ -11,6 +11,7 @@
 #' @return coordinates for nodes,columns: name, X, Y
 #' @export
 #' @examples
+#' library(igraph)
 #' c_net_lay(co_net)->coors
 #' c_net_plot(co_net,coors)
 #' c_net_plot(co_net,c_net_lay(co_net,in_circle()),vertex.size=2)
@@ -18,6 +19,7 @@
 #' c_net_plot(co_net,c_net_lay(co_net,in_circle(),order_by="size",order_ls="desc"))
 #' c_net_plot(co_net,c_net_lay(co_net,as_polygon(3)))
 c_net_lay<-function(go,method=igraph::nicely(),order_by=NULL,order_ls=NULL,seed=1234,line_curved=1){
+
   set.seed(seed)
   if("igraph_layout_spec"%in%class(method))coors<-igraph::layout_(go,method)
   else if ("poly"%in%class(method)) {coors=method(go,group2 =order_by,group2_order =order_ls)}
@@ -33,7 +35,7 @@ c_net_lay<-function(go,method=igraph::nicely(),order_by=NULL,order_ls=NULL,seed=
       if(is.numeric(ordervec)){
         name=tmp_v[order(ordervec,decreasing = is.null(order_ls)),"name"]}
       else {
-        ordervec=change_fac_lev(ordervec,order_ls)
+        ordervec=pcutils::change_fac_lev(ordervec,order_ls)
         name=tmp_v[order(ordervec),"name"]
       }
       coors<-data.frame(name =name,X=coors[,1],Y=coors[,2])
@@ -47,27 +49,30 @@ c_net_lay<-function(go,method=igraph::nicely(),order_by=NULL,order_ls=NULL,seed=
     if(nrow(tmp_e)>0)curved=data.frame(tmp_e,curved=line_curved)
     else curved=NULL
     coors=list(coors=coors,curved=curved)
+    class(coors)=c("coors",class(coors))
     }
   }
 
   return(coors)
 }
 
-#' @export
 is_lay=\(x){
   any(class(x)%in%c("igraph_layout_spec","layout"))
 }
 
-#' @export
 get_coors=\(coors,go,...){
   edge_curved=NULL
-  if(is.null(coors)) coors <- igraph::nicely()
-
+  if(is.null(coors)){
+    if(is.null(graph_attr(go,"coors"))){
+      coors <-c_net_lay(go,igraph::nicely(),...)
+    }
+    else coors=graph_attr(go,"coors")
+  }
   if(is_lay(coors))coors=c_net_lay(go,coors,...)
-  if(all(class(coors)=="list")){
-    if(!is.null(coors$curved)){edge_curved=dplyr::left_join(get_e(go),coors$curved,
-                                 by=c("from","to"),suffix = c(".x", ""))%>%
-      dplyr::select("from","to","curved")}
+  if(inherits(coors,"coors")){
+    if(!is.null(coors$curved)){
+      edge_curved=dplyr::left_join(get_e(go),coors$curved,by=c("from","to"),suffix = c(".x", ""))%>%
+        dplyr::select("from","to","curved")}
     if(!is.null(coors$coors))coors<-coors$coors
     else coors=c_net_lay(go,igraph::nicely(),...)
   }
@@ -76,7 +81,7 @@ get_coors=\(coors,go,...){
     coors<-coors[match(V(go)$name,coors$name),]
     return(list(coors=coors,curved=edge_curved))
   }
-  return("coors wrong")
+  stop("coors wrong!")
 }
 
 #' Layout as a line
@@ -85,9 +90,9 @@ get_coors=\(coors,go,...){
 #'
 #' @return A two-column matrix, each row giving the coordinates of a vertex, according to the ids of the vertex ids.
 #' @export
-#'
 #' @examples
 #' as_line()(co_net)
+#' c_net_plot(co_net,coors=as_line(pi/2))
 as_line=\(angle=0){fun=\(go){
   nv=length(V(go))
   data.frame(x=seq(-cos(angle),cos(angle),len=nv),
@@ -103,9 +108,9 @@ fun
 #'
 #' @return A two-column matrix, each row giving the coordinates of a vertex, according to the ids of the vertex ids.
 #' @export
-#'
 #' @examples
 #' as_arc()(co_net)
+#' c_net_plot(co_net,coors=as_arc(pi/2),rescale=FALSE)
 as_arc=\(angle=0,arc=pi){fun=\(go){
   #(0,0) is the midpoint of circle
   nv=length(V(go))
@@ -117,29 +122,30 @@ fun
 }
 
 #deprecated,(0,0) in on arc
-if(F){
-  as_arc1=\(angle=0,arc=pi){\(go){
-    nv=length(V(go))
-    theta=seq(-arc/2,arc/2,len=nv)
-    coor=data.frame(x=sin(theta+angle)-sin(angle),
-                    y=cos(angle)-cos(theta+angle))
-    as.matrix(coor)%>%round(.,4)}
-  }
+if(FALSE){
+  # as_arc1=\(angle=0,arc=pi){\(go){
+  #   nv=length(V(go))
+  #   theta=seq(-arc/2,arc/2,len=nv)
+  #   coor=data.frame(x=sin(theta+angle)-sin(angle),
+  #                   y=cos(angle)-cos(theta+angle))
+  #   as.matrix(coor)%>%round(.,4)}
+  # }
 }
 
 #' Layout as a polygon
 #'
 #' @param n how many edges of this polygon
+#' @param line_curved line_curved 0~0.5
 #'
 #' @return A two-column matrix, each row giving the coordinates of a vertex, according to the ids of the vertex ids.
 #' @export
-#'
 #' @examples
 #' as_polygon()(co_net)
 as_polygon=\(n=3,line_curved=0.5){fun=\(go,group2 =NULL,group2_order =NULL){
   V(go)$poly_group=rep(paste0("omic",1:n),len=length(go))
   if(n<2)stop("n should bigger than 1")
-  g_lay_polygon(go,group ="poly_group",group2 =group2 ,group2_order = group2_order,line_curved=line_curved)->oridata
+  g_lay_polygon(go,group ="poly_group",group2 =group2 ,group2_order = group2_order,
+                line_curved=line_curved)->oridata
   oridata
 }
 class(fun)=c("poly","layout","function")
@@ -168,13 +174,23 @@ fun
 
 #' Interactive layout
 #'
+#' @param go igraph
+#' @param canvas.width canvas.width
+#' @param canvas.height canvas.height
+#'
+#' @export
 #' @examples
+#' \donttest{
+#' \dontrun{
 #' make_graph("Zachary")%>%manual_lay
+#' }}
 manual_lay<-function(go,canvas.width =600,canvas.height=400){
+  stopifnot(is.igraph(go))
   flag="y"
   if(length(V(go))>100){
-    print("Too big network, recommend using Gephi to layout,still use tkplot?")
+    print("Too big network, recommend using Gephi to layout, still use tkplot?")
     flag=readline("yes/no(y/n):")}
+
   if(tolower(flag)%in%c("yes","y")){
     x <- igraph::tkplot(go,
                 vertex.size = 10,
@@ -182,38 +198,47 @@ manual_lay<-function(go,canvas.width =600,canvas.height=400){
                 canvas.height = canvas.height
     )
     #Here: Move nodes within the tkplot window to a layout you like!
-    coors <- tkplot.getcoords(x)
+    coors <- igraph::tkplot.getcoords(x)
   }
-  else print("Quit.");return()
+  else print("Quit.")
+  return()
   coors<-data.frame(name = V(go)$name,X=coors[,1],Y=coors[,2])
   coors
 }
 
+
 #' Layout with group
 #'
-#' @param go igraph object
-#' @param group group name (default:module)
+#' @param go igraph or metanet object
+#' @param group group name (default: module)
 #' @param zoom1 big network layout size
 #' @param zoom2 average sub_network layout size, or numeric vector, or "auto"
 #' @param layout1 layout1 method, one of
 #' {1.a dataframe or matrix: rowname is group, two columns are X and Y}
 #' {2.function: layout method for \code{\link{c_net_lay}} default: in_circle()}
 #' @param layout2 one of functions: layout method for \code{\link{c_net_lay}}, or a list of functions.
+#' @param show_big_lay show the big layout to help you adjust.
+#' @param ... add
 #'
 #' @return coors
 #' @export
 #'
 #' @examples
+#' \donttest{
+#' \dontrun{
 #' data("c_net")
 #' modu_dect(co_net,method="cluster_fast_greedy") -> co_net_modu
 #' g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 1:5,layout2 =as_line())->oridata
-#' #g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 5,layout1=data.frame(X=c(1,1,1,1,2,2,2,2,3,3,3,3,3.5),Y=c(1,2,3,4,1,2,3,4,1,2,3,4,2)),layout2 =nicely())->oridata
+#' #custom_lay1=data.frame(X=c(1,1,1,1,2,2,2,2,3,3,3,3,3.5),Y=c(1,2,3,4,1,2,3,4,1,2,3,4,2))
+#' #g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 5,
+#' #    layout1=custom_lay1,layout2 =nicely())->oridata
 #' plot(co_net_modu,coors = oridata)
 #'
 #' g_lay_nice(co_net_modu,group ="module")->oridata
 #' plot(co_net_modu,coors = oridata)
-#'
-g_lay<-function(go,group="module",layout1=in_circle(),zoom1=20,layout2=in_circle(),zoom2=3,show_big_lay=F,...){
+#' }}
+g_lay<-function(go,group="module",layout1=in_circle(),zoom1=20,layout2=in_circle(),
+                zoom2=3,show_big_lay=FALSE,...){
   stopifnot(is_igraph(go))
   if(!group%in%vertex_attr_names(go))stop("no group named ",group," !")
   get_v(go)%>%dplyr::select(name,!!group)->nodeGroup
@@ -221,9 +246,10 @@ g_lay<-function(go,group="module",layout1=in_circle(),zoom1=20,layout2=in_circle
   nodeGroup$group<-as.factor(nodeGroup$group)
 
   big_lay<-\(zoom1,layout1){
-    c_net_update(make_ring(nlevels(nodeGroup$group)))->tmp_da_net
+    c_net_update(igraph::make_ring(nlevels(nodeGroup$group)))->tmp_da_net
     da=get_coors(layout1,tmp_da_net)[["coors"]]
     da$name=NULL
+
     if(!all(levels(nodeGroup$group)%in%rownames(da)))rownames(da)=levels(nodeGroup$group)
 
     #center of each group
@@ -243,7 +269,7 @@ g_lay<-function(go,group="module",layout1=in_circle(),zoom1=20,layout2=in_circle
     else {
       for (i in levels(nodeGroup$group)) {
         if(i%in%names(layout2))layoutls[[i]]=layout2[[i]]
-        else {layoutls[[i]]=in_circle();warning("layout of ",i," not set, use in_circle()")}
+        else {layoutls[[i]]=igraph::in_circle();warning("layout of ",i," not set, use in_circle()")}
       }
     }
   }
@@ -259,10 +285,12 @@ g_lay<-function(go,group="module",layout1=in_circle(),zoom1=20,layout2=in_circle
     nodeGroup%>%dplyr::filter(group==i)%>%dplyr::pull(ID)->tmpid
     igraph::subgraph(go,tmpid)->tmp_net
 
-    if(T){
+    if(TRUE){
       get_coors(layoutls[[i]],tmp_net,...)->coors
       data=coors$coors
-      if("igraph_layout_spec"%in%class(layoutls[[i]]))data[,c("X","Y")]=igraph::norm_coords(as.matrix(data[,c("X","Y")]))
+      if("igraph_layout_spec"%in%class(layoutls[[i]])){
+        data[,c("X","Y")]=igraph::norm_coords(as.matrix(data[,c("X","Y")]))
+      }
       data[,"X"]=data[,"X"]*zoom2[i]+ da[i, "X"]
       data[,"Y"]=data[,"Y"]*zoom2[i]+ da[i, "Y"]
     }
@@ -273,21 +301,26 @@ g_lay<-function(go,group="module",layout1=in_circle(),zoom1=20,layout2=in_circle
   oridata2=do.call(rbind,oridata2)
 
   if(show_big_lay){
-    print("Big layout:")
-    print(da)
-    plot(da,pch=21,bty="n",bg=get_cols(nrow(da),"col2"),main="Big layout coordinates")
-    text(da$X*0.8,da$Y*0.9,rownames(da))}
-
-  return(list(coors=oridata,curved=oridata2))
+      print("Big layout:")
+      print(da)
+      plot(da,pch=21,bty="n",bg=get_cols(nrow(da),"col2"),main="Big layout coordinates")
+      graphics::text(da$X*0.8,da$Y*0.9,rownames(da))
+    }
+  coors=list(coors=oridata,curved=oridata2)
+  class(coors)="coors"
+  return(coors)
 }
 
 #' Layout with group nicely
+#'
+#' @param go igraph or metanet
+#' @param group group name (default: module)
 #'
 #' @export
 #'
 #' @rdname g_lay
 g_lay_nice<-function(go,group="module"){
-  lib_ps("ggraph")
+  lib_ps("ggraph",library = FALSE)
   stopifnot(is_igraph(go))
   if(!group%in%vertex_attr_names(go))stop("no group named ",group," !")
   get_v(go)%>%dplyr::select(name,!!group)->nodeGroup
@@ -307,10 +340,10 @@ g_lay_nice<-function(go,group="module"){
   return(coor)
 }
 
-#' @export
+
 plot_gg_circle<-function(go=co_net,group="v_class",sep=0){
   #还需要调试
-  lib_ps("ggraph")
+  lib_ps("ggraph",library = FALSE)
   stopifnot(is_igraph(go))
   #construct hierarchy or just give it.
   {
@@ -322,12 +355,15 @@ plot_gg_circle<-function(go=co_net,group="v_class",sep=0){
     nodeGroup$group<-as.factor(nodeGroup$group)
 
     hierarchy=rbind(data.frame(from ="origin",to=levels(nodeGroup$v_group)),
-                    data.frame(distinct(nodeGroup,v_group,group)%>%rename(from="v_group",to="group")),
+                    data.frame(dplyr::distinct(nodeGroup,v_group,group)%>%
+                                 dplyr::rename(from="v_group",to="group")),
                     data.frame(from =nodeGroup$group, to = nodeGroup$ID))
+
     if(sep){
       #添加间隔
       hierarchy=rbind(data.frame(from ="origin",to=paste0(levels(nodeGroup$v_group),"_a")),
-                      data.frame(distinct(nodeGroup,v_group,group)%>%rename(from="v_group",to="group")),
+                      data.frame(dplyr::distinct(nodeGroup,v_group,group)%>%
+                                   dplyr::rename(from="v_group",to="group")),
                       data.frame(from =nodeGroup$group, to = nodeGroup$ID))
       hierarchy=rbind(hierarchy,
                       data.frame(from =rep(paste0(levels(nodeGroup$v_group),"_a"),each=2),
@@ -335,44 +371,51 @@ plot_gg_circle<-function(go=co_net,group="v_class",sep=0){
                       data.frame(from=rep(paste0(levels(nodeGroup$v_group),"_b"),each=sep),
                                  to=paste0(rep(paste0(levels(nodeGroup$v_group),"_bbb"),each=sep),seq_len(sep))))
     }
+
   }
   edge = get_e(go)
   # create a vertices data.frame. One line per object of our hierarchy
   vertices  <-  data.frame(
     name = unique(c(as.character(hierarchy$from), as.character(hierarchy$to)))
   )
+
   # Let's add a column with the group of each name. It will be useful later to color points
-  vertices$gg_group  <-  hierarchy$from[ match( vertices$name, hierarchy$to )]
-  vertices=left_join(vertices,get_v(go))
+  vertices$gg_group  <-  hierarchy$from[match( vertices$name, hierarchy$to )]
+  vertices=dplyr::left_join(vertices,get_v(go))
 
   # Create a graph object
-  mygraph <- graph_from_data_frame(hierarchy, vertices=vertices )
+  mygraph <- igraph::graph_from_data_frame(hierarchy, vertices=vertices )
 
   # The connection object must refer to the ids of the leaves:
   edge$from  <-  match( edge$from, vertices$name)
   edge$to  <-  match( edge$to, vertices$name)
 
   # Basic usual argument
-  p=ggraph(mygraph, layout = 'dendrogram', circular = TRUE) +
-    geom_conn_bundle(data = get_con(from = edge$from, to = edge$to,e_type=edge$e_type,width=edge$width),
+  p=ggraph::ggraph(mygraph, layout = 'dendrogram', circular = TRUE) +
+    ggraph::geom_conn_bundle(data = ggraph::get_con(from = edge$from,
+                                                    to = edge$to,e_type=edge$e_type,
+                                                    width=edge$width),
                       alpha=0.2, aes(width=width,colour=e_type),tension=0.5) +
-    scale_edge_width(range = c(0.2,1))+
+    ggraph::scale_edge_width(range = c(0.2,1))+
     #scale_edge_colour_discrete()+
     theme_void()
 
   #继续加外圈注释
-  if(F){
+  if(FALSE){
     offset=1.05
     for(i in c("Phylum","Kingdom")){
-      p=p+geom_node_point(aes(filter = leaf, x = x*offset, y=y*offset, colour=get(i),shape=v_group),size=3)+
+      p=p+ggraph::geom_node_point(aes(filter = leaf, x = x*offset, y=y*offset, colour=get(i),
+                                      shape=v_group),size=3)+
         ggnewscale::new_scale_color()
       offset=offset+0.1
     }
   }
-  p+geom_node_point(aes(filter = leaf, x = x*1.05, y=y*1.05, colour=v_class,shape=v_group),size=3) +
-    scale_colour_manual(values= pcutils::get_cols(14,"col3"),name=group,na.translate=F)+
-    scale_shape(na.translate=F)+guides(shape=guide_none())
+
+  p+ggraph::geom_node_point(aes(filter = leaf, x = x*1.05, y=y*1.05, colour=v_class,shape=v_group),size=3) +
+    scale_colour_manual(values= pcutils::get_cols(14,"col3"),name=group,na.translate=FALSE)+
+    scale_shape(na.translate=FALSE)+guides(shape=guide_none())
 }
+
 
 #' Layout with group as a polygon
 #'
@@ -380,6 +423,7 @@ plot_gg_circle<-function(go=co_net,group="v_class",sep=0){
 #' @param group group name (default:v_group)
 #' @param group2 group2 name, will order nodes in each group according to group2_order (default:v_class)
 #' @param group2_order group2_order
+#' @param line_curved line_curved 0~1
 #'
 #' @return coors
 #' @export
@@ -405,6 +449,8 @@ g_lay_polygon<-function(go,group="v_group",group2=NULL,group2_order=NULL,line_cu
 
 #' Layout with group as a polyarc
 #'
+#' @param space the space between each arc, default: pi/3
+#'
 #' @rdname g_lay_polygon
 #' @export
 g_lay_polyarc<-function(go,group="v_group",group2=NULL,group2_order=NULL,space=pi/4){
@@ -412,6 +458,7 @@ g_lay_polyarc<-function(go,group="v_group",group2=NULL,group2_order=NULL,space=p
   group1=as.factor(tmp_v[,group])
   n=nlevels(group1)
   if(n<2)stop("n should bigger than 1")
+
   #consider each group numbers!!!
   g_num=table(group1)
   sep=space/n
@@ -428,7 +475,7 @@ g_lay_polyarc<-function(go,group="v_group",group2=NULL,group2_order=NULL,space=p
       if(is.numeric(ordervec)){
         name=tmp_v1[order(ordervec,decreasing = is.null(group2_order)),"name"]}
       else {
-        ordervec=change_fac_lev(ordervec,group2_order)
+        ordervec=pcutils::change_fac_lev(ordervec,group2_order)
         name=tmp_v1[order(ordervec),"name"]
       }
     }
@@ -444,19 +491,23 @@ g_lay_polyarc<-function(go,group="v_group",group2=NULL,group2_order=NULL,space=p
 
 #' Plot a metanet
 #'
-#' @param go metanet object
+#' @param x metanet object
+#' @param ... add
 #'
 #' @exportS3Method
-plot.metanet=function(go,...){
+#' @method plot metanet
+plot.metanet=function(x,...){
+  go=x
   if(is.null(get_n(go)$n_type)) c_net_plot(go,...)
   else if(get_n(go)$n_type=="skeleton")skeleton_plot(go,...)
   else if(get_n(go)$n_type=="module")c_net_plot(go,group_legend_title = "Module",...)
   else c_net_plot(go,...)
 }
 
+
 #' Plot a network
 #'
-#' @param go a igraph object
+#' @param go a igraph or metanet object
 #' @param coors the coordinates you saved
 #' @param ... additional parameters for \code{\link[igraph]{igraph.plotting}}
 #' @param labels_num show how many labels,>1 indicates number, <1 indicates fraction ,default:5
@@ -488,20 +539,19 @@ plot.metanet=function(go,...){
 #' @examples
 #' data("c_net")
 #' c_net_plot(co_net)
-#' c_net_plot(co_net_rmt)
 #' c_net_plot(co_net2)
 #' c_net_plot(multi1)
 c_net_plot <- function(go, coors = NULL,...,labels_num=5,
-                       legend_number=F,legend=T,legend_cex=1,
+                       legend_number=FALSE,legend=TRUE,legend_cex=1,
                        legend_position=c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1),
-                       lty_legend=F,lty_legend_title="Edge class",
-                       size_legend=F,size_legend_title="Node Size",
-                       edge_legend=T,edge_legend_title="Edge type",edge_legend_order=NULL,
-                       width_legend=F,width_legend_title="Edge width",
-                       col_legend=T,col_legend_order=NULL,
+                       lty_legend=FALSE,lty_legend_title="Edge class",
+                       size_legend=FALSE,size_legend_title="Node Size",
+                       edge_legend=TRUE,edge_legend_title="Edge type",edge_legend_order=NULL,
+                       width_legend=FALSE,width_legend_title="Edge width",
+                       col_legend=TRUE,col_legend_order=NULL,
                        group_legend_title=NULL,group_legend_order=NULL,
-                       plot_module=F,mark_module=F,mark_color=NULL,seed=1234){
-  lib_ps("igraph")
+                       plot_module=FALSE,mark_module=FALSE,mark_color=NULL,seed=1234){
+  lib_ps("igraph",library = FALSE)
   set.seed(seed)
 
   #modules
@@ -517,7 +567,7 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
             "single" = {main="Correlation network"},
             "bipartite" = {main="Bipartite network"},
             "multi_full" ={main="Multi-omics network"},
-            "module"={main=paste0(get_n(go)$n_modules,"-modules network");plot_module=T},
+            "module"={main=paste0(get_n(go)$n_modules,"-modules network")},
             "skeleton" ={main=paste0(get_n(go)$skeleton," skeleton network")},
             default={main="Network"}
     )
@@ -535,7 +585,7 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
   coors=coors$coors[,c("X","Y")]%>%as.matrix()
 
   #scale the size and width
-{
+  {
   node_size_text1=c()
   node_size_text2=c()
   for(i in unique(tmp_v$v_group)){
@@ -543,6 +593,8 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
     node_size_text2=c(node_size_text2,max(tmp_v[tmp_v$v_group==i,"size"]))
     tmp_v[tmp_v$v_group==i,"size"]%<>%pcutils::mmscale(.,3,12)
   }
+  node_size_text1=round(node_size_text1,3)
+  node_size_text2=round(node_size_text2,3)
   tmp_e$width=pcutils::mmscale(tmp_e$width,0.5,1)
 
   #some custom parameters
@@ -554,16 +606,20 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
   if("edge.color"%in%params_name)tmp_e$color=condance(data.frame(tmp_e$color,tidai(tmp_e$e_type,params[["edge.color"]])))
   if("edge.lty"%in%params_name)tmp_e$lty=condance(data.frame(tmp_e$lty,tidai(tmp_e$e_class,params[["edge.lty"]])))
   if("edge.width"%in%params_name)tmp_e$width=params[["edge.width"]]
-  if("vertex.label"%in%params_name)tmp_e$label=params[["vertex.label"]]
+  if("vertex.label"%in%params_name)tmp_v$label=params[["vertex.label"]]
 }
   #show labels
-  {if(labels_num>=1){tmp_v%>%dplyr::top_n(labels_num,size)%>%dplyr::pull(name)%>%head(labels_num)->toplabel}
-  else {tmp_v%>%dplyr::top_frac(labels_num,size)%>%dplyr::pull(name)%>%head(ceiling(labels_num*nrow(tmp_v)))->toplabel}
+  {if(labels_num>=1){tmp_v%>%dplyr::top_n(labels_num,size)%>%
+      dplyr::pull(name)%>%head(labels_num)->toplabel}
+  else {
+    tmp_v%>%dplyr::top_frac(labels_num,size)%>%dplyr::pull(name)%>%
+      head(ceiling(labels_num*nrow(tmp_v)))->toplabel
+    }
   tmp_v$label=ifelse(tmp_v$name%in%toplabel,tmp_v$label,NA)
   }
 
   #modules set
-  {
+{
   if(mark_module){
     new_modu=as_module(setNames(tmp_v$module,tmp_v$name))
     new_modu[["others"]]=NULL
@@ -576,7 +632,8 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
   }
   else {
     new_modu=module_color=NULL
-  }}
+  }
+}
 
   #main plot
   {
@@ -592,12 +649,14 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
                 mark.border =module_color[names(new_modu)],
                 ...,
                 main = main,
-                vertex.label.font = 1, vertex.label.color = "black",
+                vertex.label.font = 1,
+                vertex.label.color = "black",
                 vertex.label.cex = 0.08*tmp_v$size,
                 vertex.label=tmp_v$label,
                 edge.arrow.size=0.3,
                 edge.arrow.width=0.5,
-                edge.curved = edge_curved, margin = c(0, 0, 0, 0))
+                edge.curved = edge_curved,
+                margin = c(0, 0, 0, 0))
   }
 
   if(!legend)return(message(""))
@@ -605,11 +664,8 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
   #produce legends
   legend_position_default=c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1)
   if(is.null(legend_position))legend_position=legend_position_default
-  else {
-    if(is.null(names(legend_position)))legend_position=setNames(legend_position,names(legend_position_default)[seq_along(legend_position)])
-    legend_position=condance(data.frame(legend_position_default,tidai(names(legend_position_default),legend_position)))
-    names(legend_position)=names(legend_position_default)
-  }
+  if(is.null(names(legend_position)))legend_position=setNames(legend_position,names(legend_position_default)[seq_along(legend_position)])
+  legend_position=pcutils::update_param(legend_position_default,legend_position)
   left_leg_x=legend_position["left_leg_x"]
   left_leg_y=legend_position["left_leg_y"]
   right_leg_x=legend_position["right_leg_x"]
@@ -623,9 +679,9 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
     }
 
   if(edge_legend){
-    edges=change_fac_lev(tmp_e$e_type,edge_legend_order)
+    edges=pcutils::change_fac_lev(tmp_e$e_type,edge_legend_order)
     edges=levels(edges)
-    edge_cols=distinct(tmp_e,color,e_type)
+    edge_cols=dplyr::distinct(tmp_e,color,e_type)
     edge_cols=setNames(edge_cols$color,edge_cols$e_type)
     if(legend_number){
       eee=table(tmp_e$e_type)
@@ -647,7 +703,7 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
 
   if(lty_legend){
     edges=levels(factor(tmp_e$e_class))
-    edge_ltys=distinct(tmp_e,lty,e_class)
+    edge_ltys=dplyr::distinct(tmp_e,lty,e_class)
     edge_ltys=setNames(edge_ltys$lty,edge_ltys$e_class)
 
     if(legend_number){
@@ -662,7 +718,7 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
 
   if(col_legend){
     pchls=c("circle"=21,"square"=22)
-    vgroups=change_fac_lev(tmp_v$v_group,group_legend_order)
+    vgroups=pcutils::change_fac_lev(tmp_v$v_group,group_legend_order)
     vgroups=levels(vgroups)
     if(is.null(group_legend_title))group_legend_title=setNames(vgroups,vgroups)
     else if(is.null(names(group_legend_title)))group_legend_title=setNames(rep(group_legend_title,len=length(vgroups)),vgroups)
@@ -670,12 +726,12 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
     for(g_i in vgroups){
       tmp_v1=tmp_v[tmp_v$v_group==g_i,c("v_class","color","shape")]
 
-      vclass=change_fac_lev(tmp_v1$v_class,col_legend_order)
+      vclass=pcutils::change_fac_lev(tmp_v1$v_class,col_legend_order)
       vclass=levels(vclass)
 
-      node_cols=distinct(tmp_v1,color,v_class)
+      node_cols=dplyr::distinct(tmp_v1,color,v_class)
       node_cols=setNames(node_cols$color,node_cols$v_class)
-      node_shapes=distinct(tmp_v1,shape,v_class)
+      node_shapes=dplyr::distinct(tmp_v1,shape,v_class)
       node_shapes=setNames(node_shapes$shape,node_shapes$v_class)
 
       if(legend_number){
@@ -694,8 +750,7 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
 
 #' Transfer a igraph object to a ggig
 #'
-#' @param go igraph
-#' @param net_par_res net_par() result
+#' @param go igraph or meatnet
 #' @param coors coordinates for nodes,columns: name, X, Y
 #'
 #' @return ggig object
@@ -712,14 +767,16 @@ to.ggig<-function(go,coors=NULL){
   list(n_index=get_n(go),v_index=get_v(go),e_index=get_e(go))->net_par_res
 
   if(is.null(coors))coors=c_net_lay(co_net)
+  coors=get_coors(coors,go)
+  coors=coors$coors
   # coors$X=max(coors$X)-coors$X
   # coors$Y=max(coors$Y)-coors$Y
 
   #add coors
   coors=coors[,1:3]%>%na.omit()
   net_par_res$v_index%<>%dplyr::left_join(.,coors,by="name",suffix = c("", ".1"))
-  net_par_res$e_index%<>%dplyr::left_join(.,coors,by=c("from"="name"))%>%rename(X1=X,Y1=Y)%>%
-    dplyr::left_join(.,coors,by=c("to"="name"))%>%rename(X2=X,Y2=Y)
+  net_par_res$e_index%<>%dplyr::left_join(.,coors,by=c("from"="name"))%>%dplyr::rename(X1=X,Y1=Y)%>%
+    dplyr::left_join(.,coors,by=c("to"="name"))%>%dplyr::rename(X2=X,Y2=Y)
 
   class(net_par_res)<-c("ggig","list")
   return(net_par_res)
@@ -727,20 +784,39 @@ to.ggig<-function(go,coors=NULL){
 
 #' Plot a ggig
 #'
-#' @param ggig ggig object
+#' @param x ggig object
+#' @param coors the coordinates you saved
+#' @param ... additional parameters
+#' @param labels_num show how many labels,>1 indicates number, <1 indicates fraction ,default:5
+#' @param legend_number legend with numbers
+#' @param legend all legends
+#' @param lty_legend logical
+#' @param size_legend logical
+#' @param edge_legend logical
+#' @param col_legend logical
+#' @param width_legend logical
+#' @param lty_legend_title lty_legend_title
+#' @param size_legend_title size_legend_title
+#' @param edge_legend_title edge_legend_title
+#' @param edge_legend_order edge_legend_order vector, e.g. c("positive","negative")
+#' @param width_legend_title width_legend_title
+#' @param col_legend_order col_legend_order vector,
+#' @param group_legend_title group_legend_title, length must same to the numbers of v_group
+#' @param group_legend_order group_legend_order vector
 #'
 #' @return ggplot
 #' @exportS3Method
-#'
-plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
-                    legend_number=F,legend=T,
-                    lty_legend=F,lty_legend_title="Edge class",
-                    size_legend=F,size_legend_title="Node Size",
-                    edge_legend=T,edge_legend_title="Edge type",edge_legend_order=NULL,
-                    width_legend=F,width_legend_title="Edge width",
-                    col_legend=T,col_legend_order=NULL,
-                    class_legend_title="Node class",group_legend_order=NULL){
-  lib_ps("ggplot2","ggnewscale")
+#' @method plot ggig
+plot.ggig<-function(x,coors = NULL,...,labels_num=0,
+                    legend_number=FALSE,legend=TRUE,
+                    lty_legend=FALSE,lty_legend_title="Edge class",
+                    size_legend=FALSE,size_legend_title="Node Size",
+                    edge_legend=TRUE,edge_legend_title="Edge type",edge_legend_order=NULL,
+                    width_legend=FALSE,width_legend_title="Edge width",
+                    col_legend=TRUE,col_legend_order=NULL,
+                    group_legend_title="Node class",group_legend_order=NULL){
+  ggig=x
+  lib_ps("ggplot2","ggnewscale",library = FALSE)
   ggig$v_index->tmp_v
   ggig$e_index->tmp_e
   set.seed(1234)
@@ -776,7 +852,7 @@ plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
     }
     node_size_text=c(paste(node_size_text1,collapse = "/"),paste(node_size_text2,collapse = "/"))
     edge_width_text=c(min(tmp_e$width),max(tmp_e$width))
-    tmp_e$width=mmscale(tmp_e$width,0.5,1)
+    tmp_e$width=pcutils::mmscale(tmp_e$width,0.5,1)
     #new shapes
     tmp_v$shape=tidai(tmp_v$v_group,21:26)
 
@@ -796,10 +872,10 @@ plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
   else tmp_v%>%dplyr::top_frac(labels_num,size)%>%dplyr::pull(name)%>%head(ceiling(labels_num*nrow(tmp_v)))->toplabel
   tmp_v$label=ifelse(tmp_v$name%in%toplabel,tmp_v$label,NA)
 
-  if(T){
-    tmp_e$e_type=change_fac_lev(tmp_e$e_type,edge_legend_order)
+  if(TRUE){
+    tmp_e$e_type=pcutils::change_fac_lev(tmp_e$e_type,edge_legend_order)
     edges=levels(tmp_e$e_type)
-    edge_cols=distinct(tmp_e,color,e_type)
+    edge_cols=dplyr::distinct(tmp_e,color,e_type)
     edge_cols=setNames(edge_cols$color,edge_cols$e_type)
     if(legend_number){
       eee=table(tmp_e$e_type)
@@ -807,9 +883,9 @@ plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
     }
     else edge_text= edges}
 
-  if(T){
+  if(TRUE){
     edges1=levels(factor(tmp_e$e_class))
-    edge_ltys=distinct(tmp_e,lty,e_class)
+    edge_ltys=dplyr::distinct(tmp_e,lty,e_class)
     edge_ltys=setNames(edge_ltys$lty,edge_ltys$e_class)
 
     if(legend_number){
@@ -818,23 +894,23 @@ plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
     }
     else lty_text= edges1}
 
-  if(T){
+  if(TRUE){
     pchls=c("circle"=21,"square"=22)
 
-    vgroups=change_fac_lev(tmp_v$v_group,group_legend_order)
+    vgroups=pcutils::change_fac_lev(tmp_v$v_group,group_legend_order)
     new_f=c()
     for(g_i in levels(vgroups)){
       tmp_v1=tmp_v[tmp_v$v_group==g_i,c("v_class","color","shape")]
-      tmp_f=change_fac_lev(tmp_v1$v_class,col_legend_order)
+      tmp_f=pcutils::change_fac_lev(tmp_v1$v_class,col_legend_order)
       new_f=c(new_f,levels(tmp_f))
     }
 
-    tmp_v$v_class=change_fac_lev(tmp_v$v_class,new_f)
+    tmp_v$v_class=pcutils::change_fac_lev(tmp_v$v_class,new_f)
     vclass=levels(tmp_v$v_class)
 
-    node_cols=distinct(tmp_v,color,v_class)
+    node_cols=dplyr::distinct(tmp_v,color,v_class)
     node_cols=setNames(node_cols$color,node_cols$v_class)
-    node_shapes=distinct(tmp_v,shape,v_class)
+    node_shapes=dplyr::distinct(tmp_v,shape,v_class)
     node_shapes=setNames(node_shapes$shape,node_shapes$v_class)
 
     if(legend_number){
@@ -858,13 +934,13 @@ plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
     geom_point(aes(X, Y,fill = v_class,size = size,shape=v_class), data = tmp_v) +#draw nodes
     #scale_shape_manual(values =setNames(pchls[node_shapes],vclass))+#node shape
     scale_shape_manual(values =node_shapes)+
-    scale_fill_manual(name=class_legend_title,values =node_cols[vclass],
+    scale_fill_manual(name=group_legend_title,values =node_cols[vclass],
                       labels=le_text,guide=ifelse(col_legend,"legend","none"))+#node color
     scale_size(name=size_legend_title,breaks = c(min(tmp_v$size),max(tmp_v$size)),
                labels = node_size_text,guide=ifelse(size_legend,"legend","none"))+#node size
 
     ggnewscale::new_scale("size")+
-    geom_text(aes(X, Y,size = size,label=label),col="black",data = tmp_v,show.legend = F)+
+    geom_text(aes(X, Y,size = size,label=label),col="black",data = tmp_v,show.legend = FALSE)+
     scale_size(range = c(1,3),guide = "none")+
     guides(fill = guide_legend(override.aes = list(shape = node_shapes[vclass])),
            shape="none")
@@ -881,6 +957,7 @@ plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
     theme(panel.grid.minor = element_blank(), panel.grid.major = element_blank())
 
   if(!legend)return(p2+theme(legend.position = "none"))
+
   p2
 }
 
@@ -890,28 +967,36 @@ plot.ggig<-function(ggig,coors = NULL,...,labels_num=0,
 #' @param file graphml file exported by Gephi
 #'
 #' @return list contains the igraph object and coordinates
+#'
 #' @export
 #' @examples
+#' \donttest{
+#' \dontrun{
 #' input_gephi("test.graphml")->gephi
 #' c_net_plot(gephi$go,gephi$coors)
+#' }}
 input_gephi<-function(file){
   igraph::read.graph(file,format = "graphml")->gephi
   get_v(gephi)->tmp_v
   #extract coors
-  if(!all(c("x","y","r","g","b","id")%in%colnames(tmp_v)))stop("The file is not exported by Gephi, please use igraph::read.graph()")
+  if(!all(c("x","y","r","g","b","id")%in%colnames(tmp_v))){
+    stop("This file is not exported by Gephi, please use igraph::read.graph()")}
   coors<-tmp_v[,c("x","y")]
-  coors<-data.frame(name = tmp_v$name,X=coors[,1],Y=coors[,2])
-  coors%>%mutate(X=mmscale(X,-40,40),Y=mmscale(Y,-40,40))->coors
+  coors<-data.frame(name = tmp_v$label,X=coors[,1],Y=coors[,2])
+  coors%>%dplyr::mutate(X=pcutils::mmscale(X,-40,40),Y=pcutils::mmscale(Y,-40,40))->coors
+
   #transform color
   pcutils::rgb2code(tmp_v[,c("r","g","b")])%>%dplyr::pull(code)->tmp_v$color
   E(gephi)$color=ifelse(E(gephi)$cor > 0, "#48A4F0", "#E85D5D")
   #scale size
-  tmp_v$size=mmscale(tmp_v$size,1,5)
-  E(gephi)$width=mmscale(E(gephi)$width,0.05,0.2)
+  tmp_v$size=pcutils::mmscale(tmp_v$size,1,5)
+  E(gephi)$width=pcutils::mmscale(E(gephi)$width,0.05,0.2)
   #delete
   tmp_v%>%dplyr::select(-c("label","x","y","r","g","b","id"))%>%as.list()->vertex.attributes(gephi)
   edge.attributes(gephi)["Edge Label"]=edge.attributes(gephi)["id"]=NULL
+
   gephi=c_net_update(gephi)
+
   return(list(go=gephi,coors=coors))
 }
 
@@ -932,7 +1017,7 @@ netD3plot<-function(go,v_class="v_class",...){
     print("Too big network, recommend using Gephi to layout,still use networkD3?")
     flag=readline("yes/no(y/n):")}
   if(tolower(flag)%in%c("yes","y")){
-    lib_ps("networkD3")
+    lib_ps("networkD3",library = FALSE)
     go=c_net_set(go,vertex_class = v_class)
     get_v(go)->tmp_v
     nodes=tmp_v[,c("name","v_class","size","color")]
@@ -950,9 +1035,14 @@ netD3plot<-function(go,v_class="v_class",...){
     # Create force directed network plot
     networkD3::forceNetwork(Links = links, Nodes = nodes,
                             Source = 'IDsource', Target = 'IDtarget',linkColour = links$color,linkDistance=20,
-                            linkWidth= JS("function(d) { return (d.width); }"),charge = -5,
+                            linkWidth= networkD3::JS("function(d) { return (d.width); }"),charge = -5,
                             NodeID = 'name', Group = 'group',Nodesize = 'size',
-                            colourScale = JS(paste0("d3.scaleOrdinal([`",paste(colors,collapse = '`,`'),"`])")),legend = T,...)
+                            colourScale = networkD3::JS(paste0("d3.scaleOrdinal([`",paste(colors,collapse = '`,`'),"`])")),legend = TRUE,...)
   }
 }
 
+mytheme <- {
+  ggplot2::theme_classic(base_size = 13) + ggplot2::theme(axis.text = element_text(color = "black"),
+                                                          plot.margin = grid::unit(rep(0.5, 4), "lines"),
+                                                          strip.background = ggplot2::element_rect(fill = NA))
+}

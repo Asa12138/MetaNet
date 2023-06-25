@@ -4,21 +4,40 @@
 \alias{module_expression}
 \title{Plot the expression of each modules}
 \usage{
-module_expression(go_m, totu, group = NULL, cor = 0.6)
+module_expression(
+  go_m,
+  totu,
+  group = NULL,
+  cor = 0.6,
+  x_order = NULL,
+  facet_param = NULL,
+  plot_eigen = FALSE
+)
 }
 \arguments{
-\item{go_m}{network}
+\item{go_m}{module metanet}
 
 \item{totu}{original abundance table used for module_eigen().}
 
 \item{group}{group variable for totu}
 
-\item{cor}{the threshold for node_eigen_cor}
+\item{cor}{the threshold for node_eigen_cor, default: 0.6.}
+
+\item{x_order}{order the x axis.}
+
+\item{facet_param}{parameters parse to \code{\link[ggplot2]{facet_wrap}}, e.g. nrow=2.}
+
+\item{plot_eigen}{plot the eigen value line.}
 }
 \description{
 Plot the expression of each modules
 }
 \examples{
+data("otutab",package="pcutils")
+t(otutab) -> totu
+data("c_net")
+modu_dect(co_net) -> co_net_modu
+
 module_eigen(co_net_modu,totu)->co_net_modu
 module_expression(co_net_modu,totu)
 }

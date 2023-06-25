@@ -6,9 +6,19 @@
 \usage{
 manual_lay(go, canvas.width = 600, canvas.height = 400)
 }
+\arguments{
+\item{go}{igraph}
+
+\item{canvas.width}{canvas.width}
+
+\item{canvas.height}{canvas.height}
+}
 \description{
 Interactive layout
 }
 \examples{
+\donttest{
+\dontrun{
 make_graph("Zachary")\%>\%manual_lay
+}}
 }

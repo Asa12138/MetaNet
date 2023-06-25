@@ -2,22 +2,33 @@
 % Please edit documentation in R/modules.R
 \name{zp_analyse}
 \alias{zp_analyse}
+\alias{zp_plot}
 \title{Zi-Pi calculate}
 \usage{
-zp_analyse(go, mode = 2, use_origin = T)
+zp_analyse(go_m, mode = 2, use_origin = TRUE)
+
+zp_plot(go, label = TRUE, mode = 1)
 }
 \arguments{
-\item{go}{igraph object after modu_dect()}
+\item{go_m}{igraph object after \code{modu_dect()}}
 
-\item{mode}{use 7-group (mode=1) or 4-group (mode=2)}
+\item{mode}{plot style, 1~3}
 
-\item{use_origin}{use origin_module, default:T, if F, use module}
+\item{use_origin}{use origin_module, default:TRUE, if FALSE, use module}
+
+\item{go}{igraph object after zp_analyse()}
+
+\item{label}{show label or not}
 }
 \value{
 igraph
+
+a ggplot object
 }
 \description{
 Zi-Pi calculate
+
+Zi-Pi plot of vertexes
 }
 \examples{
 data("c_net")
@@ -27,5 +38,7 @@ zp_plot(co_net_modu)
 zp_plot(co_net_modu,mode=3)
 }
 \references{
-1. Guimerà, R. & Amaral, L. Functional cartography of complex metabolic networks. (2005) doi:10.1038/nature03288.
+\enumerate{
+\item Guimerà, R. & Amaral, L. Functional cartography of complex metabolic networks. (2005) doi:10.1038/nature03288.
+}
 }

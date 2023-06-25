@@ -2,19 +2,22 @@
 % Please edit documentation in R/stability.R
 \name{robust_test}
 \alias{robust_test}
-\alias{plot.robustness}
-\title{robust_test for a network}
+\alias{plot.robust}
+\title{Robust_test for a network}
 \usage{
 robust_test(go_ls, partial = 0.5, step = 10, reps = 9, threads = 1)
 
-\method{plot}{robustness}(
-  robust_res,
-  indexs = c("nat_connectivity", "ave_path_len", "ave_degree"),
+\method{plot}{robust}(
+  x,
+  indexes = c("nat_connectivity", "ave_path_len", "ave_degree"),
+  use_ratio = FALSE,
   mode = 1,
   ...
 )
 }
 \arguments{
+\item{go_ls}{a igraph object or igraph list.}
+
 \item{partial}{how much percent vertexes be removed in total}
 
 \item{step}{how many nodes be removed each time?}
@@ -23,13 +26,15 @@ robust_test(go_ls, partial = 0.5, step = 10, reps = 9, threads = 1)
 
 \item{threads}{threads}
 
-\item{robust_res}{robust_test() result (robustness class)}
+\item{x}{\code{robust_test()} result (robust object)}
 
-\item{indexs}{indexs selected to show}
+\item{indexes}{indexes selected to show}
 
-\item{mode}{plot mode}
+\item{use_ratio}{use the delete nodes ratio rather than nodes number}
 
-\item{go}{a igraph object}
+\item{mode}{plot mode, 1~3}
+
+\item{...}{additional arguments for \code{\link[pcutils]{group_box}}}
 }
 \value{
 dataframe(robustness class)
@@ -37,13 +42,15 @@ dataframe(robustness class)
 a ggplot
 }
 \description{
-robust_test for a network
+Robust_test for a network
 
-Plot robustness
+Plot robust
 }
 \examples{
+\donttest{
+\dontrun{
 data("c_net")
 robust_test(co_net,step=4)->robust_res
-class(robust_res)
 plot(robust_res,index="ave_degree",mode=2)
+}}
 }

@@ -7,11 +7,18 @@
 smallworldness(go, reps = 99, threads = 1)
 }
 \arguments{
-\item{go}{igraph}
+\item{go}{igraph or metanet}
+
+\item{reps}{simulation time}
+
+\item{threads}{threads}
 }
 \description{
 Calculate small-world coefficient
 }
 \examples{
+\donttest{
+\dontrun{
 smallworldness(co_net)
+}}
 }

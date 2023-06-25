@@ -4,12 +4,14 @@
 \alias{module_eigen}
 \title{Calculate the eigenvalue of each module and correlation of nodes and eigenvalue (node_eigen_cor).}
 \usage{
-module_eigen(go_m, totu)
+module_eigen(go_m, totu, cor_method = "spearman")
 }
 \arguments{
-\item{go_m}{network}
+\item{go_m}{module metanet}
 
 \item{totu}{original abundance table}
+
+\item{cor_method}{"pearson", "kendall", "spearman"}
 }
 \description{
 Calculate the eigenvalue of each module and correlation of nodes and eigenvalue (node_eigen_cor).

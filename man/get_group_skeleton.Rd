@@ -5,16 +5,20 @@
 \alias{skeleton_plot}
 \title{Get skeleton network according to a group}
 \usage{
-get_group_skeleton(go, Group = "v_class", count = NULL, direct = F)
+get_group_skeleton(go, Group = "v_class", count = NULL)
 
-skeleton_plot(tmp_go, ...)
+skeleton_plot(ske_net, ...)
 }
 \arguments{
 \item{go}{network}
 
-\item{tmp_go}{skeleton}
+\item{Group}{vertex column name}
 
-\item{group}{vertex column name}
+\item{count}{take which column count, default: NULL}
+
+\item{ske_net}{skeleton}
+
+\item{...}{additional parameters for \code{\link[igraph]{igraph.plotting}}}
 }
 \value{
 skeleton network
@@ -22,12 +26,9 @@ skeleton network
 \description{
 Get skeleton network according to a group
 
-skeleton_plot
+Skeleton plot
 }
 \examples{
 get_group_skeleton(co_net)->ske_net
 skeleton_plot(ske_net)
-x=tkplot(ske_net)
-da <- tkplot.getcoords(x)
-tkplot.close(x)
 }

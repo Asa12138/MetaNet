@@ -7,12 +7,12 @@
 input_corr(filename)
 }
 \arguments{
-\item{filename}{}
+\item{filename}{filename of .corr}
 }
 \value{
 a list with 7 elements:
 \item{r}{default: spearman correlation}
-\item{p.value}{}
+\item{p.value}{default: p-value of spearman correlation}
 \item{p.adjust}{default p.adjust.method = NULL}
 }
 \description{
@@ -20,6 +20,7 @@ Import corr from .csv file
 }
 \examples{
 \dontrun{
-# input_corr("occor")->corr
-}
+\donttest{
+ input_corr("test")->corr
+}}
 }
