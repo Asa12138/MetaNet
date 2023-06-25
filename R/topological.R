@@ -22,6 +22,7 @@ extract_sub_net<-function(a_net,otutab,threads=1,save_net=FALSE){
   sub_nets=lapply(1:reps, \(i){
     rownames(otutab)[otutab[,i]>0]->exist_sp
     subgraph(a_net,which(v_name%in%exist_sp))->spe_sub
+    class(spe_sub)=c("metanet","igraph")
     return(spe_sub)
   })
   names(sub_nets)<-colnames(otutab)
@@ -33,8 +34,7 @@ extract_sub_net<-function(a_net,otutab,threads=1,save_net=FALSE){
   {
     spe_sub <- sub_nets[[i]]
     indexs <- net_par(spe_sub, mode = "n")[["n_index"]]
-    wc <- igraph::cluster_fast_greedy(spe_sub, weights = abs(igraph::E(spe_sub)$weight),
-    )
+    wc <- igraph::cluster_fast_greedy(spe_sub, weights = abs(igraph::E(spe_sub)$weight))
     indexs$modularity <- igraph::modularity(wc)
     indexs
   }
@@ -57,13 +57,12 @@ extract_sub_net<-function(a_net,otutab,threads=1,save_net=FALSE){
     }}
   #simplify method
   sub_net_pars=do.call(rbind,res)
-  pcutils::del_ps("foreach","doSNOW")
 
   rownames(sub_net_pars)<-colnames(otutab)
 
   if(is.logical(save_net)){if(save_net)save_net=paste0("sub_net_",date())}
   if (is.character(save_net)) {
-    saveRDS(res,file = paste0(save_net,".RDS"))
+    saveRDS(sub_nets,file = paste0(save_net,".RDS"))
   }
   sub_net_pars
 }
@@ -278,11 +277,12 @@ skeleton_plot<-function(ske_net,...) {
   #some
   params=list(...)
   params_name=names(params)
+  legend_position=params[["legend_position"]]
   legend_position_default=c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1)
   if(!"legend_position"%in%params_name)legend_position=legend_position_default
   else {
     if(is.null(names(legend_position)))legend_position=setNames(legend_position,names(legend_position_default)[seq_along(legend_position)])
-    legend_position=condance(data.frame(legend_position_default,tidai(names(legend_position_default),legend_position)))
+    legend_position=pcutils::update_param(legend_position_default,legend_position)
   }
   if("vertex.color"%in%params_name)tmp_v$color=condance(data.frame(tmp_v$color,tidai(tmp_v$v_class,params[["vertex.color"]])))
   if("legend_cex"%in%params_name)legend_cex=parms[["legend_cex"]]
@@ -628,7 +628,6 @@ rand_net_par<-function(go,reps=99,threads=1){
     }}
   #simplify method
   rand_net_pars=do.call(rbind,res)
-  pcutils::del_ps("foreach","doSNOW")
 
   if(FALSE){
     ggplot(a,aes(x=clusteringC))+geom_histogram()+

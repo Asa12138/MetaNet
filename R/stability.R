@@ -137,8 +137,7 @@ plot.robust<-function(x, indexes = c("nat_connectivity", "ave_path_len", "ave_de
       geom_errorbar(data = sdd,aes(ymax=mean+se,ymin=mean-se))+
       #geom_smooth(se = FALSE,method = "loess",formula = 'y ~ x') +
       facet_wrap(. ~ variable, scales = "free")+labs(x=xlab,y=NULL)+
-      theme_bw()+
-      theme(legend.position = "none")
+      theme_bw()
   }
   if(mode==2){
     lib_ps("ggpmisc",library = FALSE)
@@ -150,8 +149,7 @@ plot.robust<-function(x, indexes = c("nat_connectivity", "ave_path_len", "ave_de
         formula = y ~ x,  parse = TRUE,label.x = "right",
         size = 3,
       )+
-      facet_wrap(. ~ variable, scales = "free")+labs(x=xlab,y=NULL)+theme_bw()+
-      theme(legend.position = "none")
+      facet_wrap(. ~ variable, scales = "free")+labs(x=xlab,y=NULL)+theme_bw()
   }
   if(mode==3){
     robust_res%>%dplyr::select(i,rep,group,nat_connectivity)->pdat

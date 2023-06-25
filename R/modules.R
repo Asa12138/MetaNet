@@ -202,12 +202,12 @@ summ_module=function(go_m,var="v_class",module="module",...){
   tmp_v=get_v(go_m)
   if((length(module)>1)|(length(var)>1))stop("var or module should be one column!")
   a=tmp_v%>%dplyr::select(!!module,!!var)
-  colnames(a)[1]="module1"
+  colnames(a)[1]="module"
 
   i=var
-  if(is.numeric(a[,i]))pcutils::group_box(a[i],group = "module1",metadata = a,...)
+  if(is.numeric(a[,i]))pcutils::group_box(a[i],group = "module",metadata = a,...)
   else {
-    table(a[,i],a$module1)%>%as.data.frame()%>%
+    table(a[,i],a$module)%>%as.data.frame()%>%
       reshape2::acast(Var1~Var2,value.var = "Freq")%>%
       as.data.frame()->tab
     pcutils::stackplot(tab,legend_title=var,...)+labs(x="Module")
@@ -325,6 +325,7 @@ module_expression=function(go_m,totu,group=NULL,cor=0.6,x_order=NULL,facet_param
                                size=node_eigen_cor,alpha=node_eigen_cor),size=0.8)+
     mytheme+theme(plot.margin=unit(c(1,2,1,1),'lines'))+
     do.call(facet_wrap,append(list(facets = ~module),pcutils::update_param(list(scales = "free_y",ncol=2),facet_param)))+
+    labs(x=NULL,y=NULL)+
     #facet_wrap(facets = ~module,nrow = nrow,scales = "free_y")+
     scale_alpha_continuous(range = c(0,0.6))+
     scale_x_discrete(expand=c(0,0))+

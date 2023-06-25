@@ -676,6 +676,7 @@ RMT_threshold = function(occor.r, min_threshold = 0.5, max_threshold = 0.8,
 
   if(inherits(occor.r,"corr"))occor.r=occor.r$r
   if(!dir.exists("./RMT_temp"))dir.create("./RMT_temp")
+  diag(occor.r)=0
 
   if(max_threshold>=max(abs(occor.r))) max_threshold=(max(abs(occor.r))-step)
   if(min_threshold>=max_threshold) min_threshold=max_threshold-10*step

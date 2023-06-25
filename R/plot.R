@@ -393,7 +393,8 @@ plot_gg_circle<-function(go=co_net,group="v_class",sep=0){
   # Basic usual argument
   p=ggraph::ggraph(mygraph, layout = 'dendrogram', circular = TRUE) +
     ggraph::geom_conn_bundle(data = ggraph::get_con(from = edge$from,
-                                                    to = edge$to,e_type=edge$e_type,
+                                                    to = edge$to,
+                                                    e_type=edge$e_type,
                                                     width=edge$width),
                       alpha=0.2, aes(width=width,colour=e_type),tension=0.5) +
     ggraph::scale_edge_width(range = c(0.2,1))+
@@ -511,6 +512,7 @@ plot.metanet=function(x,...){
 #' @param coors the coordinates you saved
 #' @param ... additional parameters for \code{\link[igraph]{igraph.plotting}}
 #' @param labels_num show how many labels,>1 indicates number, <1 indicates fraction ,default:5
+#' @param vertex_size_range the vertex size range, e.g. c(1,10)
 #' @param legend_number legend with numbers
 #' @param legend all legends
 #' @param legend_position legend_position, default: c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1)
@@ -541,7 +543,7 @@ plot.metanet=function(x,...){
 #' c_net_plot(co_net)
 #' c_net_plot(co_net2)
 #' c_net_plot(multi1)
-c_net_plot <- function(go, coors = NULL,...,labels_num=5,
+c_net_plot <- function(go, coors = NULL,...,labels_num=5,vertex_size_range=NULL,
                        legend_number=FALSE,legend=TRUE,legend_cex=1,
                        legend_position=c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1),
                        lty_legend=FALSE,lty_legend_title="Edge class",
@@ -585,14 +587,17 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
   coors=coors$coors[,c("X","Y")]%>%as.matrix()
 
   #scale the size and width
-  {
+{
+  nice_size <- ceiling(60/sqrt(length(V(go))))+1
+
   node_size_text1=c()
   node_size_text2=c()
   for(i in unique(tmp_v$v_group)){
     node_size_text1=c(node_size_text1,min(tmp_v[tmp_v$v_group==i,"size"]))
     node_size_text2=c(node_size_text2,max(tmp_v[tmp_v$v_group==i,"size"]))
-    tmp_v[tmp_v$v_group==i,"size"]%<>%pcutils::mmscale(.,3,12)
-  }
+    if(is.null(vertex_size_range))vertex_size_range=c(max(nice_size*0.4,3),min(nice_size*1.6,12))
+    tmp_v[tmp_v$v_group==i,"size"]=do.call(pcutils::mmscale,append(list(tmp_v[tmp_v$v_group==i,"size"]),as.list(vertex_size_range)))
+}
   node_size_text1=round(node_size_text1,3)
   node_size_text2=round(node_size_text2,3)
   tmp_e$width=pcutils::mmscale(tmp_e$width,0.5,1)
@@ -766,7 +771,7 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,
 to.ggig<-function(go,coors=NULL){
   list(n_index=get_n(go),v_index=get_v(go),e_index=get_e(go))->net_par_res
 
-  if(is.null(coors))coors=c_net_lay(co_net)
+  if(is.null(coors))coors=c_net_lay(go)
   coors=get_coors(coors,go)
   coors=coors$coors
   # coors$X=max(coors$X)-coors$X
