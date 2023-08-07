@@ -9,6 +9,7 @@ c_net_plot(
   coors = NULL,
   ...,
   labels_num = 5,
+  vertex_size_range = NULL,
   legend_number = FALSE,
   legend = TRUE,
   legend_cex = 1,
@@ -40,7 +41,9 @@ c_net_plot(
 
 \item{...}{additional parameters for \code{\link[igraph]{igraph.plotting}}}
 
-\item{labels_num}{show how many labels,>1 indicates number, <1 indicates fraction ,default:5}
+\item{labels_num}{show how many labels,>1 indicates number, <1 indicates fraction, "all" indicates all, default:5}
+
+\item{vertex_size_range}{the vertex size range, e.g. c(1,10)}
 
 \item{legend_number}{legend with numbers}
 

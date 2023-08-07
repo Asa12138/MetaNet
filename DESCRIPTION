@@ -1,6 +1,6 @@
 Package: MetaNet
 Type: Package
-Title: Network analysis for large omics data
+Title: Network Analysis for Omics Data
 Version: 0.1.0
 Author: Peng Chen [aut, cre]
 Maintainer: Peng Chen <pengchen2001@zju.edu.cn>
@@ -32,7 +32,8 @@ Imports:
     utils,
     pcutils,
     vegan,
-    rlang
+    rlang,
+    stringr
 Suggests:
     pheatmap,
     foreach,

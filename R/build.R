@@ -132,7 +132,7 @@ c_net_build <- function(corr, r_thres = 0.6, p_thres = 0.05,use_p_adj=TRUE, del_
 #'    vertex_size =paste0("Abundance",1:3))
 #' c_net_plot(multi1)
 multi_net_build<-function(...,mode="full",method = "spearman",
-                          filename = "multi-net",p.adjust.method=NULL,
+                          filename = FALSE,p.adjust.method=NULL,
                           r_thres = 0.6, p_thres = 0.05,use_p_adj=TRUE, del_single = TRUE){
   tables=list(...)
   if(all(class(tables[[1]])=="list"))tables=tables[[1]]
@@ -166,17 +166,22 @@ multi_net_build<-function(...,mode="full",method = "spearman",
   multi_net
 }
 
+e_match=function(df){
+  n=dplyr::distinct_all(df)%>%nrow()
+  all_same(c(n,length(unique(df[,1,drop=T])),length(unique(df[,2,drop=T]))))
+}
 
 #' Update a metanet
 #'
 #' @param go metanet metanet object
-#' @param node_break node_break
-#' @param edge_break edge_break
-#'
+#' @param node_break node_break if v_class is numeric, default: 5
+#' @param edge_break edge_break if e_type is numeric, default: 5
+#' @aliases as.metanet
 #' @export
 #' @return metanet
 c_net_update<-function(go,node_break=5,edge_break=5){
   stopifnot(inherits(go,"igraph"))
+
   #name
   if(!"name"%in%igraph::vertex_attr_names(go))V(go)$name=paste0("n",seq_len(length(go)))
   if(!"label"%in%igraph::vertex_attr_names(go))V(go)$label=V(go)$name
@@ -184,43 +189,63 @@ c_net_update<-function(go,node_break=5,edge_break=5){
   #v_size
   if(!"size"%in%colnames(tmp_v)){tmp_v$size=ceiling(60/sqrt(length(V(go))))+1}
 
+  flag=TRUE
   #v_shape
-  if("v_group"%in%colnames(tmp_v)){
-    tmp_v$shape <- tidai(tmp_v$v_group,c("circle","square"))
+  if(!"v_group"%in%colnames(tmp_v)){tmp_v$v_group="v_group1"}
+  if("shape"%in%colnames(tmp_v)){
+    if(e_match(tmp_v[,c("v_group","shape")]))flag=FALSE
   }
-  else {tmp_v$v_group="v_group1";tmp_v$shape="circle"}
+  if(flag)tmp_v$shape <- tidai(tmp_v$v_group,c("circle","square"))
 
+  flag=TRUE
   #v_color
   if(!"v_class"%in%colnames(tmp_v)){tmp_v$v_class="v_class1"}
-  if(is.numeric(tmp_v$v_class)){
-    tmp_v$color=as.character(cut(tmp_v$v_class,breaks = node_break,
-                             labels=pcutils::get_cols(node_break,RColorBrewer::brewer.pal(n = 9, name = "PuBu")[3:9])))
-    tmp_v$v_class=as.character(cut(tmp_v$v_class,breaks = node_break))
+  if("color"%in%colnames(tmp_v)){
+    if(e_match(tmp_v[,c("v_class","color")]))flag=FALSE
   }
-  else{tmp_col=paste0(tmp_v$v_group,"-",tmp_v$v_class)
-  tmp_v$color =tidai(tmp_col,pcutils::get_cols(nlevels(factor(tmp_col)),"col3"),fac = TRUE)}
+  if(flag){
+    if(is.numeric(tmp_v$v_class)){
+      tmp_v$color=as.character(cut(tmp_v$v_class,breaks = node_break,
+                                   labels=pcutils::get_cols(node_break,RColorBrewer::brewer.pal(n = 9, name = "Reds")[2:9])))
+      tmp_v$v_class=as.character(cut(tmp_v$v_class,breaks = node_break,
+                                   labels=seq(min(tmp_v$v_class,na.rm = T),max(tmp_v$v_class,na.rm = T),length.out=node_break)))
+    }
+    else{
+      tmp_col=paste0(tmp_v$v_group,"-",tmp_v$v_class)
+      tmp_v$color =tidai(tmp_col,pcutils::get_cols(nlevels(factor(tmp_col)),"col3"),fac = TRUE)
+    }
+  }
 
   as.list(tmp_v)->igraph::vertex_attr(go)
 
+  flag=TRUE
   #e_color
   if(!"e_type"%in%igraph::edge_attr_names(go)){E(go)$e_type="e_type1"}
-  #分割
-  if(is.numeric(E(go)$e_type)){
-    E(go)$color=as.character(cut(E(go)$e_type,breaks = edge_break,
-                             labels=pcutils::get_cols(edge_break,RColorBrewer::brewer.pal(n = 9, name = "Greens")))[3:9])
-    E(go)$e_type=as.character(cut(E(go)$e_type,breaks = edge_break))
+  if("color"%in%igraph::edge_attr_names(go)){
+    if(e_match(data.frame(a=E(go)$e_type,b=E(go)$color)))flag=FALSE
   }
-  else{
-    edge.color <- droplevels(as.factor(E(go)$e_type))
-    if(all(levels(edge.color)%in%c("negative","positive")))ncols=c(negative="#E85D5D",positive="#48A4F0")
-    else if(all(levels(edge.color)%in%c("inter-module","intra-module")))ncols=c("inter-module"="#FA789A","intra-module"="#A6CEE3")
-    else ncols=pcutils::get_cols(nlevels(edge.color),"col2")
-    E(go)$color=tidai(E(go)$e_type,ncols,fac = TRUE)
+  if(flag){
+    if(is.numeric(E(go)$e_type)){
+      E(go)$color=as.character(cut(E(go)$e_type,breaks = edge_break,
+                                   labels=pcutils::get_cols(edge_break,RColorBrewer::brewer.pal(n = 9, name = "Greens")[3:9])))
+      E(go)$e_type=as.character(cut(E(go)$e_type,breaks = edge_break))
+    }
+    else{
+      edge.color <- droplevels(as.factor(E(go)$e_type))
+      if(all(levels(edge.color)%in%c("negative","positive")))ncols=c(negative="#E85D5D",positive="#48A4F0")
+      else if(all(levels(edge.color)%in%c("inter-module","intra-module")))ncols=c("inter-module"="#FA789A","intra-module"="#A6CEE3")
+      else ncols=pcutils::get_cols(nlevels(edge.color),"col2")
+      E(go)$color=tidai(E(go)$e_type,ncols,fac = TRUE)
+    }
   }
 
+  flag=TRUE
   #e_lty
   if(!"e_class"%in%igraph::edge_attr_names(go)){E(go)$e_class="e_class1"}
-  E(go)$lty=tidai(E(go)$e_class,1:4)
+  if("lty"%in%igraph::edge_attr_names(go)){
+    if(e_match(data.frame(a=E(go)$e_class,b=E(go)$lty)))flag=FALSE
+  }
+  if(flag)E(go)$lty=tidai(E(go)$e_class,1:4)
 
   #e_width
   if(!"width"%in%igraph::edge_attr_names(go)){E(go)$width=1}
@@ -229,6 +254,8 @@ c_net_update<-function(go,node_break=5,edge_break=5){
   return(go)
 }
 
+#' @export
+as.metanet=c_net_update
 
 #' Construct a network from Edge_list dataframe
 #'
@@ -263,6 +290,8 @@ c_net_from_edgelist<-function(edgelist,vertex=NULL,direct=FALSE,e_type=NULL,e_cl
 #' @param edge_type choose which column to be edge_type (map to edge_color)
 #' @param edge_class choose which column to be edge_class (map to edge_linetype)
 #' @param edge_width choose which column to be edge_width (map to edge_width)
+#' @param node_break node_break if v_class is numeric, default: 5
+#' @param edge_break edge_break if e_type is numeric, default: 5
 #'
 #' @return a metanet object
 #' @export
@@ -279,8 +308,9 @@ c_net_from_edgelist<-function(edgelist,vertex=NULL,direct=FALSE,e_type=NULL,e_cl
 #'    vertex_class=c("Phylum","env"))
 #' co_net2<-c_net_set(co_net2,data.frame("Abundance"=colSums(totu)),vertex_size="Abundance")
 c_net_set <- function(go,...,vertex_group="v_group",vertex_class="v_class",vertex_size="size",
-                      edge_type="e_type",edge_class="e_class",edge_width="width") {
+                      edge_type="e_type",edge_class="e_class",edge_width="width",node_break=5,edge_break=5) {
   lib_ps("igraph",library = FALSE)
+  c_net_update(go)->go
 #annotation vertex
   anno_dfs<-list(...)
   if(length(anno_dfs)>0){
@@ -301,11 +331,60 @@ c_net_set <- function(go,...,vertex_group="v_group",vertex_class="v_class",verte
   get_v(go)->v_index
   get_e(go)->e_index
 #set something
-
   if(!setequal(vertex_group,"v_group"))dplyr::select(v_index,v_group,!!vertex_group)%>%condance->v_index$v_group
-  if(!setequal(vertex_class,"v_class"))dplyr::select(v_index,v_class,!!vertex_class)%>%condance->v_index$v_class
+  if(!setequal(vertex_class,"v_class")){
+    tmp_color=list()
+    tmp_ann=dplyr::select(v_index,!!vertex_class)
+    #charcter
+    tmp_col=dplyr::select_if(tmp_ann,\(i)!is.numeric(i))%>%condance()%>%unique()%>%na.omit()
+    if(length(tmp_col)>0)tmp_col=setNames(pcutils::get_cols(nlevels(factor(tmp_col)),"col3"),tmp_col)
+    #tmp_col=c(tmp_col,`NA`=NA)
+
+    for (i in 1:ncol(tmp_ann)) {
+      if(is.numeric(tmp_ann[,i])){
+        tmp_color[[i]]=as.character(cut(tmp_ann[,i],breaks = node_break,
+                                     labels=pcutils::get_cols(node_break,RColorBrewer::brewer.pal(n = 9, name = "Reds")[2:9])))
+        tmp_ann[,i]=as.character(cut(tmp_ann[,i],breaks = node_break,
+                                       labels=seq(min(tmp_ann[,i],na.rm = T),max(tmp_ann[,i],na.rm = T),
+                                                  length.out=node_break)))
+      }
+      else{
+        tmp_color[[i]]=tmp_col[tmp_ann[,i]]
+      }
+    }
+
+    cbind(dplyr::select(v_index,v_class),tmp_ann)%>%condance->v_index$v_class
+    cbind(dplyr::select(v_index,color),as.data.frame(tmp_color))%>%condance->v_index$color
+  }
   if(!setequal(vertex_size,"size"))dplyr::select(v_index,size,!!vertex_size)%>%condance->v_index$size
-  if(!setequal(edge_type,"e_type"))dplyr::select(e_index,e_type,!!edge_type)%>%condance->e_index$e_type
+  if(!setequal(edge_type,"e_type")){
+    tmp_color=list()
+    tmp_ann=dplyr::select(e_index,!!edge_type)
+    #charcter
+    tmp_col=dplyr::select_if(tmp_ann,\(i)!is.numeric(i))%>%condance()%>%unique()%>%na.omit()
+    if(length(tmp_col)>0){
+      tmp_col=setNames(pcutils::get_cols(nlevels(factor(tmp_col)),"col2"),tmp_col)
+      tmp_col=pcutils::update_param(tmp_col,c(negative="#E85D5D",positive="#48A4F0",
+                                              "inter-module"="#FA789A","intra-module"="#A6CEE3"))
+    }
+    #tmp_col=c(tmp_col,`NA`=NA)
+
+    for (i in 1:ncol(tmp_ann)) {
+      if(is.numeric(tmp_ann[,i])){
+        tmp_color[[i]]=as.character(cut(tmp_ann[,i],breaks = edge_break,
+                                     labels=pcutils::get_cols(edge_break,RColorBrewer::brewer.pal(n = 9, name = "Greens")[3:9])))
+        tmp_ann[,i]=as.character(cut(tmp_ann[,i],breaks = edge_break,
+                                     labels=seq(min(tmp_ann[,i],na.rm = T),max(tmp_ann[,i],na.rm = T),
+                                                length.out=edge_break)))
+      }
+      else{
+        tmp_color[[i]]=tmp_col[tmp_ann[,i]]
+      }
+    }
+
+    cbind(dplyr::select(e_index,e_type),tmp_ann)%>%condance->e_index$e_type
+    cbind(dplyr::select(e_index,color),as.data.frame(tmp_color))%>%condance->e_index$color
+  }
   if(!setequal(edge_class,"e_class"))dplyr::select(e_index,e_class,!!edge_class)%>%condance->e_index$e_class
   if(!setequal(edge_width,"width"))dplyr::select(e_index,width,!!edge_width)%>%condance->e_index$width
 
@@ -945,7 +1024,8 @@ df2net=function(test){
   c_net_from_edgelist(as.data.frame(links),vertex = nodes)
   net=igraph::graph_from_data_frame(as.data.frame(links),vertices = nodes)
   net=c_net_update(net)
-  net=c_net_set(net,vertex_class = "level",vertex_size = "weight",edge_width = "weight")->ttt
+  net=c_net_set(net,vertex_class = "level",vertex_size = "weight",edge_width = "weight")
+  graph_attr(net,"coors")=c_net_lay(net,as_tree())
   net
 }
 

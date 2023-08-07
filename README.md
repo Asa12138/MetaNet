@@ -16,7 +16,7 @@ Please go to <https://asa12138.github.io/MetaNet_tutorial> for the full vignette
 
 Please cite:
 
-Chen P (2023). *MetaNet: Network analysis for multi-omics*. R package, <https://github.com/Asa12138/MetaNet>.
+Chen P (2023). *MetaNet: Network Analysis for Omics Data*. R package, <https://github.com/Asa12138/MetaNet>.
 
 ## Need helps?
 

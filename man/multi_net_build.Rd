@@ -8,7 +8,7 @@ multi_net_build(
   ...,
   mode = "full",
   method = "spearman",
-  filename = "multi-net",
+  filename = FALSE,
   p.adjust.method = NULL,
   r_thres = 0.6,
   p_thres = 0.05,

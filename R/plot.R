@@ -444,7 +444,7 @@ g_lay_polygon<-function(go,group="v_group",group2=NULL,group2_order=NULL,line_cu
   g_lay(go,group =group,zoom1=1,zoom2 =0.9*(ifelse(n>2,tan(pi/n),2)),
         layout2 =fun_ls,order_by=group2,order_ls=group2_order)->oridata
 
-  oridata$curved$curved=line_curved
+  if(is.data.frame(oridata$curved))oridata$curved$curved=line_curved
   oridata
 }
 
@@ -501,7 +501,46 @@ plot.metanet=function(x,...){
   go=x
   if(is.null(get_n(go)$n_type)) c_net_plot(go,...)
   else if(get_n(go)$n_type=="skeleton")skeleton_plot(go,...)
-  else if(get_n(go)$n_type=="module")c_net_plot(go,group_legend_title = "Module",...)
+  else if(get_n(go)$n_type=="module"){
+    default_arg=list(
+      labels_num = 0,
+      group_legend_title = "Module"
+    )
+    do.call(c_net_plot,append(list(go=go),pcutils::update_param(default_arg,list(...))))
+  }
+  else if(get_n(go)$n_type=="venn"){
+    nice_size <- ceiling(60/sqrt(length(V(go))))+1
+    default_arg=list(
+      labels_num = "all",
+      vertex_size_range = list("Group"=c(1.5*nice_size,1.5*nice_size),"elements"=c(0.5*nice_size,0.5*nice_size)),
+      vertex.shape="circle",
+      legend = FALSE,edge.curved=0.3,
+      edge.color=unique(V(go)$color)
+    )
+    do.call(c_net_plot,append(list(go=go),pcutils::update_param(default_arg,list(...))))
+  }
+  else if(get_n(go)$n_type=="twocol"){
+    nice_size <- ceiling(60/sqrt(length(V(go))))+1
+    default_arg=list(
+      labels_num = 0,
+      vertex.shape="circle",
+      edge_legend = FALSE,
+      edge.color="black"
+    )
+    do.call(c_net_plot,append(list(go=go),pcutils::update_param(default_arg,list(...))))
+  }
+  else if(get_n(go)$n_type=="ko_net"){
+    nice_size <- ceiling(60/sqrt(length(V(go))))+1
+    default_arg=list(
+      labels_num = "all",
+      vertex.shape="circle",
+      vertex_size_range = list("Pathway"=c(1.2*nice_size,1.2*nice_size),"KOs"=c(0.6*nice_size,0.6*nice_size)),
+      edge_legend = FALSE,
+      edge.color="black",
+      mark_alpha=0.1
+    )
+    do.call(c_net_plot,append(list(go=go),pcutils::update_param(default_arg,list(...))))
+  }
   else c_net_plot(go,...)
 }
 
@@ -511,7 +550,7 @@ plot.metanet=function(x,...){
 #' @param go a igraph or metanet object
 #' @param coors the coordinates you saved
 #' @param ... additional parameters for \code{\link[igraph]{igraph.plotting}}
-#' @param labels_num show how many labels,>1 indicates number, <1 indicates fraction ,default:5
+#' @param labels_num show how many labels,>1 indicates number, <1 indicates fraction, "all" indicates all, default:5
 #' @param vertex_size_range the vertex size range, e.g. c(1,10)
 #' @param legend_number legend with numbers
 #' @param legend all legends
@@ -532,6 +571,7 @@ plot.metanet=function(x,...){
 #' @param group_legend_order group_legend_order vector
 #' @param mark_module logical, mark the modules?
 #' @param mark_color mark colors
+#' @param mark_alpha mark fill alpha, default 0.3
 #' @param seed random seed, default:1234, make sure each plot is the same.
 #' @param plot_module logical, plot module?
 #'
@@ -552,7 +592,8 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,vertex_size_range=NULL,
                        width_legend=FALSE,width_legend_title="Edge width",
                        col_legend=TRUE,col_legend_order=NULL,
                        group_legend_title=NULL,group_legend_order=NULL,
-                       plot_module=FALSE,mark_module=FALSE,mark_color=NULL,seed=1234){
+                       plot_module=FALSE,mark_module=FALSE,mark_color=NULL,mark_alpha=0.3,
+                       seed=1234){
   lib_ps("igraph",library = FALSE)
   set.seed(seed)
 
@@ -571,6 +612,7 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,vertex_size_range=NULL,
             "multi_full" ={main="Multi-omics network"},
             "module"={main=paste0(get_n(go)$n_modules,"-modules network")},
             "skeleton" ={main=paste0(get_n(go)$skeleton," skeleton network")},
+            "venn"={main="Venn network"},
             default={main="Network"}
     )
   }
@@ -587,59 +629,77 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,vertex_size_range=NULL,
   coors=coors$coors[,c("X","Y")]%>%as.matrix()
 
   #scale the size and width
-{
-  nice_size <- ceiling(60/sqrt(length(V(go))))+1
+  {
+    v_groups=unique(tmp_v$v_group)
+    nice_size <- ceiling(60/sqrt(length(V(go))))+1
+    vertex_size_range_default=rep(list(c(max(nice_size*0.4,3),min(nice_size*1.6,12))),length(v_groups))
+    names(vertex_size_range_default)=v_groups
 
-  node_size_text1=c()
-  node_size_text2=c()
-  for(i in unique(tmp_v$v_group)){
-    node_size_text1=c(node_size_text1,min(tmp_v[tmp_v$v_group==i,"size"]))
-    node_size_text2=c(node_size_text2,max(tmp_v[tmp_v$v_group==i,"size"]))
-    if(is.null(vertex_size_range))vertex_size_range=c(max(nice_size*0.4,3),min(nice_size*1.6,12))
-    tmp_v[tmp_v$v_group==i,"size"]=do.call(pcutils::mmscale,append(list(tmp_v[tmp_v$v_group==i,"size"]),as.list(vertex_size_range)))
-}
-  node_size_text1=round(node_size_text1,3)
-  node_size_text2=round(node_size_text2,3)
-  tmp_e$width=pcutils::mmscale(tmp_e$width,0.5,1)
+    if(!is.null(vertex_size_range)){
+      if(!is.list(vertex_size_range))vertex_size_range=list(vertex_size_range)
+      if(is.null(names(vertex_size_range))){
+        vertex_size_range=rep(vertex_size_range,length(v_groups))
+        names(vertex_size_range)=v_groups
+      }
+      vertex_size_range=pcutils::update_param(vertex_size_range_default,vertex_size_range)
+    }
+    else vertex_size_range=vertex_size_range_default
 
+    node_size_text1=c()
+    node_size_text2=c()
+    for(i in v_groups){
+      node_size_text1=c(node_size_text1,min(tmp_v[tmp_v$v_group==i,"size"]))
+      node_size_text2=c(node_size_text2,max(tmp_v[tmp_v$v_group==i,"size"]))
+      tmp_v[tmp_v$v_group==i,"size"]=do.call(pcutils::mmscale,append(list(tmp_v[tmp_v$v_group==i,"size"]),as.list(vertex_size_range[[i]][1:2])))
+  }
+    node_size_text1=round(node_size_text1,3)
+    node_size_text2=round(node_size_text2,3)
+
+    tmp_e$width=pcutils::mmscale(tmp_e$width,0.5,1)
+  }
   #some custom parameters
   params=list(...)
   params_name=names(params)
   if("vertex.size"%in%params_name)tmp_v$size=params[["vertex.size"]]
   if("vertex.color"%in%params_name)tmp_v$color=condance(data.frame(tmp_v$color,tidai(tmp_v$v_class,params[["vertex.color"]])))
   if("vertex.shape"%in%params_name)tmp_v$shape=condance(data.frame(tmp_v$shape,tidai(tmp_v$v_group,params[["vertex.shape"]])))
+  if("vertex.label.color"%in%params_name)vertex.label.color=condance(data.frame("black",tidai(tmp_v$v_group,params[["vertex.label.color"]])))
+  else vertex.label.color="black"
+  if("vertex.label"%in%params_name)tmp_v$label=params[["vertex.label"]]
+
   if("edge.color"%in%params_name)tmp_e$color=condance(data.frame(tmp_e$color,tidai(tmp_e$e_type,params[["edge.color"]])))
   if("edge.lty"%in%params_name)tmp_e$lty=condance(data.frame(tmp_e$lty,tidai(tmp_e$e_class,params[["edge.lty"]])))
   if("edge.width"%in%params_name)tmp_e$width=params[["edge.width"]]
-  if("vertex.label"%in%params_name)tmp_v$label=params[["vertex.label"]]
-}
+
   #show labels
-  {if(labels_num>=1){tmp_v%>%dplyr::top_n(labels_num,size)%>%
-      dplyr::pull(name)%>%head(labels_num)->toplabel}
-  else {
-    tmp_v%>%dplyr::top_frac(labels_num,size)%>%dplyr::pull(name)%>%
-      head(ceiling(labels_num*nrow(tmp_v)))->toplabel
+  {
+    if(labels_num=="all")tmp_v%>%dplyr::pull(name)->toplabel
+    else {
+      if(labels_num>=1){tmp_v%>%dplyr::top_n(labels_num,size)%>%
+          dplyr::pull(name)%>%head(labels_num)->toplabel}
+      else {
+        tmp_v%>%dplyr::top_frac(labels_num,size)%>%dplyr::pull(name)%>%
+          head(ceiling(labels_num*nrow(tmp_v)))->toplabel
+      }
     }
-  tmp_v$label=ifelse(tmp_v$name%in%toplabel,tmp_v$label,NA)
+    tmp_v$label=ifelse(tmp_v$name%in%toplabel,tmp_v$label,NA)
   }
-
   #modules set
-{
-  if(mark_module){
-    new_modu=as_module(setNames(tmp_v$module,tmp_v$name))
-    new_modu[["others"]]=NULL
+  {
+    if(mark_module){
+      new_modu=as_module(setNames(tmp_v$module,tmp_v$name))
+      new_modu[["others"]]=NULL
 
-    module_color=pcutils::get_cols(length(new_modu))
-    if(!is.null(mark_color))module_color=condance(data.frame(module_color,tidai(names(new_modu),mark_color)))
+      module_color=pcutils::get_cols(length(new_modu))
+      if(!is.null(mark_color))module_color=condance(data.frame(module_color,tidai(names(new_modu),mark_color)))
 
-    module_color=setNames(module_color,names(new_modu))
-    module_color=module_color[names(module_color)!="others"]
+      module_color=setNames(module_color,names(new_modu))
+      module_color=module_color[names(module_color)!="others"]
+    }
+    else {
+      new_modu=module_color=NULL
+    }
   }
-  else {
-    new_modu=module_color=NULL
-  }
-}
-
   #main plot
   {
     igraph::plot.igraph(go, layout = coors,
@@ -650,12 +710,12 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,vertex_size_range=NULL,
                 edge.lty=tmp_e$lty,
                 edge.width=tmp_e$width,
                 mark.groups = new_modu,
-                mark.col = pcutils::add_alpha(module_color[names(new_modu)],0.3),
+                mark.col = pcutils::add_alpha(module_color[names(new_modu)],mark_alpha),
                 mark.border =module_color[names(new_modu)],
+                vertex.label.color = vertex.label.color,
                 ...,
                 main = main,
                 vertex.label.font = 1,
-                vertex.label.color = "black",
                 vertex.label.cex = 0.08*tmp_v$size,
                 vertex.label=tmp_v$label,
                 edge.arrow.size=0.3,
@@ -724,13 +784,14 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,vertex_size_range=NULL,
   if(col_legend){
     pchls=c("circle"=21,"square"=22)
     vgroups=pcutils::change_fac_lev(tmp_v$v_group,group_legend_order)
-    vgroups=levels(vgroups)
+    vgroups=unique(vgroups)
     if(is.null(group_legend_title))group_legend_title=setNames(vgroups,vgroups)
     else if(is.null(names(group_legend_title)))group_legend_title=setNames(rep(group_legend_title,len=length(vgroups)),vgroups)
 
     for(g_i in vgroups){
       tmp_v1=tmp_v[tmp_v$v_group==g_i,c("v_class","color","shape")]
 
+      tmp_v1$v_class=factor(tmp_v1$v_class,levels = stringr::str_sort(unique(tmp_v1$v_class),numeric = T))
       vclass=pcutils::change_fac_lev(tmp_v1$v_class,col_legend_order)
       vclass=levels(vclass)
 
@@ -744,6 +805,7 @@ c_net_plot <- function(go, coors = NULL,...,labels_num=5,vertex_size_range=NULL,
         le_text= paste(vclass,eee[vclass],sep = ": ")
       }
       else le_text= vclass
+      if(length(le_text)==0)le_text=""
       legend(left_leg_x, left_leg_y, cex = 0.7*legend_cex, adj = 0,
              legend = le_text,title.cex = 0.8*legend_cex,
              title =group_legend_title[g_i],title.font = 2,title.adj = 0,
@@ -1050,4 +1112,66 @@ mytheme <- {
   ggplot2::theme_classic(base_size = 13) + ggplot2::theme(axis.text = element_text(color = "black"),
                                                           plot.margin = grid::unit(rep(0.5, 4), "lines"),
                                                           strip.background = ggplot2::element_rect(fill = NA))
+}
+
+#' Venn network
+#'
+#' @param tab data.frame (row is elements, column is group), or a list (names is group, value is elements)
+#'
+#' @return plot
+#' @export
+#'
+#' @examples
+#' data(otutab,package="pcutils")
+#' tab=otutab[400:492,1:3]
+#' venn_net(tab)->v_net
+#' plot(v_net)
+venn_net=function(tab){
+  #pcutils:::venn_cal(tab)->vennlist
+  edgelist=data.frame()
+  if(is.data.frame(tab)){
+    groupss=colnames(tab)
+    for (i in groupss) {
+      if(sum(tab[,i]>0)>0)edgelist=rbind(edgelist,data.frame(Group=i,elements=rownames(tab)[tab[,i]>0]))
+    }
+  }
+  else if(all(class(tab)=="list")){
+    vennlist=tab
+    groupss=names(vennlist)
+    for (i in groupss) {
+      if(!is.null(vennlist[[i]]))edgelist=rbind(edgelist,data.frame(Group=i,elements=vennlist[[i]]))
+    }
+  }
+  else stop("wrong input tab")
+
+  nodelist=rbind(data.frame(name=groupss,v_group="Group",v_class=paste0("Group: ",groupss)),
+                 data.frame(name=unique(edgelist$elements),v_group="elements",v_class="elements"))
+  venn_net=c_net_from_edgelist(edgelist,vertex = nodelist)
+  graph.attributes(venn_net)$n_type="venn"
+  all_group=get_e(venn_net)[,c("from","to")]%>%pcutils::squash("from")%>%dplyr::rename(name="to",all_group="from")
+  venn_net=c_net_set(venn_net,all_group,vertex_class = "all_group",edge_type = "from")
+  venn_net
+}
+
+
+#' Quick build a metanet from two columns table
+#'
+#' @param edgelist two columns table (no elements exist in two columns at same time)
+#'
+#' @return metanet
+#' @export
+#'
+#' @examples
+#' twocol=data.frame("col1"=sample(letters,30,replace = TRUE),
+#'        "col2"=sample(c("A","B"),30,replace = TRUE))
+#' twocol_net=twocol_edgelist(twocol)
+#' plot(twocol_net)
+twocol_edgelist=function(edgelist){
+  if(any(edgelist[,1]%in%edgelist[,2]))stop("Must no elements exist in two columns at same time")
+  nodelist=rbind(data.frame(name=unique(edgelist[,1]),v_group=names(edgelist)[1],v_class=names(edgelist)[1]),
+                 data.frame(name=unique(edgelist[,2]),v_group=names(edgelist)[2],v_class=names(edgelist)[2]))
+  venn_net=c_net_from_edgelist(edgelist,vertex = nodelist)
+  graph.attributes(venn_net)$n_type="twocol"
+  #venn_net=c_net_set(venn_net,edge_type = "from")
+  venn_net
 }

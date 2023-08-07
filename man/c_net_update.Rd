@@ -2,6 +2,7 @@
 % Please edit documentation in R/build.R
 \name{c_net_update}
 \alias{c_net_update}
+\alias{as.metanet}
 \title{Update a metanet}
 \usage{
 c_net_update(go, node_break = 5, edge_break = 5)
@@ -9,9 +10,9 @@ c_net_update(go, node_break = 5, edge_break = 5)
 \arguments{
 \item{go}{metanet metanet object}
 
-\item{node_break}{node_break}
+\item{node_break}{node_break if v_class is numeric, default: 5}
 
-\item{edge_break}{edge_break}
+\item{edge_break}{edge_break if e_type is numeric, default: 5}
 }
 \value{
 metanet

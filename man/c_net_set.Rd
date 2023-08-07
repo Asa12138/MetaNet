@@ -12,7 +12,9 @@ c_net_set(
   vertex_size = "size",
   edge_type = "e_type",
   edge_class = "e_class",
-  edge_width = "width"
+  edge_width = "width",
+  node_break = 5,
+  edge_break = 5
 )
 }
 \arguments{
@@ -31,6 +33,10 @@ c_net_set(
 \item{edge_class}{choose which column to be edge_class (map to edge_linetype)}
 
 \item{edge_width}{choose which column to be edge_width (map to edge_width)}
+
+\item{node_break}{node_break if v_class is numeric, default: 5}
+
+\item{edge_break}{edge_break if e_type is numeric, default: 5}
 }
 \value{
 a metanet object
