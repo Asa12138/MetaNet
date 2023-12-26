@@ -44,11 +44,11 @@ c_net_cal <- function(totu, totu2 = NULL, method = "spearman", filename = FALSE,
 
   if (!is.null(p.adjust.method)) {
     p.adjust <- p.adjust.table(corr$p.value, p.adjust.method)
+    res=list(r = corr$r, p.value = corr$p.value, p.adjust = p.adjust)
   } else {
-    p.adjust <- corr$p.value
+    res=list(r = corr$r, p.value = corr$p.value)
   }
 
-  res=list(r = corr$r, p.value = corr$p.value, p.adjust = p.adjust)
   class(res)="corr"
 
   # save the correlation result

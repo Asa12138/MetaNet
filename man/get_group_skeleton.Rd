@@ -5,7 +5,7 @@
 \alias{skeleton_plot}
 \title{Get skeleton network according to a group}
 \usage{
-get_group_skeleton(go, Group = "v_class", count = NULL)
+get_group_skeleton(go, Group = "v_class", count = NULL, top_N = 8)
 
 skeleton_plot(ske_net, ...)
 }
@@ -15,6 +15,8 @@ skeleton_plot(ske_net, ...)
 \item{Group}{vertex column name}
 
 \item{count}{take which column count, default: NULL}
+
+\item{top_N}{top_N}
 
 \item{ske_net}{skeleton}
 

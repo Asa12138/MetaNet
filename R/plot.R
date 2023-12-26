@@ -1139,7 +1139,7 @@ venn_net=function(tab){
     vennlist=tab
     groupss=names(vennlist)
     for (i in groupss) {
-      if(!is.null(vennlist[[i]]))edgelist=rbind(edgelist,data.frame(Group=i,elements=vennlist[[i]]))
+      if(length(vennlist[[i]]>0))edgelist=rbind(edgelist,data.frame(Group=i,elements=vennlist[[i]]))
     }
   }
   else stop("wrong input tab")

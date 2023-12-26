@@ -85,10 +85,20 @@ c_net_build <- function(corr, r_thres = 0.6, p_thres = 0.05,use_p_adj=TRUE, del_
   E(go)$weight <- abs(go.weight)
 
   #time-consuming
-  if(FALSE){
-    if("p.adjust"%in%names(occor.r))E(go)$p.adjust <-get_e(go)%>%dplyr::select(from,to)%>%apply(., 1, \(x)occor.r$p.adjust[x[1],x[2]])
-    if("p.value"%in%names(occor.r))E(go)$p.value <-get_e(go)%>%dplyr::select(from,to)%>%apply(., 1, \(x)occor.r$p.value[x[1],x[2]])
+  if(T){
+    tmp_e=get_e(go)
+    if("p.value"%in%names(corr)){
+      #E(go)$p.value <-get_e(go)%>%dplyr::select(from,to)%>%apply(., 1, \(x)occor.r$p.value[x[1],x[2]])
+      tmp=reshape2::melt(corr$p.value,varnames = c("from","to"),value.name = "p.value")
+      tmp_e=dplyr::left_join(tmp_e,tmp,by = c("from", "to"))
+    }
+    if("p.adjust"%in%names(corr)){
+      #E(go)$p.adjust <-get_e(go)%>%dplyr::select(from,to)%>%apply(., 1, \(x)occor.r$p.adjust[x[1],x[2]])
+      tmp=reshape2::melt(corr$p.adjust,varnames = c("from","to"),value.name = "p.adjust")
+      tmp_e=dplyr::left_join(tmp_e,tmp,by = c("from", "to"))
+    }
     #应该直接expand，再left_join快很多
+    igraph::edge.attributes(go)=as.list(tmp_e)
   }
 
   # set edges type
@@ -408,6 +418,7 @@ c_net_set <- function(go,...,vertex_group="v_group",vertex_class="v_class",verte
 #' tidai(c("a","a","b","c"),c("red","blue"))
 tidai=\(x,y,fac=FALSE){
   if(is.null(y))return(x)
+  x=as.character(x)
   tmp=y
   if(is.null(names(tmp))){
     tmp=rep(unique(tmp),len=length(unique(x)))
@@ -988,6 +999,7 @@ rmt = function(occor.r, min_threshold = 0.5, max_threshold = 0.85, step = 0.01){
 #' Transfer a dataframe to a network edgelist.
 #'
 #' @param test df
+#' @param fun default: sum
 #'
 #' @return metanet
 #' @export
@@ -999,32 +1011,24 @@ rmt = function(occor.r, min_threshold = 0.5, max_threshold = 0.85, step = 0.01){
 #' cbind(taxonomy,num=rowSums(otutab))[1:20,]->test
 #' df2net(test)->ttt
 #' }}
-df2net=function(test){
+df2net=function(test,fun=sum){
+  flag=FALSE
   if(!is.numeric(test[,ncol(test)]))test$num=1
+  else {flag=TRUE;name=colnames(test)[ncol(test)]}
   nc=ncol(test)
   if(nc<3)stop("as least 3-columns dataframe")
-  #change duplicated data
 
-  # for (i in 1:(nc-1)){
-  #   test[,i]=paste0(test[,i],strrep(" ",i-1))
-  # }
+  link=pcutils::df2link(test,fun = fun)
 
-  #merge to two columns
-  links=data.frame()
-  nodes=data.frame(name=unique(test[,1]),level=colnames(test)[1],
-                   weight=stats::aggregate(test[,ncol(test)],by=list(test[,1]),sum)[["x"]])
-  for (i in 1:(nc-2)){
-    test[,c(i,i+1,nc)]->tmp
-    colnames(tmp)=c("from","to","weight")
-    tmp=dplyr::group_by(tmp,from,to)%>%dplyr::summarise(weight=sum(weight),.groups="keep")
-    links=rbind(links,tmp)
-    nodes=rbind(nodes,data.frame(name=unique(tmp$to),level=colnames(test)[i+1],
-                                 weight=stats::aggregate(tmp$weight,by=list(tmp$to),sum)[["x"]]))
-  }
-  c_net_from_edgelist(as.data.frame(links),vertex = nodes)
+  nodes=link$nodes
+  links=link$links
+  if(flag)colnames(links)[3]=colnames(nodes)[3]=name
+  else name="weight"
+
+  #c_net_from_edgelist(as.data.frame(links),vertex = nodes)
   net=igraph::graph_from_data_frame(as.data.frame(links),vertices = nodes)
   net=c_net_update(net)
-  net=c_net_set(net,vertex_class = "level",vertex_size = "weight",edge_width = "weight")
+  net=c_net_set(net,vertex_class = "level",vertex_size = name,edge_width = name)
   graph_attr(net,"coors")=c_net_lay(net,as_tree())
   net
 }
@@ -1040,10 +1044,10 @@ if(FALSE){
   #https://r-graph-gallery.com/315-hide-first-level-in-circle-packing.html
   lib_ps("ggraph",library = F)
   df2net(test)->ttt
-  ggraph::ggraph(ttt, layout = 'circlepack', weight=weight) +
-    ggraph::geom_node_circle(aes(fill = as.factor(depth), color = as.factor(depth) )) +
-    theme_void() +
-    theme(legend.position="FALSE")
+  ggraph::ggraph(ttt, layout = 'circlepack') +
+    ggraph::geom_node_circle(aes(fill=size))+
+    ggraph::geom_node_circle(aes(color = v_class))
+
 
   #tree
   df2net(test)->ttt

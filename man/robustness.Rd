@@ -7,7 +7,7 @@
 \usage{
 robustness(go_ls, keystone = FALSE, reps = 9, threads = 1)
 
-\method{plot}{robustness}(x, indexes = "num_nodes", ...)
+\method{plot}{robustness}(x, indexes = "Node number", ...)
 }
 \arguments{
 \item{go_ls}{a igraph object or igraph list.}

@@ -31,6 +31,7 @@ c_net_plot(
   plot_module = FALSE,
   mark_module = FALSE,
   mark_color = NULL,
+  mark_alpha = 0.3,
   seed = 1234
 )
 }
@@ -84,6 +85,8 @@ c_net_plot(
 \item{mark_module}{logical, mark the modules?}
 
 \item{mark_color}{mark colors}
+
+\item{mark_alpha}{mark fill alpha, default 0.3}
 
 \item{seed}{random seed, default:1234, make sure each plot is the same.}
 }

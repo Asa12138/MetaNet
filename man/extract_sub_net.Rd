@@ -4,7 +4,7 @@
 \alias{extract_sub_net}
 \title{Extract sub-network from the whole network}
 \usage{
-extract_sub_net(a_net, otutab, threads = 1, save_net = FALSE)
+extract_sub_net(a_net, otutab, threads = 1, save_net = FALSE, fast = TRUE)
 }
 \arguments{
 \item{a_net}{the whole network}
@@ -14,6 +14,8 @@ extract_sub_net(a_net, otutab, threads = 1, save_net = FALSE)
 \item{threads}{threads, default: 1}
 
 \item{save_net}{should save these sub_nets? FALSE or a filename}
+
+\item{fast}{less indexes for faster calculate ?}
 }
 \value{
 a dataframe contains all sub_net parameters

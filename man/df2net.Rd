@@ -4,10 +4,12 @@
 \alias{df2net}
 \title{Transfer a dataframe to a network edgelist.}
 \usage{
-df2net(test)
+df2net(test, fun = sum)
 }
 \arguments{
 \item{test}{df}
+
+\item{fun}{default: sum}
 }
 \value{
 metanet

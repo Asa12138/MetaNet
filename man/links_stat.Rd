@@ -7,7 +7,7 @@
 links_stat(
   go,
   group = "v_class",
-  inter = "all",
+  e_type = "all",
   topN = 6,
   colors = NULL,
   legend_number = FALSE,
@@ -25,7 +25,7 @@ links_stat(
 
 \item{group}{summary which group of vertex attribution in names(vertex_attr(go))}
 
-\item{inter}{"positive", "negative", "all"}
+\item{e_type}{"positive", "negative", "all"}
 
 \item{topN}{topN of group, default:5}
 

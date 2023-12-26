@@ -6,6 +6,7 @@
 #' @param otutab otutab, these columns will be extract
 #' @param threads threads, default: 1
 #' @param save_net should save these sub_nets? FALSE or a filename
+#' @param fast less indexes for faster calculate ?
 #'
 #' @return a dataframe contains all sub_net parameters
 #' @export
@@ -13,7 +14,7 @@
 #' @examples
 #' data(otutab,package="pcutils")
 #' extract_sub_net(co_net,otutab)->sub_net_pars
-extract_sub_net<-function(a_net,otutab,threads=1,save_net=FALSE){
+extract_sub_net<-function(a_net,otutab,threads=1,save_net=FALSE,fast=TRUE){
   lib_ps("igraph",library = FALSE)
   V(a_net)$name->v_name
   reps=ncol(otutab)
@@ -33,7 +34,7 @@ extract_sub_net<-function(a_net,otutab,threads=1,save_net=FALSE){
   loop=function (i)
   {
     spe_sub <- sub_nets[[i]]
-    indexs <- net_par(spe_sub, mode = "n")[["n_index"]]
+    indexs <- net_par(spe_sub, mode = "n",fast = fast)[["n_index"]]
     wc <- igraph::cluster_fast_greedy(spe_sub, weights = abs(igraph::E(spe_sub)$weight))
     indexs$modularity <- igraph::modularity(wc)
     indexs
@@ -118,20 +119,20 @@ net_par <- function(go, mode = c("v", "e", "n", "all"),fast=TRUE) {
   if(!is.null(igraph::edge_attr(up)[["weight"]]))up<-igraph::delete_edge_attr(up,"weight")
   if ("n" %in% mode) {
     # Calculate Network Parameters
-    n_index <- data.frame(
-      num_nodes = length(igraph::V(go)), # number of nodes
-      num_edges = length(igraph::E(go)), # number of edges
-      edge_density = igraph::edge_density(go), # density of network, connectance
-      neg_percent=ifelse(!is.null(E(go)$cor),sum(igraph::E(go)$cor<0)/length(igraph::E(go)),NA), # negative edges percentage
-      ave_path_len = igraph::average.path.length(up), # Average path length
-      #w_ave_path_len = ifelse(is.null(E(go)$weight), ave_path_len, average.path.length(go)) # weighted Average path length
-      global_efficiency=igraph::global_efficiency(up),
-      ave_degree = mean(igraph::degree(go)), # Average degree
-      w_ave_degree = ifelse(is.null(igraph::E(go)$weight), mean(igraph::degree(go)), sum(igraph::E(go)$weight) / length(igraph::V(go))), # weighted degree
-      diameter = igraph::diameter(up), # network diameter
-      clusteringC = igraph::transitivity(go), # Clustering coefficient
-      cen_betweenness = igraph::centralization.betweenness(go)$centralization, # Betweenness centralization
-      nat_connectivity = nc(go) # natural
+    n_index <- data.frame(check.names = F,
+      `Node_number` = length(igraph::V(go)), # number of nodes
+      `Edge_number` = length(igraph::E(go)), # number of edges
+      `Edge_density` = igraph::edge_density(go), # density of network, connectance
+      `Negative_percentage`=ifelse(!is.null(E(go)$cor),sum(igraph::E(go)$cor<0)/length(igraph::E(go)),NA), # negative edges percentage
+      `Average_path_length` = igraph::average.path.length(up), # Average path length
+
+      `Global_efficiency`=igraph::global_efficiency(up),
+      `Average_degree` = mean(igraph::degree(go)), # Average degree
+      `Average_weighted_degree` = ifelse(is.null(igraph::E(go)$weight), mean(igraph::degree(go)), sum(igraph::E(go)$weight) / length(igraph::V(go))), # weighted degree
+      Diameter = igraph::diameter(up), # network diameter
+      `Clustering_coefficent` = igraph::transitivity(go), # Clustering coefficient
+      `Centralized_betweenness` = igraph::centralization.betweenness(go)$centralization, # Betweenness centralization
+      `Natural_connectivity` = nc(go) # natural
     )
 
     if(!fast){
@@ -145,13 +146,13 @@ net_par <- function(go, mode = c("v", "e", "n", "all"),fast=TRUE) {
       rand_m=igraph::modularity(igraph::cluster_fast_greedy(rand.g))
       relative_modularity=(modularity-rand_m)/rand_m #
 
-      n_index <- data.frame(
+      n_index <- data.frame(check.names = F,
         n_index,
-        modularity=modularity,
-        relative_modularity=relative_modularity,
-        cen_closeness = igraph::centralization.closeness(go)$centralization, # Closeness centralization
-        cen_degree = igraph::centralization.degree(go)$centralization, # Degree centralization
-        cen_evcent = igraph::centralization.evcent(go)$centralization # eigenvector centralization
+        Modularity=modularity,
+        `Relative_modularity`=relative_modularity,
+        `Centralized_closeness` = igraph::centralization.closeness(go)$centralization, # Closeness centralization
+        `Centralized_degree` = igraph::centralization.degree(go)$centralization, # Degree centralization
+        `Centralized_eigenvector` = igraph::centralization.evcent(go)$centralization # eigenvector centralization
       )
     }
     n_index <- apply(n_index, 1, FUN = \(x)replace(x, is.nan(x), 0)) %>%t() %>%as.data.frame()
@@ -159,13 +160,13 @@ net_par <- function(go, mode = c("v", "e", "n", "all"),fast=TRUE) {
   }
   if ("v" %in% mode) {
     # Calculate Vertices Parameters
-    v_index <- data.frame(
-      degree = igraph::degree(go),
-      clusteringC = igraph::transitivity(go, type = "local"), # local clustering coefficient
-      betweenness = igraph::betweenness(go), # betweenness
-      eccentricity = igraph::eccentricity(go),
-      closeness=igraph::closeness(go),
-      hub_score=igraph::hub_score(go)[["vector"]]
+    v_index <- data.frame(check.names = F,
+      Degree = igraph::degree(go),
+      `Clustering_coefficent` = igraph::transitivity(go, type = "local"), # local clustering coefficient
+      Betweenness = igraph::betweenness(go), # betweenness
+      Eccentricity = igraph::eccentricity(go),
+      Closeness=igraph::closeness(go),
+      `Hub_score`=igraph::hub_score(go)[["vector"]]
       #page_rank = page.rank(go)$vector
       #igraph::evcent(go)[["vector"]]
       #igraph::local_efficiency(go)
@@ -176,7 +177,7 @@ net_par <- function(go, mode = c("v", "e", "n", "all"),fast=TRUE) {
       get_e(go)->edge_list
       edge_list%>%dplyr::select(from,cor)%>%rbind(.,dplyr::select(edge_list,to,cor)%>%dplyr::rename(from=to))%>%
         dplyr::group_by(from)%>%dplyr::summarise(w_degree=sum(cor))->w_degree
-      v_index$w_degree=w_degree[match(rownames(v_index),w_degree$from),"w_degree"]%>%unlist()
+      v_index$`Average_weighted_degree`=w_degree[match(rownames(v_index),w_degree$from),"w_degree"]%>%unlist()
     }
 
     v_index <- apply(v_index, 1, FUN = \(x)replace(x, is.nan(x), 0)) %>%
@@ -214,6 +215,7 @@ c_net_index<-function(go,force=FALSE){
 #' @param go network
 #' @param Group vertex column name
 #' @param count take which column count, default: NULL
+#' @param top_N top_N
 #'
 #' @return skeleton network
 #' @export
@@ -221,7 +223,7 @@ c_net_index<-function(go,force=FALSE){
 #' @examples
 #' get_group_skeleton(co_net)->ske_net
 #' skeleton_plot(ske_net)
-get_group_skeleton=function(go,Group ="v_class",count=NULL){
+get_group_skeleton=function(go,Group ="v_class",count=NULL,top_N=8){
   lib_ps("igraph")
   stopifnot(is_igraph(go))
   direct=is_directed(go)
@@ -238,11 +240,18 @@ get_group_skeleton=function(go,Group ="v_class",count=NULL){
   else edge$count=edge[,count]}
   bb=data.frame()
   for (i in unique(edge$e_type)) {
-    bb=rbind(bb,data.frame(summ_2col(edge[edge$e_type==i,c("Group_from","Group_to","count")],
+    tmp=edge[edge$e_type==i,c("Group_from","Group_to","count")]
+    tmp=dplyr::mutate_if(tmp,is.factor,as.character)
+    #tmp=pcutils:::gettop(tmp,top_N)
+    bb=rbind(bb,data.frame(summ_2col(tmp,
                                      direct = direct),e_type=i))
   }
   tmp_go=igraph::graph_from_data_frame(bb,directed = direct)
   nodeGroup=cbind_new(nodeGroup,data.frame(v_group=tmp_v$v_group))
+
+  # nodeGroup=mutate_all(nodeGroup,as.character)
+  # nodeGroup=rbind(nodeGroup,c("others","others","others"))
+
   dplyr::distinct(nodeGroup,Group,v_group)%>%tibble::column_to_rownames("Group")->v_group_tab
 
   V(tmp_go)$v_group=v_group_tab[V(tmp_go)$name,"v_group"]
@@ -267,6 +276,7 @@ get_group_skeleton=function(go,Group ="v_class",count=NULL){
 #' @export
 #' @rdname get_group_skeleton
 skeleton_plot<-function(ske_net,...) {
+  flag=TRUE
   tmp_go=ske_net
   lib_ps("igraph",library = FALSE)
   if(get_n(tmp_go)$n_type!="skeleton")stop("Not a skeleton network")
@@ -299,12 +309,12 @@ skeleton_plot<-function(ske_net,...) {
                lty_legend = FALSE,legend_number = FALSE,size_legend = FALSE)
 
     if("legend"%in%params_name){
-      if(!params["legend"])return(message(""))
+      if(!params[["legend"]])flag=FALSE
     }
-
-    #color legend
-    pchls=c("circle"=21,"square"=22)
-    for(i in 1:length(unique(tmp_v$v_group))){
+    if(flag){
+      #color legend
+      pchls=c("circle"=21,"square"=22)
+      for(i in 1:length(unique(tmp_v$v_group))){
         g_i=unique(tmp_v$v_group)[i]
         tmp_v1=tmp_v[tmp_v$v_group==g_i,c("v_class","count","color","shape")]
         if(TRUE){
@@ -317,6 +327,8 @@ skeleton_plot<-function(ske_net,...) {
                col = "black", pt.bg = unique(tmp_v1$color), bty = "n", pch = pchls[unique(tmp_v1$shape)])
         left_leg_y=left_leg_y-(length(unique(tmp_v1$v_class))*0.12+0.2)*legend_cex
       }
+    }
+
   }
 }
 
@@ -324,7 +336,7 @@ skeleton_plot<-function(ske_net,...) {
 #'
 #' @param go igraph
 #' @param group summary which group of vertex attribution in names(vertex_attr(go))
-#' @param inter "positive", "negative", "all"
+#' @param e_type "positive", "negative", "all"
 #' @param topN topN of group, default:5
 #' @param colors colors
 #' @param legend_number legend with numbers
@@ -343,7 +355,7 @@ skeleton_plot<-function(ske_net,...) {
 #' #modu_dect(co_net) -> co_net_modu
 #' #links_stat(co_net_modu,group="module")
 #' #c_net_plot(co_net,g_lay_polyarc(co_net,"v_class"))
-links_stat<-function(go,group="v_class",inter="all",topN=6,colors=NULL,
+links_stat<-function(go,group="v_class",e_type="all",topN=6,colors=NULL,
                      legend_number=FALSE,legend=TRUE,legend_cex=1,
                      legend_position=c(left_leg_x=-1.6,left_leg_y=1,right_leg_x=1.2,right_leg_y=1),
                      col_legend_order=NULL,
@@ -357,7 +369,7 @@ links_stat<-function(go,group="v_class",inter="all",topN=6,colors=NULL,
 
   suppressMessages(anno_edge(go,map)%>%get_e()->edge)
 #statistics
-  if(inter!="all")edge%>%dplyr::filter(inter==!!inter)->edge
+  if(e_type!="all")edge%>%dplyr::filter(e_type==!!e_type)->edge
   summ_2col(edge[,paste0("v_class",c("_from","_to"))],direct = direct)->bb
   colnames(bb)=c("from","to","count")
 
@@ -632,7 +644,7 @@ rand_net_par<-function(go,reps=99,threads=1){
   if(FALSE){
     ggplot(a,aes(x=clusteringC))+geom_histogram()+
       geom_vline(xintercept = transitivity(go), col = 'red')
-    ggplot(a,aes(x=ave_path_len))+geom_histogram()+
+    ggplot(a,aes(x=`Average path length`))+geom_histogram()+
       geom_vline(xintercept = average.path.length(go), col = 'red')+xlim(2,3)
   }
   rand_net_pars
@@ -642,7 +654,7 @@ rand_net_par<-function(go,reps=99,threads=1){
 #'
 #' @param pars your net pars resulted by net_pars()
 #' @param randp random networks pars resulted by rand_net_par()
-#' @param index compared indexes: "ave_path_len","clusteringC" or else
+#' @param index compared indexes: "Average path length","clusteringC" or else
 #'
 #' @return ggplot
 #' @export
@@ -654,7 +666,7 @@ rand_net_par<-function(go,reps=99,threads=1){
 #' net_par(co_net_rmt,fast = FALSE)->pars
 #' compare_rand(pars,randp)
 #' }}
-compare_rand<-function(pars,randp,index=c("ave_path_len","clusteringC")){
+compare_rand<-function(pars,randp,index=c("Average path length","clusteringC")){
   labss=t(pars$n_index[,index,drop=FALSE])%>%as.data.frame()
   rownames(labss)->labss$indexes
   pcutils::group_box(randp[,index,drop=FALSE])+
@@ -680,7 +692,7 @@ compare_rand<-function(pars,randp,index=c("ave_path_len","clusteringC")){
 smallworldness<-function(go,reps=99,threads = 1){
   rand_net_par(go,reps = reps,threads = threads)->rands
   small_world_coefficient=(igraph::transitivity(go)/mean(rands$clusteringC))/
-    (igraph::average.path.length(go)/mean(rands$ave_path_len))
+    (igraph::average.path.length(go)/mean(rands$`Average path length`))
   small_world_coefficient
 }
 

@@ -9,7 +9,7 @@ robust_test(go_ls, partial = 0.5, step = 10, reps = 9, threads = 1)
 
 \method{plot}{robust}(
   x,
-  indexes = c("nat_connectivity", "ave_path_len", "ave_degree"),
+  indexes = c("Natural_connectivity", "Average_path_length", "Average_degree"),
   use_ratio = FALSE,
   mode = 1,
   ...
@@ -51,6 +51,6 @@ Plot robust
 \dontrun{
 data("c_net")
 robust_test(co_net,step=4)->robust_res
-plot(robust_res,index="ave_degree",mode=2)
+plot(robust_res,index="Average_degree",mode=2)
 }}
 }

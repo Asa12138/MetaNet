@@ -15,7 +15,7 @@
 #' \dontrun{
 #' data("c_net")
 #' robust_test(co_net,step=4)->robust_res
-#' plot(robust_res,index="ave_degree",mode=2)
+#' plot(robust_res,index="Average_degree",mode=2)
 #' }}
 robust_test <- function(go_ls, partial = 0.5,step=10,reps=9,threads=1){
   if("igraph"%in%class(go_ls)){
@@ -117,7 +117,7 @@ robust_test_in <- function(go, partial = 0.5,step=10,reps=9,threads=1) {
 #' @method plot robust
 #' @exportS3Method
 #' @rdname robust_test
-plot.robust<-function(x, indexes = c("nat_connectivity", "ave_path_len", "ave_degree"),use_ratio=FALSE,mode=1,...){
+plot.robust<-function(x, indexes = c("Natural_connectivity", "Average_path_length", "Average_degree"),use_ratio=FALSE,mode=1,...){
   robust_res=x
   lib_ps("reshape2",library = FALSE)
   xlab="Removed_nodes"
@@ -126,7 +126,7 @@ plot.robust<-function(x, indexes = c("nat_connectivity", "ave_path_len", "ave_de
     xlab="Removed_nodes_ratio"
   }
   robust_res %>%
-    dplyr::select(i,group, c("ave_degree","nat_connectivity")) %>%
+    dplyr::select(i,group, !!indexes) %>%
     reshape2::melt(id.var = c("i","group")) -> pdat
 
   pdat%>%dplyr::group_by(i,variable,group)%>%dplyr::summarise(mean=mean(value),sd=sd(value),se=sd/sqrt(length(value)))->sdd
@@ -152,13 +152,12 @@ plot.robust<-function(x, indexes = c("nat_connectivity", "ave_path_len", "ave_de
       facet_wrap(. ~ variable, scales = "free")+labs(x=xlab,y=NULL)+theme_bw()
   }
   if(mode==3){
-    robust_res%>%dplyr::select(i,rep,group,nat_connectivity)->pdat
-    #robust_res%>%filter(i==0)%>%select(num_nodes,group)%>%distinct()%>%left_join(pdat,.,by="group")->pdat
-    #pdat%>%mutate(i=i/num_nodes)->pdat
+    robust_res%>%dplyr::select(i,rep,group,`Natural_connectivity`)->pdat
+
     pdat%>%
       #filter(i<0.4)%>%
       dplyr::group_by(rep,group)%>%
-      dplyr::summarise(slope=coefficients(lm(nat_connectivity~i))[2])->slope
+      dplyr::summarise(slope=coefficients(lm(`Natural_connectivity`~i))[2])->slope
 
     p=pcutils::group_box(slope["slope"],group="group",metadata = slope,alpha = TRUE,...)+theme_bw()
   }
@@ -477,7 +476,7 @@ robustness_in<-function(go,keystone=FALSE,reps=9,threads=1){
 #' @method plot robustness
 #' @exportS3Method
 #' @rdname robustness
-plot.robustness=function(x,indexes="num_nodes",...){
+plot.robustness=function(x,indexes="Node number",...){
   robustness_res=x
   if(!"group"%in%colnames(robustness_res))robustness_res$group="Network"
   pcutils::group_box(robustness_res[,indexes,drop=FALSE],group = "group",

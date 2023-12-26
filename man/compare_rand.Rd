@@ -7,7 +7,7 @@
 \usage{
 rand_net_par(go, reps = 99, threads = 1)
 
-compare_rand(pars, randp, index = c("ave_path_len", "clusteringC"))
+compare_rand(pars, randp, index = c("Average path length", "clusteringC"))
 }
 \arguments{
 \item{go}{igraph}
@@ -20,7 +20,7 @@ compare_rand(pars, randp, index = c("ave_path_len", "clusteringC"))
 
 \item{randp}{random networks pars resulted by rand_net_par()}
 
-\item{index}{compared indexes: "ave_path_len","clusteringC" or else}
+\item{index}{compared indexes: "Average path length","clusteringC" or else}
 }
 \value{
 ggplot
