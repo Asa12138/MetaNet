@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.R
 \name{to.ggig}
 \alias{to.ggig}
-\title{Transfer a igraph object to a ggig}
+\title{Transfer an igraph object to a ggig}
 \usage{
 to.ggig(go, coors = NULL)
 }
@@ -15,13 +15,11 @@ to.ggig(go, coors = NULL)
 ggig object
 }
 \description{
-Transfer a igraph object to a ggig
+Transfer an igraph object to a ggig
 }
 \examples{
-coors=c_net_lay(co_net)
-to.ggig(co_net,coors=coors)->ggig
+to.ggig(co_net, coors = c_net_lay(co_net)) -> ggig
 plot(ggig)
-to.ggig(multi1,coors=c_net_lay(multi1))->ggig
-plot(ggig,labels_num=0.3)
-
+to.ggig(multi1, coors = c_net_lay(multi1)) -> ggig
+plot(ggig, labels_num = 0.3)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/build.R
 \name{c_net_from_edgelist}
 \alias{c_net_from_edgelist}
-\title{Construct a network from Edge_list dataframe}
+\title{Construct a network from edge_list dataframe}
 \usage{
 c_net_from_edgelist(
   edgelist,
@@ -24,10 +24,10 @@ c_net_from_edgelist(
 \item{e_class}{set e_class}
 }
 \description{
-Construct a network from Edge_list dataframe
+Construct a network from edge_list dataframe
 }
 \examples{
 data(edgelist)
-edge_net=c_net_from_edgelist(arc_count,vertex = arc_taxonomy)
+edge_net <- c_net_from_edgelist(arc_count, vertex = arc_taxonomy)
 c_net_plot(edge_net)
 }

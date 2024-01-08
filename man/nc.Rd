@@ -7,7 +7,7 @@
 nc(p)
 }
 \arguments{
-\item{p}{a igraph or metanet object}
+\item{p}{an igraph or metanet object}
 }
 \value{
 natural_connectivity (numeric)

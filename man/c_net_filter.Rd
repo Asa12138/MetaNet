@@ -21,5 +21,5 @@ Filter a network according to some attributes
 }
 \examples{
 data("multi_net")
-c_net_filter(multi1,v_group\%in\%c("omic1","omic2"))
+c_net_filter(multi1, v_group \%in\% c("omic1", "omic2"))
 }

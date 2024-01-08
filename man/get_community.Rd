@@ -9,6 +9,9 @@ get_community(go_m)
 \arguments{
 \item{go_m}{module metanet}
 }
+\value{
+community
+}
 \description{
 Get community
 }

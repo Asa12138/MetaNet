@@ -39,12 +39,12 @@ Cohesion calculate
 Plot cohesion
 }
 \examples{
-\donttest{
 \dontrun{
-Cohesion(otutab[1:50,])->cohesion_res
-plot.cohesion(cohesion_res,group = "Group",metadata = metadata,mode = 1)
-plot.cohesion(cohesion_res,group = "Group",metadata = metadata,mode = 2)
-}}
+data("otutab", package = "pcutils")
+Cohesion(otutab[1:50, ]) -> cohesion_res
+plot.cohesion(cohesion_res, group = "Group", metadata = metadata, mode = 1)
+plot.cohesion(cohesion_res, group = "Group", metadata = metadata, mode = 2)
+}
 }
 \references{
 \enumerate{

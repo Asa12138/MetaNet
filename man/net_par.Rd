@@ -31,5 +31,5 @@ Add topological indexes for a network
 }
 \examples{
 igraph::make_graph("Walther") \%>\% net_par()
-c_net_index(co_net)->co_net_with_par
+c_net_index(co_net) -> co_net_with_par
 }

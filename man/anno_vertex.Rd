@@ -3,12 +3,12 @@
 \name{anno_vertex}
 \alias{anno_vertex}
 \alias{anno_node}
-\title{Use dataframe to annotate vertexes of a igraph}
+\title{Use data.frame to annotate vertexes of an igraph}
 \usage{
 anno_vertex(go, anno_tab)
 }
 \arguments{
-\item{go}{metanet a igraph object}
+\item{go}{metanet an igraph object}
 
 \item{anno_tab}{a dataframe using to annotate (with rowname or a name column)}
 }
@@ -16,10 +16,10 @@ anno_vertex(go, anno_tab)
 a annotated igraph object
 }
 \description{
-Use dataframe to annotate vertexes of a igraph
+Use data.frame to annotate vertexes of an igraph
 }
 \examples{
 data("c_net")
-data("otutab",package="pcutils")
-anno_vertex(co_net, taxonomy)->a
+data("otutab", package = "pcutils")
+anno_vertex(co_net, taxonomy)
 }

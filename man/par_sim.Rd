@@ -4,7 +4,7 @@
 \alias{par_sim}
 \title{Calculate distance for otutab}
 \usage{
-par_sim(totu, method = "bray", norm = TRUE)
+par_sim(totu, method = "bray", norm = FALSE)
 }
 \arguments{
 \item{totu}{t(otutab)}
@@ -14,7 +14,7 @@ par_sim(totu, method = "bray", norm = TRUE)
 \item{norm}{hellinger normalization in tax (default:TRUE)}
 }
 \value{
-dist
+1-dist, similarity
 }
 \description{
 Calculate distance for otutab

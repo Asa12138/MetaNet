@@ -4,12 +4,14 @@
 \alias{p.adjust.table}
 \title{p.adjust apply on a correlation table (matrix or data.frame)}
 \usage{
-p.adjust.table(pp, method = "BH")
+p.adjust.table(pp, method = "BH", mode = "all")
 }
 \arguments{
 \item{pp}{table}
 
 \item{method}{see \code{\link[stats]{p.adjust}}}
+
+\item{mode}{"all" for all values; "rows" adjust each row one by one; "columns" adjust each column one by one.}
 }
 \value{
 matrix
@@ -18,6 +20,6 @@ matrix
 p.adjust apply on a correlation table (matrix or data.frame)
 }
 \examples{
-matrix(abs(rnorm(100, 0.01)), 10, 10) -> pp
+matrix(abs(rnorm(100, 0.01, 0.1)), 10, 10) -> pp
 p.adjust.table(pp)
 }

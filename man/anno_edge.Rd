@@ -2,12 +2,12 @@
 % Please edit documentation in R/build.R
 \name{anno_edge}
 \alias{anno_edge}
-\title{Use dataframe to annotate edges of a igraph}
+\title{Use dataframe to annotate edges of an igraph}
 \usage{
 anno_edge(go, anno_tab)
 }
 \arguments{
-\item{go}{metanet a igraph object}
+\item{go}{metanet an igraph object}
 
 \item{anno_tab}{a dataframe using to annotate (with rowname or a name column)}
 }
@@ -15,10 +15,10 @@ anno_edge(go, anno_tab)
 a annotated igraph object
 }
 \description{
-Use dataframe to annotate edges of a igraph
+Use dataframe to annotate edges of an igraph
 }
 \examples{
 data("c_net")
-data("otutab",package="pcutils")
-anno_edge(co_net, taxonomy)->a
+data("otutab", package = "pcutils")
+anno_edge(co_net, taxonomy) -> a
 }

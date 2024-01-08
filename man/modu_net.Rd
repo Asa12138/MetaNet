@@ -5,16 +5,16 @@
 \title{Generate a n-modules network}
 \usage{
 modu_net(
-  n_modu = 3,
-  n_node_in_modu = 30,
+  module_number = 3,
+  n_node_in_module = 30,
   intra_modu_density = 0.3,
   inter_modu_density = 0.01
 )
 }
 \arguments{
-\item{n_modu}{number of modules}
+\item{module_number}{number of modules}
 
-\item{n_node_in_modu}{number of nodes in each modules}
+\item{n_node_in_module}{number of nodes in each modules}
 
 \item{intra_modu_density}{intra_modu_density, recommend bigger than 20*inter_modu_density, default:0.3}
 
@@ -24,13 +24,13 @@ modu_net(
 n-modules metanet
 }
 \description{
-this is just a random generation method, the module number of result is not exactly the n_modu, you can change the inter_modu_density and intra_modu_density to get the proper result.
+this is just a random generation method, the module number of result is not exactly the module_number, you can change the inter_modu_density and intra_modu_density to get the proper result.
 }
 \examples{
-g1=modu_net()
+g1 <- modu_net()
 get_n(g1)
-plot(g1)
-plot(g1,coors=g_lay(g1,zoom2 = 20))
-plot(g1,coors=g_lay_polyarc(g1,group = "module"))
-plot(g1,coors=g_lay_polygon(g1,group = "module"))
+plot(g1, mark_module = TRUE)
+plot(g1, coors = g_lay(g1, zoom2 = 20))
+plot(g1, coors = g_lay_polyarc(g1, group = "module"))
+plot(g1, coors = g_lay_polygon(g1, group = "module"))
 }

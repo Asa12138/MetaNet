@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.R
 \name{c_net_plot}
 \alias{c_net_plot}
-\title{Plot a network}
+\title{Plot a metanet}
 \usage{
 c_net_plot(
   go,
@@ -36,7 +36,7 @@ c_net_plot(
 )
 }
 \arguments{
-\item{go}{a igraph or metanet object}
+\item{go}{an igraph or metanet object}
 
 \item{coors}{the coordinates you saved}
 
@@ -94,7 +94,7 @@ c_net_plot(
 a network plot
 }
 \description{
-Plot a network
+Plot a metanet
 }
 \examples{
 data("c_net")

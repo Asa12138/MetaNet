@@ -2,7 +2,7 @@
 % Please edit documentation in R/topological.R
 \name{fit_power}
 \alias{fit_power}
-\title{Fit power-law distribution for a igraph}
+\title{Fit power-law distribution for an igraph}
 \usage{
 fit_power(go, p.value = FALSE)
 }
@@ -15,7 +15,7 @@ fit_power(go, p.value = FALSE)
 ggplot
 }
 \description{
-Fit power-law distribution for a igraph
+Fit power-law distribution for an igraph
 }
 \examples{
 fit_power(co_net)

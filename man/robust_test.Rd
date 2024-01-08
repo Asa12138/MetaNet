@@ -5,7 +5,14 @@
 \alias{plot.robust}
 \title{Robust_test for a network}
 \usage{
-robust_test(go_ls, partial = 0.5, step = 10, reps = 9, threads = 1)
+robust_test(
+  go_ls,
+  partial = 0.5,
+  step = 10,
+  reps = 9,
+  threads = 1,
+  verbose = TRUE
+)
 
 \method{plot}{robust}(
   x,
@@ -16,7 +23,7 @@ robust_test(go_ls, partial = 0.5, step = 10, reps = 9, threads = 1)
 )
 }
 \arguments{
-\item{go_ls}{a igraph object or igraph list.}
+\item{go_ls}{an igraph object or igraph list.}
 
 \item{partial}{how much percent vertexes be removed in total}
 
@@ -25,6 +32,8 @@ robust_test(go_ls, partial = 0.5, step = 10, reps = 9, threads = 1)
 \item{reps}{simulation number}
 
 \item{threads}{threads}
+
+\item{verbose}{verbose}
 
 \item{x}{\code{robust_test()} result (robust object)}
 
@@ -47,10 +56,9 @@ Robust_test for a network
 Plot robust
 }
 \examples{
-\donttest{
 \dontrun{
 data("c_net")
-robust_test(co_net,step=4)->robust_res
-plot(robust_res,index="Average_degree",mode=2)
-}}
+robust_test(co_net, step = 10, reps = 9) -> robust_res
+plot(robust_res, index = "Average_degree", mode = 2)
+}
 }

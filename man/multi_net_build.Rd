@@ -43,10 +43,12 @@ Multi-omics network build
 }
 \examples{
 data("multi_test")
-multi_net_build(micro,metab,transc,filename=FALSE)->multi1
-multi1=c_net_set(multi1,micro_g,metab_g,transc_g,vertex_class = c("Phylum","kingdom","type"))
-multi1=c_net_set(multi1,data.frame("Abundance1"=colSums(micro)),
-   data.frame("Abundance2"=colSums(metab)),data.frame("Abundance3"=colSums(transc)),
-   vertex_size =paste0("Abundance",1:3))
+multi_net_build(list(Microbiome = micro, Metabolome = metab, Transcriptome = transc)) -> multi1
+multi1 <- c_net_set(multi1, micro_g, metab_g, transc_g,
+    vertex_class = c("Phylum", "kingdom", "type"))
+multi1 <- c_net_set(multi1, data.frame("Abundance1" = colSums(micro)),
+    data.frame("Abundance2" = colSums(metab)), data.frame("Abundance3" = colSums(transc)),
+    vertex_size = paste0("Abundance", 1:3)
+)
 c_net_plot(multi1)
 }

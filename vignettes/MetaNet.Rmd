@@ -15,17 +15,17 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
 
 ## Install
 
 ```{r eval=FALSE}
-if(!requireNamespace("devtools"))install.packages("devtools")
-devtools::install_github('Asa12138/pcutils',dependencies=T)
-devtools::install_github('Asa12138/MetaNet',dependencies=T)
+if (!requireNamespace("devtools")) install.packages("devtools")
+devtools::install_github("Asa12138/pcutils", dependencies = T)
+devtools::install_github("Asa12138/MetaNet", dependencies = T)
 ```
 
 ## Vignette
@@ -36,7 +36,7 @@ Please go to <https://asa12138.github.io/MetaNet_tutorial> for the full vignette
 
 Please cite:
 
-Chen P (2023). _MetaNet: Network Analysis for Omics Data_. R package, <https://github.com/Asa12138/MetaNet>.
+Chen P (2023). _MetaNet: Network Analysis for Multi-Omics Data_. R package, <https://github.com/Asa12138/MetaNet>.
 
 ## Need helps?
 

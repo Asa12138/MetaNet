@@ -7,7 +7,7 @@
 summ_2col(df, from = 1, to = 2, count = 3, direct = FALSE)
 }
 \arguments{
-\item{df}{dataframe}
+\item{df}{data.frame}
 
 \item{from}{first column name or index}
 
@@ -17,12 +17,16 @@ summ_2col(df, from = 1, to = 2, count = 3, direct = FALSE)
 
 \item{direct}{consider direct? default: FALSE}
 }
+\value{
+data.frame
+}
 \description{
 Summaries two columns information
 }
 \examples{
-test=data.frame(a=sample(letters[1:4],10,replace = TRUE),b=sample(letters[1:4],10,replace = TRUE))
-summ_2col(test,direct=TRUE)
-summ_2col(test,direct=FALSE)
-summ_2col(test,direct=TRUE)\%>\%pcutils::my_sankey(.,"gg")
+test <- data.frame(a = sample(letters[1:4], 10, replace = TRUE),
+    b = sample(letters[1:4], 10, replace = TRUE))
+summ_2col(test, direct = TRUE)
+summ_2col(test, direct = FALSE)
+summ_2col(test, direct = TRUE) \%>\% pcutils::my_circo()
 }

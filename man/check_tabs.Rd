@@ -13,5 +13,9 @@ check_tabs(...)
 format tables
 }
 \description{
-Check tables
+A short description...
+}
+\examples{
+data("otutab", package = "pcutils")
+check_tabs(otutab)
 }

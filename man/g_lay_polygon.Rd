@@ -32,7 +32,7 @@ g_lay_polyarc(
 
 \item{line_curved}{line_curved 0~1}
 
-\item{space}{the space between each arc, default: pi/3}
+\item{space}{the space between each arc, default: pi/4}
 }
 \value{
 coors
@@ -43,8 +43,8 @@ Layout with group as a polygon
 Layout with group as a polyarc
 }
 \examples{
-g_lay_polygon(multi1)->oridata
-c_net_plot(multi1,oridata)
-g_lay_polyarc(multi1,group2_order = c(LETTERS[4:1]))->oridata
-c_net_plot(multi1,oridata)
+g_lay_polygon(multi1) -> oridata
+c_net_plot(multi1, oridata)
+g_lay_polyarc(multi1, group2_order = c(LETTERS[4:1])) -> oridata
+c_net_plot(multi1, oridata)
 }

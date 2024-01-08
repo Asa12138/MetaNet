@@ -52,8 +52,7 @@ plot
 Link summary of the network
 }
 \examples{
-links_stat(co_net,topN=10)
-#modu_dect(co_net) -> co_net_modu
-#links_stat(co_net_modu,group="module")
-#c_net_plot(co_net,g_lay_polyarc(co_net,"v_class"))
+links_stat(co_net, topN = 10)
+modu_dect(co_net) -> co_net_modu
+links_stat(co_net_modu, group = "module")
 }

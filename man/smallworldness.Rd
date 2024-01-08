@@ -4,7 +4,7 @@
 \alias{smallworldness}
 \title{Calculate small-world coefficient}
 \usage{
-smallworldness(go, reps = 99, threads = 1)
+smallworldness(go, reps = 99, threads = 1, verbose = TRUE)
 }
 \arguments{
 \item{go}{igraph or metanet}
@@ -12,13 +12,14 @@ smallworldness(go, reps = 99, threads = 1)
 \item{reps}{simulation time}
 
 \item{threads}{threads}
+
+\item{verbose}{verbose}
 }
 \description{
 Calculate small-world coefficient
 }
 \examples{
-\donttest{
 \dontrun{
 smallworldness(co_net)
-}}
+}
 }

@@ -20,7 +20,6 @@ Import corr from .csv file
 }
 \examples{
 \dontrun{
-\donttest{
- input_corr("test")->corr
-}}
+input_corr("test") -> corr
+}
 }

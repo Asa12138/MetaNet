@@ -8,7 +8,7 @@
 is_metanet(go)
 }
 \arguments{
-\item{go}{R object}
+\item{go}{igraph object}
 }
 \value{
 logical

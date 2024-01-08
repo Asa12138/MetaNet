@@ -5,18 +5,20 @@
 \alias{plot.robustness}
 \title{Robustness after remove 50\%\% nodes or some hubs, need the metanet contains "cor" attribute.}
 \usage{
-robustness(go_ls, keystone = FALSE, reps = 9, threads = 1)
+robustness(go_ls, keystone = FALSE, reps = 9, threads = 1, verbose = TRUE)
 
-\method{plot}{robustness}(x, indexes = "Node number", ...)
+\method{plot}{robustness}(x, indexes = "Node_number", ...)
 }
 \arguments{
-\item{go_ls}{a igraph object or igraph list.}
+\item{go_ls}{an igraph object or igraph list.}
 
 \item{keystone}{remove 70\%\% keystones instead of remove 50\%\% nodes (default: False)}
 
 \item{reps}{simulation time}
 
 \item{threads}{threads}
+
+\item{verbose}{verbose}
 
 \item{x}{\code{robustness()} result (robustness object)}
 
@@ -33,13 +35,12 @@ Robustness after remove 50\%\% nodes or some hubs, need the metanet contains "co
 Plot robustness
 }
 \examples{
-\donttest{
 \dontrun{
-robustness(co_net)->robustness_res
+robustness(co_net) -> robustness_res
 plot.robustness(robustness_res)
 modu_dect(co_net) -> co_net_modu
-zp_analyse(co_net_modu,mode = 2)->co_net_modu
-robustness(co_net_modu,keystone=TRUE)->robustness_res
+zp_analyse(co_net_modu, mode = 2) -> co_net_modu
+robustness(co_net_modu, keystone = TRUE) -> robustness_res
 plot.robustness(robustness_res)
-}}
+}
 }

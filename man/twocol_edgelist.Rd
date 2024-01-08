@@ -16,8 +16,11 @@ metanet
 Quick build a metanet from two columns table
 }
 \examples{
-twocol=data.frame("col1"=sample(letters,30,replace = TRUE),
-       "col2"=sample(c("A","B"),30,replace = TRUE))
-twocol_net=twocol_edgelist(twocol)
+twocol <- data.frame(
+    "col1" = sample(letters, 30, replace = TRUE),
+    "col2" = sample(c("A", "B"), 30, replace = TRUE)
+)
+twocol_net <- twocol_edgelist(twocol)
 plot(twocol_net)
+c_net_plot(twocol_net, g_lay_polygon(twocol_net))
 }

@@ -9,6 +9,9 @@ get_module(go_m)
 \arguments{
 \item{go_m}{module metanet}
 }
+\value{
+module
+}
 \description{
 Get module
 }

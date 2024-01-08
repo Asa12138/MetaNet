@@ -15,12 +15,15 @@ summ_module(go_m, var = "v_class", module = "module", ...)
 
 \item{...}{add}
 }
+\value{
+ggplot
+}
 \description{
 Summary module index
 }
 \examples{
 data("c_net")
-modu_dect(co_net,n_modu=30) -> co_net_modu
-summ_module(co_net_modu,var="v_class",module="module")
-summ_module(co_net_modu,var="Abundance",module="module")
+modu_dect(co_net, n_node_in_module = 30) -> co_net_modu
+summ_module(co_net_modu, var = "v_class", module = "module")
+summ_module(co_net_modu, var = "Abundance", module = "module")
 }

@@ -46,17 +46,16 @@ Layout with group
 Layout with group nicely
 }
 \examples{
-\donttest{
 \dontrun{
 data("c_net")
-modu_dect(co_net,method="cluster_fast_greedy") -> co_net_modu
-g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 1:5,layout2 =as_line())->oridata
-#custom_lay1=data.frame(X=c(1,1,1,1,2,2,2,2,3,3,3,3,3.5),Y=c(1,2,3,4,1,2,3,4,1,2,3,4,2))
-#g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 5,
+modu_dect(co_net, method = "cluster_fast_greedy") -> co_net_modu
+g_lay(co_net_modu, group = "module", zoom1 = 30, zoom2 = 1:5, layout2 = as_line()) -> oridata
+# custom_lay1=data.frame(X=c(1,1,1,1,2,2,2,2,3,3,3,3,3.5),Y=c(1,2,3,4,1,2,3,4,1,2,3,4,2))
+# g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 5,
 #    layout1=custom_lay1,layout2 =nicely())->oridata
-plot(co_net_modu,coors = oridata)
+plot(co_net_modu, coors = oridata)
 
-g_lay_nice(co_net_modu,group ="module")->oridata
-plot(co_net_modu,coors = oridata)
-}}
+g_lay_nice(co_net_modu, group = "module") -> oridata
+plot(co_net_modu, coors = oridata)
+}
 }

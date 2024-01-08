@@ -5,9 +5,13 @@
 \alias{compare_rand}
 \title{Net_pars of many random network}
 \usage{
-rand_net_par(go, reps = 99, threads = 1)
+rand_net_par(go, reps = 99, threads = 1, verbose = TRUE)
 
-compare_rand(pars, randp, index = c("Average path length", "clusteringC"))
+compare_rand(
+  pars,
+  randp,
+  index = c("Average_path_length", "Clustering_coefficent")
+)
 }
 \arguments{
 \item{go}{igraph}
@@ -16,11 +20,13 @@ compare_rand(pars, randp, index = c("Average path length", "clusteringC"))
 
 \item{threads}{threads}
 
+\item{verbose}{verbose}
+
 \item{pars}{your net pars resulted by net_pars()}
 
 \item{randp}{random networks pars resulted by rand_net_par()}
 
-\item{index}{compared indexes: "Average path length","clusteringC" or else}
+\item{index}{compared indexes: "Average_path_length","Clustering_coefficent" or else}
 }
 \value{
 ggplot
@@ -31,10 +37,10 @@ Net_pars of many random network
 Compare some indexes between your net with random networks
 }
 \examples{
-\donttest{
 \dontrun{
-rand_net_par(co_net_rmt,reps = 30)->randp
-net_par(co_net_rmt,fast = FALSE)->pars
-compare_rand(pars,randp)
-}}
+data("c_net")
+rand_net_par(co_net_rmt, reps = 30) -> randp
+net_par(co_net_rmt, fast = FALSE) -> pars
+compare_rand(pars, randp)
+}
 }

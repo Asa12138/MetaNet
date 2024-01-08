@@ -11,6 +11,9 @@ get_n(go, simple = FALSE)
 
 \item{simple}{logical, get simple index}
 }
+\value{
+data.frame
+}
 \description{
 Get network information
 }

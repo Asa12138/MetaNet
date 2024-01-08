@@ -9,6 +9,9 @@ get_e(go)
 \arguments{
 \item{go}{metanet}
 }
+\value{
+data.frame
+}
 \description{
 Get edge information
 }

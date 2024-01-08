@@ -4,7 +4,7 @@
 \alias{par_sparcc}
 \title{SparCC correlation for a otutab}
 \usage{
-par_sparcc(totu, threads = 1, bootstrap = 100)
+par_sparcc(totu, threads = 1, bootstrap = 100, verbose = TRUE)
 }
 \arguments{
 \item{totu}{an t(otutab)}
@@ -12,6 +12,8 @@ par_sparcc(totu, threads = 1, bootstrap = 100)
 \item{threads}{default: 1}
 
 \item{bootstrap}{default:100, recommend not less than 100}
+
+\item{verbose}{verbose}
 }
 \value{
 list contain a correlation matrix and a bootstrap p_value matrix
@@ -20,10 +22,9 @@ list contain a correlation matrix and a bootstrap p_value matrix
 SparCC correlation for a otutab
 }
 \examples{
-\dontrun{
 \donttest{
 data("otutab", package = "pcutils")
 t(otutab) -> totu
-par_sparcc(totu[, 1:50],4) -> sparcc_corr
-}}
+par_sparcc(totu[, 1:50], 4) -> sparcc_corr
+}
 }

@@ -14,7 +14,7 @@ zp_plot(go, label = TRUE, mode = 1)
 
 \item{mode}{plot style, 1~3}
 
-\item{use_origin}{use origin_module, default:TRUE, if FALSE, use module}
+\item{use_origin}{use original_module, default:TRUE, if FALSE, use module}
 
 \item{go}{igraph object after zp_analyse()}
 
@@ -33,9 +33,9 @@ Zi-Pi plot of vertexes
 \examples{
 data("c_net")
 modu_dect(co_net) -> co_net_modu
-zp_analyse(co_net_modu)->co_net_modu
+zp_analyse(co_net_modu) -> co_net_modu
 zp_plot(co_net_modu)
-zp_plot(co_net_modu,mode=3)
+zp_plot(co_net_modu, mode = 3)
 }
 \references{
 \enumerate{

@@ -9,6 +9,9 @@ get_v(go)
 \arguments{
 \item{go}{metanet}
 }
+\value{
+data.frame
+}
 \description{
 Get vertex information
 }

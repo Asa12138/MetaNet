@@ -31,6 +31,6 @@ Get skeleton network according to a group
 Skeleton plot
 }
 \examples{
-get_group_skeleton(co_net)->ske_net
+get_group_skeleton(co_net) -> ske_net
 skeleton_plot(ske_net)
 }

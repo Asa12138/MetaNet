@@ -10,6 +10,7 @@ RMT_threshold(
   min_threshold = 0.5,
   max_threshold = 0.8,
   step = 0.02,
+  out_dir = "./",
   gif = FALSE,
   verbose = FALSE
 )
@@ -17,7 +18,7 @@ RMT_threshold(
 rmt(occor.r, min_threshold = 0.5, max_threshold = 0.85, step = 0.01)
 }
 \arguments{
-\item{occor.r}{a correlation matrix}
+\item{occor.r}{a corr object or a correlation matrix}
 
 \item{min_threshold}{min_threshold}
 
@@ -25,12 +26,16 @@ rmt(occor.r, min_threshold = 0.5, max_threshold = 0.85, step = 0.01)
 
 \item{step}{step}
 
+\item{out_dir}{out_dir}
+
 \item{gif}{render a .gif file?}
 
 \item{verbose}{verbose}
 }
 \value{
 a r-threshold
+
+recommend threshold
 }
 \description{
 Get RMT threshold for a correlation matrix
@@ -38,15 +43,16 @@ Get RMT threshold for a correlation matrix
 Get RMT threshold for a correlation matrix roughly
 }
 \examples{
-\donttest{
+message("Spend long time and produce some files.")
 \dontrun{
 t(otutab) -> totu
 c_net_cal(totu) -> corr
 rmt(corr)
-#0.69
-c_net_build(corr,r_thres=0.69) -> co_net_rmt
-RMT_threshold(corr$r,gif=TRUE)->rmt_res
-}}
+# 0.69
+c_net_build(corr, r_thres = 0.69) -> co_net_rmt
+RMT_threshold(corr, gif = TRUE) -> rmt_res
+plot(rmt_res)
+}
 }
 \references{
 \enumerate{

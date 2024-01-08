@@ -13,6 +13,9 @@ c_net_save(go, filename = "net", format = "data.frame")
 
 \item{format}{"data.frame","graphml"}
 }
+\value{
+No value
+}
 \description{
 Save network file
 }

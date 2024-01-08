@@ -2,10 +2,8 @@ Package: MetaNet
 Type: Package
 Title: Network Analysis for Omics Data
 Version: 0.1.0
-Author: Peng Chen [aut, cre]
-Maintainer: Peng Chen <pengchen2001@zju.edu.cn>
 Authors@R:
-    person("Peng", "Chen",email ="pengchen2001@zju.edu.cn", role = c("aut", "cre"))
+    person("Peng", "Chen",email ="pengchen2001@zju.edu.cn", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9449-7606"))
 Description: Comprehensive network analysis package.
     Calculate correlation network fastly, accelerate lots of analysis by parallel computing.
     Support for multi-omics data, search sub-nets fluently.
@@ -17,14 +15,14 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Depends: 
-    R (>= 4.0.0)
+    R (>= 4.1.0),
+    igraph
 LazyData: true
 Imports: 
+    graphics,
     dplyr,
     ggplot2 (>= 3.2.0),
-    graphics,
     grDevices,
-    igraph,
     magrittr,
     reshape2,
     stats,
@@ -38,6 +36,7 @@ Suggests:
     pheatmap,
     foreach,
     doSNOW,
+    snow,
     ggrepel,
     ggpubr,
     RColorBrewer,
@@ -47,16 +46,13 @@ Suggests:
     Hmisc,
     SpiecEasi,
     gifski,
-    snow,
     ggnewscale,
     ggraph,
     networkD3,
-    ggtree,
-    ggpmisc
-Remotes: 
-    github::Asa12138/pcutils
+    ggpmisc,
+    ggtree
 VignetteBuilder: knitr
 BugReports: https://github.com/Asa12138/MetaNet/issues
 URL: https://github.com/Asa12138/MetaNet
 ByteCompile: true
-biocViews: DataImport,Network analysis, Omics, Software, Visualization
+biocViews: DataImport, Network analysis, Omics, Software, Visualization

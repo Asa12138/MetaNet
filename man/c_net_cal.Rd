@@ -10,7 +10,9 @@ c_net_cal(
   method = "spearman",
   filename = FALSE,
   p.adjust.method = NULL,
-  threads = 1
+  p.adjust.mode = "all",
+  threads = 1,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -18,13 +20,17 @@ c_net_cal(
 
 \item{totu2}{t(otutab2) or NULL}
 
-\item{method}{spearman, pearson}
+\item{method}{spearman, pearson, sparcc,}
 
 \item{filename}{the prefix of saved .corr file or FALSE}
 
 \item{p.adjust.method}{see \code{\link[stats]{p.adjust}}}
 
+\item{p.adjust.mode}{see \code{\link{p.adjust.table}}}
+
 \item{threads}{threads, default: 1.}
+
+\item{verbose}{verbose}
 }
 \value{
 a corr list with 3 elements:

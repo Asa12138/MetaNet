@@ -34,10 +34,10 @@ Layout coordinates
 }
 \examples{
 library(igraph)
-c_net_lay(co_net)->coors
-c_net_plot(co_net,coors)
-c_net_plot(co_net,c_net_lay(co_net,in_circle()),vertex.size=2)
-c_net_plot(co_net,c_net_lay(co_net,in_circle(),order_by="v_class"),vertex.size=2)
-c_net_plot(co_net,c_net_lay(co_net,in_circle(),order_by="size",order_ls="desc"))
-c_net_plot(co_net,c_net_lay(co_net,as_polygon(3)))
+c_net_lay(co_net) -> coors
+c_net_plot(co_net, coors)
+c_net_plot(co_net, c_net_lay(co_net, in_circle()), vertex.size = 2)
+c_net_plot(co_net, c_net_lay(co_net, in_circle(), order_by = "v_class"), vertex.size = 2)
+c_net_plot(co_net, c_net_lay(co_net, in_circle(), order_by = "size", order_ls = "desc"))
+c_net_plot(co_net, c_net_lay(co_net, as_polygon(3)))
 }
