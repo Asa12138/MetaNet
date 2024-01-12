@@ -13,6 +13,9 @@ netD3plot(go, v_class = "v_class", ...)
 
 \item{...}{see \code{\link[networkD3]{forceNetwork}}}
 }
+\value{
+D3 plot
+}
 \description{
 plot use networkD3
 }

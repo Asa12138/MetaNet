@@ -141,9 +141,10 @@ c_net_build <- function(corr, r_thres = 0.6, p_thres = 0.05, use_p_adj = TRUE, d
 #'
 #' @examples
 #' data("multi_test")
-#' multi_net_build(list(Microbiome = micro, Metabolome = metab, Transcriptome = transc)) -> multi1
+#' multi1 <- multi_net_build(list(Microbiome = micro, Metabolome = metab, Transcriptome = transc))
 #' multi1 <- c_net_set(multi1, micro_g, metab_g, transc_g,
-#'     vertex_class = c("Phylum", "kingdom", "type"))
+#'     vertex_class = c("Phylum", "kingdom", "type")
+#' )
 #' multi1 <- c_net_set(multi1, data.frame("Abundance1" = colSums(micro)),
 #'     data.frame("Abundance2" = colSums(metab)), data.frame("Abundance3" = colSums(transc)),
 #'     vertex_size = paste0("Abundance", 1:3)
@@ -308,7 +309,7 @@ assign("as.metanet", c_net_update, envir = asNamespace(packageName()))
 #' @param direct logical
 #' @param e_type set e_type
 #' @param e_class set e_class
-#'
+#' @return metanet
 #' @export
 #' @examples
 #' data(edgelist)
@@ -355,6 +356,7 @@ c_net_from_edgelist <- function(edgelist, vertex = NULL, direct = FALSE, e_type 
 #' co_net2 <- c_net_set(co_net2, data.frame("Abundance" = colSums(totu)), vertex_size = "Abundance")
 c_net_set <- function(go, ..., vertex_group = "v_group", vertex_class = "v_class", vertex_size = "size",
                       edge_type = "e_type", edge_class = "e_class", edge_width = "width", node_break = 5, edge_break = 5) {
+    size <- e_class <- width <- NULL
     lib_ps("igraph", library = FALSE)
     c_net_update(go) -> go
     name <- v_group <- v_class <- e_type <- color <- NULL
@@ -494,11 +496,9 @@ condance <- \(aa){
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' data("otutab", package = "pcutils")
 #' cbind(taxonomy, num = rowSums(otutab))[1:20, ] -> test
 #' df2net_tree(test) -> ttt
-#' }
 df2net_tree <- function(test, fun = sum) {
     flag <- FALSE
     if (!is.numeric(test[, ncol(test)])) {
@@ -757,6 +757,7 @@ anno_vertex <- function(go, anno_tab) {
 #' data("otutab", package = "pcutils")
 #' anno_edge(co_net, taxonomy) -> a
 anno_edge <- function(go, anno_tab) {
+    name <- NULL
     lib_ps("igraph", library = FALSE)
     if (is.null(anno_tab)) {
         return(go)
@@ -815,8 +816,10 @@ c_net_save <- function(go, filename = "net", format = "data.frame") {
 #' @return data.frame
 #' @export
 #' @examples
-#' test <- data.frame(a = sample(letters[1:4], 10, replace = TRUE),
-#'     b = sample(letters[1:4], 10, replace = TRUE))
+#' test <- data.frame(
+#'     a = sample(letters[1:4], 10, replace = TRUE),
+#'     b = sample(letters[1:4], 10, replace = TRUE)
+#' )
 #' summ_2col(test, direct = TRUE)
 #' summ_2col(test, direct = FALSE)
 #' summ_2col(test, direct = TRUE) %>% pcutils::my_circo()
@@ -863,25 +866,23 @@ summ_2col <- function(df, from = 1, to = 2, count = 3, direct = FALSE) {
 #' @param step step
 #' @param gif render a .gif file?
 #' @param verbose verbose
-#' @param out_dir out_dir
+#' @param out_dir output dir
 #'
 #' @return a r-threshold
 #' @export
 #' @references 1.  J. Zhou, Y. Deng, FALSE. Luo, Z. He, Q. Tu, X. Zhi, Functional Molecular Ecological Networks (2010), doi:10.1128/mBio.00169-10.
 #' @references 2. \code{https://matstat.org/content_en/RMT/RMThreshold_Intro.pdf}
 #' @examples
-#' message("Spend long time and produce some files.")
-#' \dontrun{
+#' \donttest{
+#' data(otutab, package = "pcutils")
 #' t(otutab) -> totu
 #' c_net_cal(totu) -> corr
 #' rmt(corr)
-#' # 0.69
+#' # recommend: 0.69
 #' c_net_build(corr, r_thres = 0.69) -> co_net_rmt
-#' RMT_threshold(corr, gif = TRUE) -> rmt_res
-#' plot(rmt_res)
 #' }
-RMT_threshold <- function(occor.r, min_threshold = 0.5, max_threshold = 0.8,
-                          step = 0.02, out_dir = "./", gif = FALSE, verbose = FALSE) {
+RMT_threshold <- function(occor.r, out_dir, min_threshold = 0.5, max_threshold = 0.8,
+                          step = 0.02, gif = FALSE, verbose = FALSE) {
     nwd <- getwd()
     on.exit(setwd(nwd))
 

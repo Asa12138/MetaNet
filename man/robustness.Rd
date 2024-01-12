@@ -35,12 +35,12 @@ Robustness after remove 50\%\% nodes or some hubs, need the metanet contains "co
 Plot robustness
 }
 \examples{
-\dontrun{
 robustness(co_net) -> robustness_res
-plot.robustness(robustness_res)
+plot(robustness_res)
+\donttest{
 modu_dect(co_net) -> co_net_modu
 zp_analyse(co_net_modu, mode = 2) -> co_net_modu
 robustness(co_net_modu, keystone = TRUE) -> robustness_res
-plot.robustness(robustness_res)
+plot(robustness_res)
 }
 }

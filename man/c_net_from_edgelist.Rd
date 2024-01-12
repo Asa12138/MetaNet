@@ -23,6 +23,9 @@ c_net_from_edgelist(
 
 \item{e_class}{set e_class}
 }
+\value{
+metanet
+}
 \description{
 Construct a network from edge_list dataframe
 }

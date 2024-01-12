@@ -56,9 +56,9 @@ Robust_test for a network
 Plot robust
 }
 \examples{
-\dontrun{
+\donttest{
 data("c_net")
-robust_test(co_net, step = 10, reps = 9) -> robust_res
+robust_test(co_net, step = 20, reps = 9) -> robust_res
 plot(robust_res, index = "Average_degree", mode = 2)
 }
 }

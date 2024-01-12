@@ -13,7 +13,7 @@ c_net_plot(
   legend_number = FALSE,
   legend = TRUE,
   legend_cex = 1,
-  legend_position = c(left_leg_x = -1.9, left_leg_y = 1, right_leg_x = 1.2, right_leg_y =
+  legend_position = c(left_leg_x = -2, left_leg_y = 1, right_leg_x = 1.2, right_leg_y =
     1),
   lty_legend = FALSE,
   lty_legend_title = "Edge class",

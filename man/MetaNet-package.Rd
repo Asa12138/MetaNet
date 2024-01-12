@@ -6,7 +6,7 @@
 \alias{MetaNet-package}
 \title{MetaNet: Network Analysis for Omics Data}
 \description{
-Comprehensive network analysis package. Calculate correlation network fastly, accelerate lots of analysis by parallel computing. Support for multi-omics data, search sub-nets fluently. Handle bigger data, more than 10,000 nodes in each omics. Offer various layout method for multi-omics network and some interfaces to other software (Gephi, Cytoscape, ggplot), easy to visualize. Provide comprehensive topology indexes calculation，including ecological network stability.
+Comprehensive network analysis package. Calculate correlation network fastly, accelerate lots of analysis by parallel computing. Support for multi-omics data, search sub-nets fluently. Handle bigger data, more than 10,000 nodes in each omics. Offer various layout method for multi-omics network and some interfaces to other software ('Gephi', 'Cytoscape', 'ggplot2'), easy to visualize. Provide comprehensive topology indexes calculation, including ecological network stability.
 }
 \seealso{
 Useful links:

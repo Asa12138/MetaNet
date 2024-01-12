@@ -24,8 +24,8 @@ g_lay_nice(go, group = "module")
 \item{group}{group name (default: module)}
 
 \item{layout1}{layout1 method, one of
-{1.a dataframe or matrix: rowname is group, two columns are X and Y}
-{2.function: layout method for \code{\link{c_net_lay}} default: in_circle()}}
+(1) a dataframe or matrix: rowname is group, two columns are X and Y
+(2) function: layout method for \code{\link{c_net_lay}} default: in_circle()}
 
 \item{zoom1}{big network layout size}
 
@@ -46,15 +46,11 @@ Layout with group
 Layout with group nicely
 }
 \examples{
-\dontrun{
+\donttest{
 data("c_net")
 modu_dect(co_net, method = "cluster_fast_greedy") -> co_net_modu
 g_lay(co_net_modu, group = "module", zoom1 = 30, zoom2 = 1:5, layout2 = as_line()) -> oridata
-# custom_lay1=data.frame(X=c(1,1,1,1,2,2,2,2,3,3,3,3,3.5),Y=c(1,2,3,4,1,2,3,4,1,2,3,4,2))
-# g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 5,
-#    layout1=custom_lay1,layout2 =nicely())->oridata
 plot(co_net_modu, coors = oridata)
-
 g_lay_nice(co_net_modu, group = "module") -> oridata
 plot(co_net_modu, coors = oridata)
 }

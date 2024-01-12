@@ -11,6 +11,9 @@
 
 \item{...}{add}
 }
+\value{
+plot
+}
 \description{
 Plot a metanet
 }

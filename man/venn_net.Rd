@@ -17,7 +17,7 @@ Venn network
 }
 \examples{
 data(otutab, package = "pcutils")
-tab <- otutab[400:492, 1:3]
+tab <- otutab[400:485, 1:3]
 venn_net(tab) -> v_net
 plot(v_net)
 }

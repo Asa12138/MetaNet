@@ -12,9 +12,9 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data("c_net")
-#' robust_test(co_net, step = 10, reps = 9) -> robust_res
+#' robust_test(co_net, step = 20, reps = 9) -> robust_res
 #' plot(robust_res, index = "Average_degree", mode = 2)
 #' }
 robust_test <- function(go_ls, partial = 0.5, step = 10, reps = 9, threads = 1, verbose = TRUE) {
@@ -35,7 +35,7 @@ robust_test <- function(go_ls, partial = 0.5, step = 10, reps = 9, threads = 1, 
 }
 
 robust_test_in <- function(go, partial = 0.5, step = 10, reps = 9, threads = 1, verbose = TRUE) {
-    lib_ps("igraph", library = FALSE)
+    i <- NULL
 
     cal_del <- \(go, partial, step, rep){
         nodes <- length(igraph::V(go))
@@ -79,7 +79,7 @@ robust_test_in <- function(go, partial = 0.5, step = 10, reps = 9, threads = 1, 
     }
     {
         if (threads > 1) {
-            pcutils::lib_ps("foreach", "doSNOW", "snow")
+            pcutils::lib_ps("foreach", "doSNOW", "snow", library = FALSE)
             pb <- utils::txtProgressBar(max = reps, style = 3)
             if (verbose) {
                 opts <- list(progress = function(n) utils::setTxtProgressBar(pb, n))
@@ -88,15 +88,12 @@ robust_test_in <- function(go, partial = 0.5, step = 10, reps = 9, threads = 1, 
                 opts <- NULL
             }
             doSNOW::registerDoSNOW(cl)
-            res <- foreach::foreach(
-                i = 1:reps, .options.snow = opts,
-                .packages = c()
-            ) %dopar% {
+            res <- foreach::`%dopar%`(
+                foreach::foreach(i = 1:reps, .options.snow = opts),
                 loop(i)
-            }
+            )
             snow::stopCluster(cl)
             gc()
-            pcutils::del_ps("doSNOW", "snow", "foreach")
         } else {
             res <- lapply(1:reps, loop)
         }
@@ -122,6 +119,7 @@ robust_test_in <- function(go, partial = 0.5, step = 10, reps = 9, threads = 1, 
 #' @exportS3Method
 #' @rdname robust_test
 plot.robust <- function(x, indexes = c("Natural_connectivity", "Average_path_length", "Average_degree"), use_ratio = FALSE, mode = 1, ...) {
+    i <- group <- variable <- value <- se <- eq.label <- adj.rr.label <- Natural_connectivity <- lm <- NULL
     robust_res <- x
     lib_ps("reshape2", library = FALSE)
     xlab <- "Removed_nodes"
@@ -184,13 +182,15 @@ plot.robust <- function(x, indexes = c("Natural_connectivity", "Average_path_len
 #' @export
 #' @references 1. Herren, C. M. & McMahon, K. Cohesion: a method for quantifying the connectivity of microbial communities. (2017) doi:10.1038/ismej.2017.91.
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data("otutab", package = "pcutils")
-#' Cohesion(otutab[1:50, ]) -> cohesion_res
-#' plot.cohesion(cohesion_res, group = "Group", metadata = metadata, mode = 1)
-#' plot.cohesion(cohesion_res, group = "Group", metadata = metadata, mode = 2)
+#' #set reps at least 99 when you run.
+#' Cohesion(otutab[1:50, ], reps = 19) -> cohesion_res
+#' plot(cohesion_res, group = "Group", metadata = metadata, mode = 1)
+#' plot(cohesion_res, group = "Group", metadata = metadata, mode = 2)
 #' }
 Cohesion <- function(otutab, reps = 200, threads = 1, mycor = NULL) {
+    i <- NULL
     d <- t(otutab)
     rel.d <- d / rowSums(d)
 
@@ -231,17 +231,17 @@ Cohesion <- function(otutab, reps = 200, threads = 1, mycor = NULL) {
         }
         {
             if (threads > 1) {
-                pcutils::lib_ps("foreach", "doSNOW", "snow")
+                pcutils::lib_ps("foreach", "doSNOW", "snow", library = FALSE)
                 pb <- utils::txtProgressBar(max = nc, style = 3)
                 opts <- list(progress = function(n) utils::setTxtProgressBar(pb, n))
                 cl <- snow::makeCluster(threads)
                 doSNOW::registerDoSNOW(cl)
-                res <- foreach::foreach(i = 1:nc, .options.snow = opts) %dopar% {
+                res <- foreach::`%dopar%`(
+                    foreach::foreach(i = 1:nc, .options.snow = opts),
                     loop(i)
-                }
+                )
                 snow::stopCluster(cl)
                 gc()
-                pcutils::del_ps("doSNOW", "snow", "foreach")
             } else {
                 res <- lapply(1:nc, loop)
             }
@@ -298,6 +298,7 @@ Cohesion <- function(otutab, reps = 200, threads = 1, mycor = NULL) {
 #' @exportS3Method
 #' @rdname Cohesion
 plot.cohesion <- function(x, group, metadata, mode = 1, ...) {
+    neg <- pos <- NULL
     cohesion_res <- x
     if (mode == 1) p <- pcutils::stackplot(abs(t(cohesion_res$Cohesion)), group = group, metadata = metadata, ...)
     if (mode == 2) {
@@ -320,10 +321,6 @@ plot.cohesion <- function(x, group, metadata, mode = 1, ...) {
 #' \deqn{Vi=\frac{E-Ei}{E}}
 #' E is the global efficiency and Ei is the global efficiency after the removal of the node i and its entire links.
 #'
-#' @examples
-#' \dontrun{
-#' vulnerability(co_net)
-#' }
 vulnerability <- function(go_ls, threads = 1, verbose = TRUE) {
     if ("igraph" %in% class(go_ls)) {
         vulnerability_res <- vul_max(go_ls, threads = threads, verbose = verbose)
@@ -339,6 +336,7 @@ vulnerability <- function(go_ls, threads = 1, verbose = TRUE) {
 }
 
 vul_max <- function(go, threads = 1, verbose = TRUE) {
+    i <- NULL
     stopifnot(is.igraph(go))
     if (is.null(V(go)$name)) V(go)$name <- V(go)
 
@@ -347,7 +345,7 @@ vul_max <- function(go, threads = 1, verbose = TRUE) {
     loop <- function(i) igraph::global_efficiency(igraph::delete_vertices(go, i))
     {
         if (threads > 1) {
-            pcutils::lib_ps("foreach", "doSNOW", "snow")
+            pcutils::lib_ps("foreach", "doSNOW", "snow", library = FALSE)
             if (verbose) {
                 pb <- utils::txtProgressBar(max = length(V(go)$name), style = 3)
                 opts <- list(progress = function(n) utils::setTxtProgressBar(pb, n))
@@ -356,12 +354,12 @@ vul_max <- function(go, threads = 1, verbose = TRUE) {
             }
             cl <- snow::makeCluster(threads)
             doSNOW::registerDoSNOW(cl)
-            res <- foreach::foreach(i = V(go)$name, .options.snow = opts) %dopar% {
+            res <- foreach::`%dopar%`(
+                foreach::foreach(i = V(go)$name, .options.snow = opts),
                 loop(i)
-            }
+            )
             snow::stopCluster(cl)
             gc()
-            pcutils::del_ps("doSNOW", "snow", "foreach")
         } else {
             res <- lapply(V(go)$name, loop)
         }
@@ -382,6 +380,7 @@ vul_max <- function(go, threads = 1, verbose = TRUE) {
 #' @exportS3Method
 #' @rdname vulnerability
 plot.vulnerability <- function(x, ...) {
+    group <- NULL
     vulnerability_res <- x
     if (is.vector(vulnerability_res)) {
         vulnerability_res <- list(vulnerability = vulnerability_res)
@@ -408,13 +407,13 @@ plot.vulnerability <- function(x, ...) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' robustness(co_net) -> robustness_res
-#' plot.robustness(robustness_res)
+#' plot(robustness_res)
+#' \donttest{
 #' modu_dect(co_net) -> co_net_modu
 #' zp_analyse(co_net_modu, mode = 2) -> co_net_modu
 #' robustness(co_net_modu, keystone = TRUE) -> robustness_res
-#' plot.robustness(robustness_res)
+#' plot(robustness_res)
 #' }
 robustness <- function(go_ls, keystone = FALSE, reps = 9, threads = 1, verbose = TRUE) {
     if ("igraph" %in% class(go_ls)) {
@@ -433,6 +432,8 @@ robustness <- function(go_ls, keystone = FALSE, reps = 9, threads = 1, verbose =
 }
 
 robustness_in <- function(go, keystone = FALSE, reps = 9, threads = 1, verbose = TRUE) {
+    roles <- name <- from <- to <- i <- NULL
+
     nodes <- length(V(go))
     floor(nodes * 0.5) -> del_i
     if (keystone) {
@@ -472,7 +473,7 @@ robustness_in <- function(go, keystone = FALSE, reps = 9, threads = 1, verbose =
     }
     {
         if (threads > 1) {
-            pcutils::lib_ps("foreach", "doSNOW", "snow")
+            pcutils::lib_ps("foreach", "doSNOW", "snow", library = FALSE)
             if (verbose) {
                 pb <- utils::txtProgressBar(max = reps, style = 3)
                 opts <- list(progress = function(n) utils::setTxtProgressBar(pb, n))
@@ -481,12 +482,12 @@ robustness_in <- function(go, keystone = FALSE, reps = 9, threads = 1, verbose =
             }
             cl <- snow::makeCluster(threads)
             doSNOW::registerDoSNOW(cl)
-            res <- foreach::foreach(i = 1:reps, .options.snow = opts) %dopar% {
+            res <- foreach::`%dopar%`(
+                foreach::foreach(i = 1:reps, .options.snow = opts),
                 loop(i)
-            }
+            )
             snow::stopCluster(cl)
             gc()
-            pcutils::del_ps("doSNOW", "snow", "foreach")
         } else {
             res <- lapply(1:reps, loop)
         }

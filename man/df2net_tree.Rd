@@ -18,9 +18,7 @@ metanet
 Transfer a dataframe to a network edgelist.
 }
 \examples{
-\dontrun{
 data("otutab", package = "pcutils")
 cbind(taxonomy, num = rowSums(otutab))[1:20, ] -> test
 df2net_tree(test) -> ttt
-}
 }

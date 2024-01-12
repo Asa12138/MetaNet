@@ -36,7 +36,7 @@ c_net_cal <- function(totu, totu2 = NULL, method = "spearman", filename = FALSE,
         corr <- f_cor(totu, totu2, method = method)
     } else if (method == "sparcc") {
         if (!is.null(totu2)) warning("sparcc only take the totu, ignore the totu2.")
-        corr <- par_sparcc(totu, threads = threads, verbose = verbose)
+        # corr <- par_sparcc(totu, threads = threads, verbose = verbose)
     } else if (method %in% c(
         "manhattan", "euclidean", "canberra", "bray",
         "kulczynski", "gower", "morisita", "horn", "mountford",
@@ -81,6 +81,7 @@ c_net_cal <- function(totu, totu2 = NULL, method = "spearman", filename = FALSE,
 #'
 #' @exportS3Method
 #' @method print corr
+#' @return No value
 print.corr <- function(x, ...) {
     cat("Correlation table:\n")
     cat("Table dimensions:", nrow(x$r), "rows,", ncol(x$r), "columns\n")
@@ -136,10 +137,6 @@ check_tabs <- function(...) {
 #' \item{p.adjust}{default p.adjust.method = NULL}
 #' @export
 #'
-#' @examples
-#' \dontrun{
-#' input_corr("test") -> corr
-#' }
 input_corr <- function(filename) {
     # r <- read.csv(paste0(filename, "_r.csv"), row.names = 1, check.names = FALSE)
     # p.value <- read.csv(paste0(filename, "_p.csv"), row.names = 1, check.names = FALSE)
@@ -189,6 +186,7 @@ f_cor <- function(totu, totu2 = NULL, method = c("pearson", "spearman")) {
 
 
 par_cor <- function(totu, totu2 = NULL, threads = 1, method = c("spearman", "pearson")) {
+    i <- NULL
     method <- match.arg(method, c("pearson", "spearman"))
 
     if (method == "spearman") {
@@ -219,13 +217,13 @@ par_cor <- function(totu, totu2 = NULL, threads = 1, method = c("spearman", "pea
     cl <- snow::makeCluster(threads)
     doSNOW::registerDoSNOW(cl)
     if (is.null(totu2)) {
-        corr <- foreach::foreach(i = 1:nc, .options.snow = opts) %dopar% {
+        corr <- foreach::`%dopar%`(foreach::foreach(i = 1:nc, .options.snow = opts), {
             corr1 <- matrix(rep(0, 2 * nc), nrow = 2, ncol = nc)
             for (j in 1:nc) {
                 if (j > i) corr1[, j] <- r_p(totu[, i], totu[, j])
             }
             corr1
-        }
+        })
         simplify2array(corr) -> corr
         rr <- corr[1, , ]
         rr <- rr + t(rr)
@@ -243,13 +241,13 @@ par_cor <- function(totu, totu2 = NULL, threads = 1, method = c("spearman", "pea
         } else {
             stop('method must be one of "spearman","pearson"')
         }
-        corr <- foreach::foreach(i = 1:nc, .options.snow = opts) %dopar% {
+        corr <- foreach::`%dopar%`(foreach::foreach(i = 1:nc, .options.snow = opts), {
             corr1 <- matrix(rep(0, 2 * ncol(totu2)), nrow = 2, ncol = ncol(totu2))
             for (j in 1:ncol(totu2)) {
                 corr1[, j] <- r_p(totu[, i], totu2[, j])
             }
             corr1
-        }
+        })
         simplify2array(corr) -> corr
         rr <- t(corr[1, , ])
         pp <- t(corr[2, , ])
@@ -279,81 +277,6 @@ Hmisc_cor <- function(totu, totu2 = NULL, method = c("spearman", "pearson")[1]) 
     p[is.na(p)] <- 0
     return(list(r = tmp$r, p.value = p))
 }
-
-#' SparCC correlation for a otutab
-#'
-#' @param totu an t(otutab)
-#' @param threads default: 1
-#' @param bootstrap default:100, recommend not less than 100
-#' @param verbose verbose
-#'
-#' @return list contain a correlation matrix and a bootstrap p_value matrix
-#' @export
-#'
-#' @examples
-#' \donttest{
-#' data("otutab", package = "pcutils")
-#' t(otutab) -> totu
-#' par_sparcc(totu[, 1:50], 4) -> sparcc_corr
-#' }
-par_sparcc <- function(totu, threads = 1, bootstrap = 100, verbose = TRUE) {
-    # sparcc
-    lib_ps("SpiecEasi", library = FALSE)
-    totu <- as.data.frame(totu)
-    set.seed(123)
-    totu.sparcc <- SpiecEasi::sparcc(totu, iter = 10, inner_iter = 5)
-    sparcc0 <- totu.sparcc$Cor # sparcc correlation
-    rownames(sparcc0) <- colnames(sparcc0) <- colnames(totu)
-
-    # parallel
-    reps <- bootstrap
-    # main function
-    loop <- function(i) {
-        totu.boot <- sample(totu, replace = TRUE)
-        totu.sparcc_boot <- SpiecEasi::sparcc(totu.boot,
-            iter = 10,
-            inner_iter = 5
-        )
-        sparcc_boot <- totu.sparcc_boot$Cor
-        sparcc_boot
-    }
-    {
-        if (threads > 1) {
-            pcutils::lib_ps("foreach", "doSNOW", "snow")
-            if (verbose) {
-                pb <- utils::txtProgressBar(max = reps, style = 3)
-                opts <- list(progress = function(n) utils::setTxtProgressBar(pb, n))
-            } else {
-                opts <- NULL
-            }
-
-            cl <- snow::makeCluster(threads)
-            doSNOW::registerDoSNOW(cl)
-            res <- foreach::foreach(
-                i = 1:reps, .options.snow = opts,
-                .packages = c()
-            ) %dopar% {
-                loop(i)
-            }
-            snow::stopCluster(cl)
-            gc()
-            pcutils::del_ps("doSNOW", "snow", "foreach")
-        } else {
-            res <- lapply(1:reps, loop)
-        }
-    }
-    # simplify method
-
-    # get the pseudo-pvalue by bootstrap
-    p <- sparcc0
-    p[p != 0] <- 0
-    lapply(res, \(x)(x > sparcc0) * 1) -> s
-    p <- apply(simplify2array(s), 1:2, sum)
-    p <- p / reps
-    colnames(p) <- rownames(p) <- colnames(sparcc0)
-    return(list(r = sparcc0, p.value = p))
-}
-
 
 #' Calculate distance for otutab
 #'

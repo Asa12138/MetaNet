@@ -37,10 +37,8 @@ Net_pars of many random network
 Compare some indexes between your net with random networks
 }
 \examples{
-\dontrun{
 data("c_net")
 rand_net_par(co_net_rmt, reps = 30) -> randp
 net_par(co_net_rmt, fast = FALSE) -> pars
 compare_rand(pars, randp)
-}
 }

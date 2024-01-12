@@ -16,6 +16,7 @@
 #' data(otutab, package = "pcutils")
 #' extract_sub_net(co_net, otutab) -> sub_net_pars
 extract_sub_net <- function(a_net, otutab, threads = 1, save_net = FALSE, fast = TRUE, verbose = TRUE) {
+    i <- NULL
     lib_ps("igraph", library = FALSE)
     V(a_net)$name -> v_name
     reps <- ncol(otutab)
@@ -41,7 +42,7 @@ extract_sub_net <- function(a_net, otutab, threads = 1, save_net = FALSE, fast =
     }
     {
         if (threads > 1) {
-            pcutils::lib_ps("foreach", "doSNOW", "snow")
+            pcutils::lib_ps("foreach", "doSNOW", "snow", library = FALSE)
             if (verbose) {
                 pb <- utils::txtProgressBar(max = reps, style = 3)
                 opts <- list(progress = function(n) utils::setTxtProgressBar(pb, n))
@@ -50,12 +51,12 @@ extract_sub_net <- function(a_net, otutab, threads = 1, save_net = FALSE, fast =
             }
             cl <- snow::makeCluster(threads)
             doSNOW::registerDoSNOW(cl)
-            res <- foreach::foreach(i = 1:reps, .options.snow = opts) %dopar% {
+            res <- foreach::`%dopar%`(
+                foreach::foreach(i = 1:reps, .options.snow = opts),
                 loop(i)
-            }
+            )
             snow::stopCluster(cl)
             gc()
-            pcutils::del_ps("doSNOW", "snow", "foreach")
         } else {
             res <- lapply(1:reps, loop)
         }
@@ -113,6 +114,7 @@ nc <- function(p) {
 #' igraph::make_graph("Walther") %>% net_par()
 #' c_net_index(co_net) -> co_net_with_par
 net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE) {
+    from <- to <- NULL
     lib_ps("igraph", "dplyr", library = FALSE)
     stopifnot(is_igraph(go))
     if ("all" %in% mode) mode <- c("v", "e", "n")
@@ -241,7 +243,7 @@ c_net_index <- function(go, force = FALSE) {
 #' get_group_skeleton(co_net) -> ske_net
 #' skeleton_plot(ske_net)
 get_group_skeleton <- function(go, Group = "v_class", count = NULL, top_N = 8) {
-    lib_ps("igraph")
+    name <- v_group <- n <- NULL
     stopifnot(is_igraph(go))
     direct <- is_directed(go)
 
@@ -303,6 +305,7 @@ get_group_skeleton <- function(go, Group = "v_class", count = NULL, top_N = 8) {
 #' @export
 #' @rdname get_group_skeleton
 skeleton_plot <- function(ske_net, ...) {
+    parms <- e_type <- NULL
     flag <- TRUE
     tmp_go <- ske_net
     lib_ps("igraph", library = FALSE)
@@ -315,7 +318,7 @@ skeleton_plot <- function(ske_net, ...) {
     params <- list(...)
     params_name <- names(params)
     legend_position <- params[["legend_position"]]
-    legend_position_default <- c(left_leg_x = -1.9, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1)
+    legend_position_default <- c(left_leg_x = -2, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1)
     if (!"legend_position" %in% params_name) {
         legend_position <- legend_position_default
     } else {
@@ -394,6 +397,7 @@ links_stat <- function(go, group = "v_class", e_type = "all", topN = 6, colors =
                        legend_position = c(left_leg_x = -1.6, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1),
                        col_legend_order = NULL,
                        group_legend_title = NULL, group_legend_order = NULL) {
+    from <- to <- n <- NULL
     pcutils::lib_ps("igraph", "dplyr", library = FALSE)
     direct <- is_directed(go)
     go <- c_net_set(go, vertex_class = group)
@@ -436,6 +440,7 @@ links_stat <- function(go, group = "v_class", e_type = "all", topN = 6, colors =
 #' @examples
 #' fit_power(co_net)
 fit_power <- function(go, p.value = FALSE) {
+    x <- y <- formula <- NULL
     # igraph::degree distribution
     degree_dist <- table(igraph::degree(go))
     dat <- data.frame(degree = as.numeric(names(degree_dist)), count = as.numeric(degree_dist))
@@ -503,7 +508,7 @@ fit_power <- function(go, p.value = FALSE) {
 #' @examples
 #' rand_net(co_net)
 rand_net <- function(go = go) {
-    lib_ps("igraph")
+    freq <- net <- NULL
     # generate a random network
     rand.g <- igraph::erdos.renyi.game(length(V(go)), length(E(go)), type = "gnm")
 
@@ -543,6 +548,7 @@ rand_net <- function(go = go) {
 #' @export
 #' @rdname compare_rand
 rand_net_par <- function(go, reps = 99, threads = 1, verbose = TRUE) {
+    i <- NULL
     # parallel
     # main function
     loop <- function(i) {
@@ -558,7 +564,7 @@ rand_net_par <- function(go, reps = 99, threads = 1, verbose = TRUE) {
     }
     {
         if (threads > 1) {
-            pcutils::lib_ps("foreach", "doSNOW", "snow")
+            pcutils::lib_ps("foreach", "doSNOW", "snow", library = FALSE)
             if (verbose) {
                 pb <- utils::txtProgressBar(max = reps, style = 3)
                 opts <- list(progress = function(n) utils::setTxtProgressBar(pb, n))
@@ -567,12 +573,12 @@ rand_net_par <- function(go, reps = 99, threads = 1, verbose = TRUE) {
             }
             cl <- snow::makeCluster(threads)
             doSNOW::registerDoSNOW(cl)
-            res <- foreach::foreach(i = 1:reps, .options.snow = opts) %dopar% {
+            res <- foreach::`%dopar%`(
+                foreach::foreach(i = 1:reps, .options.snow = opts),
                 loop(i)
-            }
+            )
             snow::stopCluster(cl)
             gc()
-            pcutils::del_ps("doSNOW", "snow", "foreach")
         } else {
             res <- lapply(1:reps, loop)
         }
@@ -593,13 +599,12 @@ rand_net_par <- function(go, reps = 99, threads = 1, verbose = TRUE) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' data("c_net")
 #' rand_net_par(co_net_rmt, reps = 30) -> randp
 #' net_par(co_net_rmt, fast = FALSE) -> pars
 #' compare_rand(pars, randp)
-#' }
 compare_rand <- function(pars, randp, index = c("Average_path_length", "Clustering_coefficent")) {
+    V1 <- NULL
     labss <- t(pars$n_index[, index, drop = FALSE]) %>% as.data.frame()
     rownames(labss) -> labss$indexes
     pcutils::group_box(randp[, index, drop = FALSE]) +
@@ -617,10 +622,12 @@ compare_rand <- function(pars, randp, index = c("Average_path_length", "Clusteri
 #' @param threads threads
 #' @param verbose verbose
 #'
+#' @return number
 #' @export
 #' @examples
-#' \dontrun{
-#' smallworldness(co_net)
+#' \donttest{
+#' #set reps at least 99 when you run.
+#' smallworldness(co_net, reps=9)
 #' }
 smallworldness <- function(go, reps = 99, threads = 1, verbose = TRUE) {
     rand_net_par(go, reps = reps, threads = threads, verbose = verbose) -> rands

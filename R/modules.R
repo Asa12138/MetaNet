@@ -127,6 +127,7 @@ as_module <- \(x){
 #' combine_n_module(co_net_modu, 20) -> co_net_modu1
 #' plot_module_tree(co_net_modu1)
 filter_n_module <- function(go_m, n_node_in_module = 0, keep_id = NULL, delete = FALSE) {
+    module <- NULL
     if (!"original_module" %in% vertex_attr_names(go_m)) stop("'module' do not exsited, please do a `modu_dect` first!")
     members <- V(go_m)$original_module
     table(members) %>% sort(decreasing = TRUE) -> s_members
@@ -150,7 +151,7 @@ filter_n_module <- function(go_m, n_node_in_module = 0, keep_id = NULL, delete =
 combine_n_module <- function(go_m, module_number = 5) {
     get_community(go_m) -> comm
     igraph::cut_at(comm, module_number) -> new_modu
-    V(go_m)$module <- new_modu
+    V(go_m)$module <- as.character(new_modu)
     graph.attributes(go_m)$communities$membership <- as.numeric(new_modu)
     go_m
 }
@@ -248,14 +249,13 @@ plot_module_tree <- function(go_m, module = "module", community = NULL, label.si
     tmp_v <- get_v(go_m)
     mdata <- tmp_v[, c("name", module)]
 
+    lib_ps("ggtree", "treeio", library = FALSE)
     # modules tree
     if (is.null(community)) {
-        get_community(go_m) %>% igraph::as_phylo() -> mcl
+        get_community(go_m) %>% treeio::as.phylo() -> mcl
     } else {
-        community %>% igraph::as_phylo() -> mcl
+        community %>% treeio::as.phylo() -> mcl
     }
-
-    lib_ps("ggtree", library = FALSE)
     mcl <- dplyr::left_join(mcl, mdata, by = c("label" = "name"))
     p <- ggtree::ggtree(mcl, size = 0.3) +
         ggtree::geom_tiplab(aes(color = module), show.legend = FALSE, size = label.size) +
@@ -333,6 +333,7 @@ module_eigen <- function(go_m, totu, cor_method = "spearman") {
 #' module_expression(co_net_modu, totu)
 module_expression <- function(go_m, totu, group = NULL, r_threshold = 0.6,
                               x_order = NULL, facet_param = NULL, plot_eigen = FALSE) {
+    node_eigen_cor <- variable <- value <- name <- module <- rowname <- NULL
     if (is.null(graph_attr(go_m, "module_eigen"))) stop("Please do module_eigen() first")
 
     graph_attr(go_m, "module_eigen") %>%
@@ -507,6 +508,7 @@ part_coeff <- function(g, A = NULL, weighted = FALSE) {
 #' @export
 #' @rdname zp_analyse
 zp_plot <- function(go, label = TRUE, mode = 1) {
+    v_class <- value <- size <- roles <- x1 <- x2 <- y1 <- y2 <- Pi <- Zi <- name <- NULL
     lib_ps("ggrepel", library = FALSE)
     get_v(go) -> taxa.roles
     if (!"roles" %in% names(taxa.roles)) stop("no roles, please zp_analyse() first")

@@ -110,7 +110,7 @@ get_coors <- \(coors, go, ...){
 #'
 #' @param x 'coors' object
 #' @param ... additional arguments
-#'
+#' @return No value
 #' @exportS3Method
 #' @method print coors
 print.coors <- function(x, ...) {
@@ -172,8 +172,8 @@ as_arc <- function(angle = 0, arc = pi) {
 #' @param zoom1 big network layout size
 #' @param zoom2 average sub_network layout size, or numeric vector, or "auto"
 #' @param layout1 layout1 method, one of
-#' {1.a dataframe or matrix: rowname is group, two columns are X and Y}
-#' {2.function: layout method for \code{\link{c_net_lay}} default: in_circle()}
+#'      (1) a dataframe or matrix: rowname is group, two columns are X and Y
+#'      (2) function: layout method for \code{\link{c_net_lay}} default: in_circle()
 #' @param layout2 one of functions: layout method for \code{\link{c_net_lay}}, or a list of functions.
 #' @param show_big_lay show the big layout to help you adjust.
 #' @param ... add
@@ -182,21 +182,17 @@ as_arc <- function(angle = 0, arc = pi) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' data("c_net")
 #' modu_dect(co_net, method = "cluster_fast_greedy") -> co_net_modu
 #' g_lay(co_net_modu, group = "module", zoom1 = 30, zoom2 = 1:5, layout2 = as_line()) -> oridata
-#' # custom_lay1=data.frame(X=c(1,1,1,1,2,2,2,2,3,3,3,3,3.5),Y=c(1,2,3,4,1,2,3,4,1,2,3,4,2))
-#' # g_lay(co_net_modu,group ="module",zoom1=30,zoom2 = 5,
-#' #    layout1=custom_lay1,layout2 =nicely())->oridata
 #' plot(co_net_modu, coors = oridata)
-#'
 #' g_lay_nice(co_net_modu, group = "module") -> oridata
 #' plot(co_net_modu, coors = oridata)
 #' }
 g_lay <- function(go, group = "module", layout1 = in_circle(), zoom1 = 20, layout2 = in_circle(),
                   zoom2 = 3, show_big_lay = FALSE, ...) {
-    name <- NULL
+    name <- ID <- NULL
 
     stopifnot(is_igraph(go))
     if (!group %in% igraph::vertex_attr_names(go)) stop("no group named ", group, " !")
@@ -432,6 +428,7 @@ as_polyarc <- \(n = 3, space = pi / 3){
 #'
 #' @rdname g_lay
 g_lay_nice <- function(go, group = "module") {
+    name <- size <- leaf <- x <- y <- NULL
     lib_ps("ggraph", library = FALSE)
     stopifnot(is_igraph(go))
     if (!group %in% vertex_attr_names(go)) stop("no group named ", group, " !")
@@ -463,6 +460,7 @@ g_lay_nice <- function(go, group = "module") {
 #' @param x metanet object
 #' @param ... add
 #'
+#' @return plot
 #' @exportS3Method
 #' @method plot metanet
 plot.metanet <- function(x, ...) {
@@ -554,7 +552,7 @@ plot.metanet <- function(x, ...) {
 #' c_net_plot(multi1)
 c_net_plot <- function(go, coors = NULL, ..., labels_num = 5, vertex_size_range = NULL,
                        legend_number = FALSE, legend = TRUE, legend_cex = 1,
-                       legend_position = c(left_leg_x = -1.9, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1),
+                       legend_position = c(left_leg_x = -2, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1),
                        lty_legend = FALSE, lty_legend_title = "Edge class",
                        size_legend = FALSE, size_legend_title = "Node Size",
                        edge_legend = TRUE, edge_legend_title = "Edge type", edge_legend_order = NULL,
@@ -563,6 +561,7 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = 5, vertex_size_range 
                        group_legend_title = NULL, group_legend_order = NULL,
                        plot_module = FALSE, mark_module = FALSE, mark_color = NULL, mark_alpha = 0.3,
                        seed = 1234) {
+    name <- size <- color <- e_type <- lty <- e_class <- v_class <- shape <- NULL
     lib_ps("igraph", library = FALSE)
     set.seed(seed)
 
@@ -700,6 +699,10 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = 5, vertex_size_range 
     }
     # main plot
     {
+        old_xpd <- graphics::par(mar = c(4, 2, 2, 2), xpd = TRUE)
+        on.exit(graphics::par(old_xpd), add = TRUE)
+        # oldpar <- graphics::par(no.readonly = TRUE)
+        # on.exit(graphics::par(oldpar),add = TRUE)
         igraph::plot.igraph(go,
             layout = coors,
             vertex.size = tmp_v$size,
@@ -729,7 +732,7 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = 5, vertex_size_range 
     }
 
     # produce legends
-    legend_position_default <- c(left_leg_x = -1.9, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1)
+    legend_position_default <- c(left_leg_x = -2, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1)
     if (is.null(legend_position)) legend_position <- legend_position_default
     if (is.null(names(legend_position))) {
         legend_position <- setNames(
@@ -902,6 +905,7 @@ plot.ggig <- function(x, coors = NULL, ..., labels_num = 0,
                       width_legend = FALSE, width_legend_title = "Edge width",
                       col_legend = TRUE, col_legend_order = NULL,
                       group_legend_title = "Node class", group_legend_order = NULL) {
+    rename <- size <- name <- color <- e_type <- lty <- e_class <- v_class <- shape <- X1 <- Y1 <- X2 <- Y2 <- width <- X <- Y <- label <- NULL
     ggig <- x
     lib_ps("ggplot2", "ggnewscale", library = FALSE)
     ggig$v_index -> tmp_v
@@ -1100,12 +1104,8 @@ plot.ggig <- function(x, coors = NULL, ..., labels_num = 0,
 #' @return list contains the igraph object and coordinates
 #'
 #' @export
-#' @examples
-#' \dontrun{
-#' input_gephi("test.graphml") -> gephi
-#' c_net_plot(gephi$go, gephi$coors)
-#' }
 input_gephi <- function(file) {
+    X <- Y <- code <- NULL
     igraph::read.graph(file, format = "graphml") -> gephi
     get_v(gephi) -> tmp_v
     # extract coors
@@ -1138,7 +1138,7 @@ input_gephi <- function(file) {
 #' @param go metanet
 #' @param v_class which attributes use to be v_class
 #' @param ... see \code{\link[networkD3]{forceNetwork}}
-#'
+#' @return D3 plot
 #' @export
 #'
 #' @examples
@@ -1194,11 +1194,12 @@ MetaNet_theme <- {
 #'
 #' @examples
 #' data(otutab, package = "pcutils")
-#' tab <- otutab[400:492, 1:3]
+#' tab <- otutab[400:485, 1:3]
 #' venn_net(tab) -> v_net
 #' plot(v_net)
 venn_net <- function(tab) {
     # pcutils:::venn_cal(tab)->vennlist
+    tab[is.na(tab)]=0
     edgelist <- data.frame()
     if (is.data.frame(tab)) {
         groupss <- colnames(tab)

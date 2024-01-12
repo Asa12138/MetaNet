@@ -18,8 +18,3 @@ a list with 7 elements:
 \description{
 Import corr from .csv file
 }
-\examples{
-\dontrun{
-input_corr("test") -> corr
-}
-}

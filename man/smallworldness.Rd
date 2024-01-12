@@ -15,11 +15,15 @@ smallworldness(go, reps = 99, threads = 1, verbose = TRUE)
 
 \item{verbose}{verbose}
 }
+\value{
+number
+}
 \description{
 Calculate small-world coefficient
 }
 \examples{
-\dontrun{
-smallworldness(co_net)
+\donttest{
+#set reps at least 99 when you run.
+smallworldness(co_net, reps=9)
 }
 }

@@ -11,6 +11,9 @@
 
 \item{...}{additional arguments}
 }
+\value{
+No value
+}
 \description{
 Print method for 'coors' objects
 }
