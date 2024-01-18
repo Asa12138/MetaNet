@@ -1,18 +1,5 @@
 # =========2.build======
 
-#' Print method for 'metanet' objects
-#'
-#' @param x 'metanet' object
-#' @param ... Additional arguments
-#' @exportS3Method
-#' @method print metanet
-#' @return No value
-print.metanet <- function(x, ...) {
-    pcutils::dabiao(" metanet ", print = TRUE)
-    print.igraph(x)
-}
-
-
 #' Construct a network from correlation table
 #'
 #' @param corr result of `c_net_cal`
@@ -242,7 +229,7 @@ c_net_update <- function(go, node_break = 5, edge_break = 5) {
             ))
             tmp_v$v_class <- as.character(cut(tmp_v$v_class,
                 breaks = node_break,
-                labels = seq(min(tmp_v$v_class, na.rm = T), max(tmp_v$v_class, na.rm = T), length.out = node_break)
+                labels = seq(min(tmp_v$v_class, na.rm = TRUE), max(tmp_v$v_class, na.rm = TRUE), length.out = node_break)
             ))
         } else {
             tmp_col <- paste0(tmp_v$v_group, "-", tmp_v$v_class)
@@ -443,7 +430,7 @@ c_net_set <- function(go, ..., vertex_group = "v_group", vertex_class = "v_class
                 ))
                 tmp_ann[, i] <- as.character(cut(tmp_ann[, i],
                     breaks = edge_break,
-                    labels = seq(min(tmp_ann[, i], na.rm = T), max(tmp_ann[, i], na.rm = T),
+                    labels = seq(min(tmp_ann[, i], na.rm = TRUE), max(tmp_ann[, i], na.rm = TRUE),
                         length.out = edge_break
                     )
                 ))
@@ -562,7 +549,7 @@ cbind_new <- \(df, df1){
     }
     inter <- intersect(colnames(df1), colnames(df))
     la <- setdiff(colnames(df), inter)
-    cbind(df[, la, drop = F], df1)
+    cbind(df[, la, drop = FALSE], df1)
 }
 
 #' Get edge information
@@ -1087,7 +1074,7 @@ get_sse <- \(ev.spacing){
 #' @rdname RMT_threshold
 rmt <- function(occor.r, min_threshold = 0.5, max_threshold = 0.85, step = 0.01) {
     if (inherits(occor.r, "corr")) occor.r <- occor.r$r
-    lib_ps("ggplot2", library = F)
+    lib_ps("ggplot2", library = FALSE)
     NNSD <- \(x)abs(diff(x))
 
     s <- seq(0, 3, 0.1)

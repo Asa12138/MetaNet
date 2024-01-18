@@ -23,7 +23,7 @@ Calculate small-world coefficient
 }
 \examples{
 \donttest{
-#set reps at least 99 when you run.
-smallworldness(co_net, reps=9)
+# set reps at least 99 when you run.
+smallworldness(co_net, reps = 9)
 }
 }

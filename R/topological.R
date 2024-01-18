@@ -626,8 +626,8 @@ compare_rand <- function(pars, randp, index = c("Average_path_length", "Clusteri
 #' @export
 #' @examples
 #' \donttest{
-#' #set reps at least 99 when you run.
-#' smallworldness(co_net, reps=9)
+#' # set reps at least 99 when you run.
+#' smallworldness(co_net, reps = 9)
 #' }
 smallworldness <- function(go, reps = 99, threads = 1, verbose = TRUE) {
     rand_net_par(go, reps = reps, threads = threads, verbose = verbose) -> rands

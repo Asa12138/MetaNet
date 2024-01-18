@@ -106,18 +106,6 @@ get_coors <- \(coors, go, ...){
     stop("coors wrong!")
 }
 
-#' Print method for 'coors' objects
-#'
-#' @param x 'coors' object
-#' @param ... additional arguments
-#' @return No value
-#' @exportS3Method
-#' @method print coors
-print.coors <- function(x, ...) {
-    cat("Coordinates:\n")
-    cat("Table dimensions:", nrow(x$coors), "rows,", ncol(x$coors), "columns\n")
-}
-
 
 #' Layout as a line
 #'
@@ -526,14 +514,14 @@ plot.metanet <- function(x, ...) {
 #' @param lty_legend logical
 #' @param size_legend logical
 #' @param edge_legend logical
-#' @param col_legend logical
+#' @param color_legend logical
 #' @param width_legend logical
 #' @param lty_legend_title lty_legend_title
 #' @param size_legend_title size_legend_title
 #' @param edge_legend_title edge_legend_title
 #' @param edge_legend_order edge_legend_order vector, e.g. c("positive","negative")
 #' @param width_legend_title width_legend_title
-#' @param col_legend_order col_legend_order vector,
+#' @param color_legend_order color_legend_order vector,
 #' @param group_legend_title group_legend_title, length must same to the numbers of v_group
 #' @param group_legend_order group_legend_order vector
 #' @param mark_module logical, mark the modules?
@@ -541,6 +529,10 @@ plot.metanet <- function(x, ...) {
 #' @param mark_alpha mark fill alpha, default 0.3
 #' @param seed random seed, default:1234, make sure each plot is the same.
 #' @param plot_module logical, plot module?
+#' @param module_label module_label
+#' @param module_label_cex module_label_cex
+#' @param module_label_color module_label_color
+#' @param module_label_just module_label_just
 #'
 #' @return a network plot
 #' @export
@@ -557,9 +549,10 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = 5, vertex_size_range 
                        size_legend = FALSE, size_legend_title = "Node Size",
                        edge_legend = TRUE, edge_legend_title = "Edge type", edge_legend_order = NULL,
                        width_legend = FALSE, width_legend_title = "Edge width",
-                       col_legend = TRUE, col_legend_order = NULL,
+                       color_legend = TRUE, color_legend_order = NULL,
                        group_legend_title = NULL, group_legend_order = NULL,
                        plot_module = FALSE, mark_module = FALSE, mark_color = NULL, mark_alpha = 0.3,
+                       module_label=TRUE, module_label_cex=2, module_label_color="black", module_label_just=c(0,0),
                        seed = 1234) {
     name <- size <- color <- e_type <- lty <- e_class <- v_class <- shape <- NULL
     lib_ps("igraph", library = FALSE)
@@ -603,15 +596,15 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = 5, vertex_size_range 
     get_e(go) -> tmp_e
 
     # get coordinates
-    coors <- get_coors(coors, go, seed = seed)
-    if (is.null(coors$curved)) {
+    ori_coors <- get_coors(coors, go, seed = seed)
+    if (is.null(ori_coors$curved)) {
         edge_curved <- 0
     } else {
-        edge_curved <- coors$curved$curved
+        edge_curved <- ori_coors$curved$curved
     }
     edge_curved[is.na(edge_curved)] <- 0
 
-    coors <- coors$coors[, c("X", "Y")] %>% as.matrix()
+    coors <- ori_coors$coors[, c("X", "Y")] %>% as.matrix()
 
     # scale the size and width
     {
@@ -696,6 +689,20 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = 5, vertex_size_range 
         } else {
             new_modu <- module_color <- NULL
         }
+        if (module_label){
+            rescale_flag=TRUE
+            module_coors=dplyr::left_join(tmp_v[,c("name","module")],ori_coors$coors,by = "name")
+            if("rescale"%in%names(params)){
+                if(!params[["rescale"]])rescale_flag=FALSE
+            }
+            if(rescale_flag) module_coors=dplyr::mutate(module_coors,X=mmscale(X,-1,1),Y=mmscale(Y,-1,1))
+            module_coors=dplyr::group_by(module_coors,module)%>%
+                dplyr::summarise(minx=min(X),maxx=max(X),miny=min(Y),maxy=max(Y))
+            module_label_just=rep(module_label_just,2)
+            module_coors=mutate(module_coors,
+                                X=minx+module_label_just[1]*(maxx-minx),
+                                Y=miny+module_label_just[2]*(maxy-miny))
+        }
     }
     # main plot
     {
@@ -725,6 +732,17 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = 5, vertex_size_range 
             edge.curved = edge_curved,
             margin = c(0, 0, 0, 0)
         )
+    }
+
+    # add module_label
+    if (module_label){
+        n_module=nrow(module_coors)
+        module_label_cex=rep(module_label_cex,n_module)
+        module_label_color=rep(module_label_color,n_module)
+        for (i in seq_len(n_module)) {
+            text(module_coors[i,"X"],module_coors[i,"Y"],labels = module_coors[i,"module"],
+                 cex=module_label_cex,col=module_label_color[i])
+        }
     }
 
     if (!legend) {
@@ -801,7 +819,7 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = 5, vertex_size_range 
         )
     }
 
-    if (col_legend) {
+    if (color_legend) {
         pchls <- c("circle" = 21, "square" = 22)
         vgroups <- pcutils::change_fac_lev(tmp_v$v_group, group_legend_order)
         vgroups <- unique(vgroups)
@@ -812,8 +830,8 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = 5, vertex_size_range 
         for (g_i in vgroups) {
             tmp_v1 <- tmp_v[tmp_v$v_group == g_i, c("v_class", "color", "shape")]
 
-            tmp_v1$v_class <- factor(tmp_v1$v_class, levels = stringr::str_sort(unique(tmp_v1$v_class), numeric = T))
-            vclass <- pcutils::change_fac_lev(tmp_v1$v_class, col_legend_order)
+            tmp_v1$v_class <- factor(tmp_v1$v_class, levels = stringr::str_sort(unique(tmp_v1$v_class), numeric = TRUE))
+            vclass <- pcutils::change_fac_lev(tmp_v1$v_class, color_legend_order)
             vclass <- levels(vclass)
 
             node_cols <- dplyr::distinct(tmp_v1, color, v_class)
@@ -883,14 +901,14 @@ to.ggig <- function(go, coors = NULL) {
 #' @param lty_legend logical
 #' @param size_legend logical
 #' @param edge_legend logical
-#' @param col_legend logical
+#' @param color_legend logical
 #' @param width_legend logical
 #' @param lty_legend_title lty_legend_title
 #' @param size_legend_title size_legend_title
 #' @param edge_legend_title edge_legend_title
 #' @param edge_legend_order edge_legend_order vector, e.g. c("positive","negative")
 #' @param width_legend_title width_legend_title
-#' @param col_legend_order col_legend_order vector,
+#' @param color_legend_order color_legend_order vector,
 #' @param group_legend_title group_legend_title, length must same to the numbers of v_group
 #' @param group_legend_order group_legend_order vector
 #'
@@ -903,7 +921,7 @@ plot.ggig <- function(x, coors = NULL, ..., labels_num = 0,
                       size_legend = FALSE, size_legend_title = "Node Size",
                       edge_legend = TRUE, edge_legend_title = "Edge type", edge_legend_order = NULL,
                       width_legend = FALSE, width_legend_title = "Edge width",
-                      col_legend = TRUE, col_legend_order = NULL,
+                      color_legend = TRUE, color_legend_order = NULL,
                       group_legend_title = "Node class", group_legend_order = NULL) {
     rename <- size <- name <- color <- e_type <- lty <- e_class <- v_class <- shape <- X1 <- Y1 <- X2 <- Y2 <- width <- X <- Y <- label <- NULL
     ggig <- x
@@ -1017,7 +1035,7 @@ plot.ggig <- function(x, coors = NULL, ..., labels_num = 0,
         new_f <- c()
         for (g_i in levels(vgroups)) {
             tmp_v1 <- tmp_v[tmp_v$v_group == g_i, c("v_class", "color", "shape")]
-            tmp_f <- pcutils::change_fac_lev(tmp_v1$v_class, col_legend_order)
+            tmp_f <- pcutils::change_fac_lev(tmp_v1$v_class, color_legend_order)
             new_f <- c(new_f, levels(tmp_f))
         }
 
@@ -1061,7 +1079,7 @@ plot.ggig <- function(x, coors = NULL, ..., labels_num = 0,
         scale_shape_manual(values = node_shapes) +
         scale_fill_manual(
             name = group_legend_title, values = node_cols[vclass],
-            labels = le_text, guide = ifelse(col_legend, "legend", "none")
+            labels = le_text, guide = ifelse(color_legend, "legend", "none")
         ) + # node color
         scale_size(
             name = size_legend_title, breaks = c(min(tmp_v$size), max(tmp_v$size)),
@@ -1147,7 +1165,7 @@ input_gephi <- function(file) {
 netD3plot <- function(go, v_class = "v_class", ...) {
     flag <- "y"
     if (length(V(go)) > 200) {
-        print("Too big network, recommend using Gephi to layout,still use networkD3?")
+        message("Too big network, recommend using Gephi to layout,still use networkD3?")
         flag <- readline("yes/no(y/n):")
     }
     if (tolower(flag) %in% c("yes", "y")) {
@@ -1199,7 +1217,7 @@ MetaNet_theme <- {
 #' plot(v_net)
 venn_net <- function(tab) {
     # pcutils:::venn_cal(tab)->vennlist
-    tab[is.na(tab)]=0
+    tab[is.na(tab)] <- 0
     edgelist <- data.frame()
     if (is.data.frame(tab)) {
         groupss <- colnames(tab)

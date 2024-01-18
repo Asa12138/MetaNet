@@ -41,7 +41,7 @@ Plot cohesion
 \examples{
 \donttest{
 data("otutab", package = "pcutils")
-#set reps at least 99 when you run.
+# set reps at least 99 when you run.
 Cohesion(otutab[1:50, ], reps = 19) -> cohesion_res
 plot(cohesion_res, group = "Group", metadata = metadata, mode = 1)
 plot(cohesion_res, group = "Group", metadata = metadata, mode = 2)

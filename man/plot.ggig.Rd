@@ -20,8 +20,8 @@
   edge_legend_order = NULL,
   width_legend = FALSE,
   width_legend_title = "Edge width",
-  col_legend = TRUE,
-  col_legend_order = NULL,
+  color_legend = TRUE,
+  color_legend_order = NULL,
   group_legend_title = "Node class",
   group_legend_order = NULL
 )
@@ -57,9 +57,9 @@
 
 \item{width_legend_title}{width_legend_title}
 
-\item{col_legend}{logical}
+\item{color_legend}{logical}
 
-\item{col_legend_order}{col_legend_order vector,}
+\item{color_legend_order}{color_legend_order vector,}
 
 \item{group_legend_title}{group_legend_title, length must same to the numbers of v_group}
 

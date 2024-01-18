@@ -83,4 +83,3 @@ NULL
 #' @docType data
 #' @name multi1
 NULL
-

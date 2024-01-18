@@ -1,9 +1,9 @@
 Package: MetaNet
 Type: Package
 Title: Network Analysis for Omics Data
-Version: 0.1.0
+Version: 0.1.1
 Authors@R:
-    person("Peng", "Chen",email ="pengchen2001@zju.edu.cn", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9449-7606"))
+    person("Chen", "Peng", email ="pengchen2001@zju.edu.cn", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9449-7606"))
 Description: Comprehensive network analysis package.
     Calculate correlation network fastly, accelerate lots of analysis by parallel computing.
     Support for multi-omics data, search sub-nets fluently.

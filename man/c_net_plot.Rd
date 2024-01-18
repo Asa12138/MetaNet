@@ -24,14 +24,18 @@ c_net_plot(
   edge_legend_order = NULL,
   width_legend = FALSE,
   width_legend_title = "Edge width",
-  col_legend = TRUE,
-  col_legend_order = NULL,
+  color_legend = TRUE,
+  color_legend_order = NULL,
   group_legend_title = NULL,
   group_legend_order = NULL,
   plot_module = FALSE,
   mark_module = FALSE,
   mark_color = NULL,
   mark_alpha = 0.3,
+  module_label = TRUE,
+  module_label_cex = 2,
+  module_label_color = "black",
+  module_label_just = c(0, 0),
   seed = 1234
 )
 }
@@ -72,9 +76,9 @@ c_net_plot(
 
 \item{width_legend_title}{width_legend_title}
 
-\item{col_legend}{logical}
+\item{color_legend}{logical}
 
-\item{col_legend_order}{col_legend_order vector,}
+\item{color_legend_order}{color_legend_order vector,}
 
 \item{group_legend_title}{group_legend_title, length must same to the numbers of v_group}
 
@@ -87,6 +91,14 @@ c_net_plot(
 \item{mark_color}{mark colors}
 
 \item{mark_alpha}{mark fill alpha, default 0.3}
+
+\item{module_label}{module_label}
+
+\item{module_label_cex}{module_label_cex}
+
+\item{module_label_color}{module_label_color}
+
+\item{module_label_just}{module_label_just}
 
 \item{seed}{random seed, default:1234, make sure each plot is the same.}
 }

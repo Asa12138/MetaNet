@@ -74,20 +74,6 @@ c_net_cal <- function(totu, totu2 = NULL, method = "spearman", filename = FALSE,
     return(res)
 }
 
-#' Print method for 'corr' objects
-#'
-#' @param x 'corr' object
-#' @param ... additional arguments
-#'
-#' @exportS3Method
-#' @method print corr
-#' @return No value
-print.corr <- function(x, ...) {
-    cat("Correlation table:\n")
-    cat("Table dimensions:", nrow(x$r), "rows,", ncol(x$r), "columns\n")
-}
-
-
 #' Check tables
 #'
 #' @description

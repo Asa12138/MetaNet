@@ -10,7 +10,7 @@
 #' @importFrom stats aggregate median var sd setNames runif relevel coef fitted cor coefficients formula lm pt
 #' @importFrom stats time na.omit kmeans p.adjust density approx ks.test smooth.spline
 #' @importFrom pcutils lib_ps mmscale get_cols trans guolv hebing update_param tidai
-#' @importFrom graphics legend hist par
+#' @importFrom graphics legend hist par text
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom reshape2 acast melt
 ## usethis namespace: end
