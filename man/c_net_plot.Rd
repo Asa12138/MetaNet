@@ -10,13 +10,24 @@ c_net_plot(
   ...,
   labels_num = 5,
   vertex_size_range = NULL,
-  legend_number = FALSE,
+  edge_width_range = NULL,
+  plot_module = FALSE,
+  mark_module = FALSE,
+  mark_color = NULL,
+  mark_alpha = 0.3,
+  module_label = FALSE,
+  module_label_cex = 2,
+  module_label_color = "black",
+  module_label_just = c(0.5, 0.5),
   legend = TRUE,
+  legend_number = FALSE,
   legend_cex = 1,
   legend_position = c(left_leg_x = -2, left_leg_y = 1, right_leg_x = 1.2, right_leg_y =
     1),
-  lty_legend = FALSE,
-  lty_legend_title = "Edge class",
+  group_legend_title = NULL,
+  group_legend_order = NULL,
+  color_legend = TRUE,
+  color_legend_order = NULL,
   size_legend = FALSE,
   size_legend_title = "Node Size",
   edge_legend = TRUE,
@@ -24,18 +35,9 @@ c_net_plot(
   edge_legend_order = NULL,
   width_legend = FALSE,
   width_legend_title = "Edge width",
-  color_legend = TRUE,
-  color_legend_order = NULL,
-  group_legend_title = NULL,
-  group_legend_order = NULL,
-  plot_module = FALSE,
-  mark_module = FALSE,
-  mark_color = NULL,
-  mark_alpha = 0.3,
-  module_label = TRUE,
-  module_label_cex = 2,
-  module_label_color = "black",
-  module_label_just = c(0, 0),
+  lty_legend = FALSE,
+  lty_legend_title = "Edge class",
+  lty_legend_order = NULL,
   seed = 1234
 )
 }
@@ -50,39 +52,7 @@ c_net_plot(
 
 \item{vertex_size_range}{the vertex size range, e.g. c(1,10)}
 
-\item{legend_number}{legend with numbers}
-
-\item{legend}{all legends}
-
-\item{legend_cex}{character expansion factor relative to current par("cex"), default: 1}
-
-\item{legend_position}{legend_position, default: c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1)}
-
-\item{lty_legend}{logical}
-
-\item{lty_legend_title}{lty_legend_title}
-
-\item{size_legend}{logical}
-
-\item{size_legend_title}{size_legend_title}
-
-\item{edge_legend}{logical}
-
-\item{edge_legend_title}{edge_legend_title}
-
-\item{edge_legend_order}{edge_legend_order vector, e.g. c("positive","negative")}
-
-\item{width_legend}{logical}
-
-\item{width_legend_title}{width_legend_title}
-
-\item{color_legend}{logical}
-
-\item{color_legend_order}{color_legend_order vector,}
-
-\item{group_legend_title}{group_legend_title, length must same to the numbers of v_group}
-
-\item{group_legend_order}{group_legend_order vector}
+\item{edge_width_range}{the edge width range, e.g. c(1,10)}
 
 \item{plot_module}{logical, plot module?}
 
@@ -99,6 +69,42 @@ c_net_plot(
 \item{module_label_color}{module_label_color}
 
 \item{module_label_just}{module_label_just}
+
+\item{legend}{all legends}
+
+\item{legend_number}{legend with numbers}
+
+\item{legend_cex}{character expansion factor relative to current par("cex"), default: 1}
+
+\item{legend_position}{legend_position, default: c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1)}
+
+\item{group_legend_title}{group_legend_title, length must same to the numbers of v_group}
+
+\item{group_legend_order}{group_legend_order vector}
+
+\item{color_legend}{logical}
+
+\item{color_legend_order}{color_legend_order vector}
+
+\item{size_legend}{logical}
+
+\item{size_legend_title}{size_legend_title}
+
+\item{edge_legend}{logical}
+
+\item{edge_legend_title}{edge_legend_title}
+
+\item{edge_legend_order}{edge_legend_order vector, e.g. c("positive","negative")}
+
+\item{width_legend}{logical}
+
+\item{width_legend_title}{width_legend_title}
+
+\item{lty_legend}{logical}
+
+\item{lty_legend_title}{lty_legend_title}
+
+\item{lty_legend_order}{lty_legend_order}
 
 \item{seed}{random seed, default:1234, make sure each plot is the same.}
 }

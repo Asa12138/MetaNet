@@ -28,12 +28,11 @@ Imports:
     stats,
     tibble,
     utils,
-    pcutils,
-    vegan,
-    rlang,
-    stringr
+    pcutils
 Suggests:
     pheatmap,
+    vegan,
+    stringr,
     foreach,
     doSNOW,
     snow,
@@ -51,7 +50,8 @@ Suggests:
     ggpmisc,
     ggtree,
     treeio,
-    circlize
+    circlize,
+    rlang
 VignetteBuilder: knitr
 BugReports: https://github.com/Asa12138/MetaNet/issues
 URL: https://github.com/Asa12138/MetaNet

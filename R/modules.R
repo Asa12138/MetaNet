@@ -162,7 +162,7 @@ combine_n_module <- function(go_m, module_number = 5) {
 #' @export
 #' @return metanet with modules
 to_module_net <- function(go) {
-    if (!"module" %in% vertex_attr_names(go)) stop("no modules, please `modu_dect()` first")
+    if (!"module" %in% vertex_attr_names(go)) stop("no 'module', please `modu_dect()` first or set the V(net)$module.")
     go <- anno_edge(go, get_v(go)[, c("name", "module")])
     tmp_e <- igraph::edge.attributes(go)
     E(go)$e_type <- ifelse(tmp_e$module_from == tmp_e$module_to, "intra-module", "inter-module")

@@ -8,6 +8,7 @@
 g_lay(
   go,
   group = "module",
+  group_order = NULL,
   layout1 = in_circle(),
   zoom1 = 20,
   layout2 = in_circle(),
@@ -16,12 +17,14 @@ g_lay(
   ...
 )
 
-g_lay_nice(go, group = "module")
+g_lay_nice(go, group = "module", mode = "circlepack", ...)
 }
 \arguments{
 \item{go}{igraph or metanet}
 
 \item{group}{group name (default: module)}
+
+\item{group_order}{group_order}
 
 \item{layout1}{layout1 method, one of
 (1) a dataframe or matrix: rowname is group, two columns are X and Y
@@ -36,6 +39,8 @@ g_lay_nice(go, group = "module")
 \item{show_big_lay}{show the big layout to help you adjust.}
 
 \item{...}{add}
+
+\item{mode}{circlepack, treemap, backbone, stress}
 }
 \value{
 coors
@@ -49,9 +54,13 @@ Layout with group nicely
 \donttest{
 data("c_net")
 modu_dect(co_net, method = "cluster_fast_greedy") -> co_net_modu
-g_lay(co_net_modu, group = "module", zoom1 = 30, zoom2 = 1:5, layout2 = as_line()) -> oridata
+g_lay(co_net_modu, group = "module", zoom1 = 30, zoom2 = "auto", layout2 = as_line()) -> oridata
 plot(co_net_modu, coors = oridata)
-g_lay_nice(co_net_modu, group = "module") -> oridata
-plot(co_net_modu, coors = oridata)
+}
+\donttest{
+data("c_net")
+modu_dect(co_net, method = "cluster_fast_greedy") -> co_net_modu
+plot(co_net_modu, coors = g_lay_nice(co_net_modu, group = "module"))
+plot(co_net_modu, coors = g_lay_nice(co_net_modu, group = "module", mode= "treemap"))
 }
 }

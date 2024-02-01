@@ -286,6 +286,22 @@ c_net_update <- function(go, node_break = 5, edge_break = 5) {
     return(go)
 }
 
+
+#' Clean a igraph object
+#'
+#' @param go igraph, metanet objects
+#' @param direct direct?
+#'
+#' @return a igraph object
+#' @export
+clean_igraph = function(go,direct=TRUE){
+    stopifnot(inherits(go, "igraph"))
+    go <- igraph::graph_from_data_frame(d = get_e(go)[,c("from","to")],
+                                        directed = direct,
+                                        vertices = get_v(go)["name"])
+    go
+}
+
 #' @export
 assign("as.metanet", c_net_update, envir = asNamespace(packageName()))
 
@@ -468,7 +484,7 @@ condance <- \(aa){
             return(tmp[length(tmp)])
         })
     } else {
-        res <- aa[, length(aa)]
+        res <- aa[, length(aa), drop = TRUE]
     }
     res
 }
@@ -536,6 +552,7 @@ is_metanet <- function(go) {
 #' @return data.frame
 #' @export
 get_v <- function(go) {
+    if(is.null(V(go)$name))V(go)$name=V(go)
     as.data.frame(igraph::vertex.attributes(go))
 }
 
@@ -1074,7 +1091,7 @@ get_sse <- \(ev.spacing){
 #' @rdname RMT_threshold
 rmt <- function(occor.r, min_threshold = 0.5, max_threshold = 0.85, step = 0.01) {
     if (inherits(occor.r, "corr")) occor.r <- occor.r$r
-    lib_ps("ggplot2", library = FALSE)
+    lib_ps("ggplot2", "rlang", library = FALSE)
     NNSD <- \(x)abs(diff(x))
 
     s <- seq(0, 3, 0.1)

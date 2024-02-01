@@ -1,3 +1,11 @@
+<!-- badges: start -->
+[![](https://img.shields.io/badge/blog-@asa-blue.svg)](https://asa-blog.netlify.app/)
+[![](https://www.r-pkg.org/badges/version/MetaNet?color=green)](https://CRAN.R-project.org/package=MetaNet)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/MetaNet)](https://cran.r-project.org/package=MetaNet)
+[![](http://cranlogs.r-pkg.org/badges/last-month/MetaNet)](https://cran.r-project.org/package=MetaNet)
+[![](https://img.shields.io/badge/devel%20version-0.1.3-green.svg)](https://github.com/Asa12138/MetaNet)
+<!-- badges: end -->
+
 # MetaNet: Network analysis for multi-omics
 
 ## Install

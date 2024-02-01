@@ -3,11 +3,13 @@
 \name{g_lay_polygon}
 \alias{g_lay_polygon}
 \alias{g_lay_polyarc}
+\alias{g_lay_polycircle}
 \title{Layout with group as a polygon}
 \usage{
 g_lay_polygon(
   go,
   group = "v_group",
+  group_order = NULL,
   group2 = NULL,
   group2_order = NULL,
   line_curved = 0.5
@@ -16,9 +18,19 @@ g_lay_polygon(
 g_lay_polyarc(
   go,
   group = "v_group",
+  group_order = NULL,
   group2 = NULL,
   group2_order = NULL,
-  space = pi/4
+  space = pi/4,
+  scale_node_num = TRUE
+)
+
+g_lay_polycircle(
+  go,
+  group = "v_group",
+  group_order = NULL,
+  group2 = NULL,
+  group2_order = NULL
 )
 }
 \arguments{
@@ -26,13 +38,17 @@ g_lay_polyarc(
 
 \item{group}{group name (default:v_group)}
 
-\item{group2}{group2 name, will order nodes in each group according to group2_order (default:v_class)}
+\item{group_order}{group_order}
+
+\item{group2}{group2 name, will order nodes in each group according to group2_order}
 
 \item{group2_order}{group2_order}
 
 \item{line_curved}{line_curved 0~1}
 
 \item{space}{the space between each arc, default: pi/4}
+
+\item{scale_node_num}{scale with the node number in each group}
 }
 \value{
 coors
@@ -41,10 +57,14 @@ coors
 Layout with group as a polygon
 
 Layout with group as a polyarc
+
+Layout with group as a polyarc
 }
 \examples{
 g_lay_polygon(multi1) -> oridata
 c_net_plot(multi1, oridata)
-g_lay_polyarc(multi1, group2_order = c(LETTERS[4:1])) -> oridata
+g_lay_polyarc(multi1, group2 = "v_class", group2_order = c(LETTERS[4:1])) -> oridata
 c_net_plot(multi1, oridata)
+g_lay_polycircle(co_net2, group2 = "v_class") -> oridata
+c_net_plot(co_net2,oridata)
 }

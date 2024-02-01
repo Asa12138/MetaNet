@@ -10,13 +10,18 @@ c_net_lay(
   order_by = NULL,
   order_ls = NULL,
   seed = 1234,
-  line_curved = 1
+  line_curved = 0.5,
+  ...
 )
 }
 \arguments{
 \item{go}{igraph or metanet}
 
-\item{method}{as_star(), as_tree(), in_circle(), nicely(), on_grid(), on_sphere(),randomly(), with_dh(), with_fr(), with_gem(), with_graphopt(), with_kk(),with_lgl(), with_mds(),as_line(), as_arc(), as_polygon(), as_polyarc(). see \code{\link[igraph]{layout_}}.}
+\item{method}{(1) as_line(), as_arc(), as_polygon(), as_polyarc(), as_polycircle(), as_circle_tree();
+(2) as_star(), as_tree(), in_circle(), nicely(), on_grid(), on_sphere(),randomly(), with_dh(), with_fr(), with_gem(), with_graphopt(), with_kk(),with_lgl(), with_mds(),. see \code{\link[igraph]{layout_}};
+(3) a character, "auto","backbone","centrality","circlepack","dendrogram",
+"eigen","focus","hive","igraph","linear","manual","matrix",
+"partition","pmds","stress","treemap","unrooted. see \code{\link[ggraph]{create_layout}}}
 
 \item{order_by}{order nodes according to a node attribute}
 
@@ -25,9 +30,11 @@ c_net_lay(
 \item{seed}{random seed}
 
 \item{line_curved}{consider line curved, only for some layout methods like as_line(), as_polygon().default:0}
+
+\item{...}{add}
 }
 \value{
-coordinates for nodes,columns: name, X, Y
+coors object: coordinates for nodes, columns: name, X, Y; curved for edges, columns: from, to, curved;
 }
 \description{
 Layout coordinates
