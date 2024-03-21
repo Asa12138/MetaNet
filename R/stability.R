@@ -30,6 +30,7 @@
 #'
 #' module_detect(co_net) -> co_net_modu
 #' zp_analyse(co_net_modu, mode = 2) -> co_net_modu
+#'
 #' c_net_stability(co_net_modu, mode = "robustness", keystone = TRUE) -> robustness_res
 #' plot(robustness_res)
 #' }
@@ -414,8 +415,10 @@ plot.robustness <- function(x, indexes = "Node_number", ...) {
 #' data("otutab", package = "pcutils")
 #' # set reps at least 99 when you run.
 #' Cohesion(otutab[1:50, ], reps = 19) -> cohesion_res
+#' if(requireNamespace("ggpubr")) {
 #' plot(cohesion_res, group = "Group", metadata = metadata, mode = 1)
 #' plot(cohesion_res, group = "Group", metadata = metadata, mode = 2)
+#' }
 #' }
 Cohesion <- function(otutab, reps = 200, threads = 1, mycor = NULL, verbose = TRUE) {
   i <- NULL

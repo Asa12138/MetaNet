@@ -75,6 +75,7 @@ plot(robustness_res)
 
 module_detect(co_net) -> co_net_modu
 zp_analyse(co_net_modu, mode = 2) -> co_net_modu
+
 c_net_stability(co_net_modu, mode = "robustness", keystone = TRUE) -> robustness_res
 plot(robustness_res)
 }

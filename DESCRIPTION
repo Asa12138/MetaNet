@@ -50,7 +50,8 @@ Suggests:
     ggpmisc,
     ggtree,
     treeio,
-    circlize
+    circlize,
+    ggpubr
 VignetteBuilder: knitr
 BugReports: https://github.com/Asa12138/MetaNet/issues
 URL: https://github.com/Asa12138/MetaNet
