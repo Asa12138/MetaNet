@@ -386,9 +386,11 @@ skeleton_plot <- function(ske_net, ...) {
 #' @export
 #' @family topological
 #' @examples
-#' links_stat(co_net, topN = 10)
-#' module_detect(co_net) -> co_net_modu
-#' links_stat(co_net_modu, group = "module")
+#' if (requireNamespace("circlize")) {
+#'   links_stat(co_net, topN = 10)
+#'   module_detect(co_net) -> co_net_modu
+#'   links_stat(co_net_modu, group = "module")
+#' }
 links_stat <- function(go, group = "v_class", e_type = "all", topN = 6, colors = NULL,
                        legend_number = FALSE, legend = TRUE, legend_cex = 1,
                        legend_position = c(left_leg_x = -1.6, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1),

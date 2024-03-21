@@ -52,9 +52,11 @@ plot
 Link summary of the network
 }
 \examples{
-links_stat(co_net, topN = 10)
-module_detect(co_net) -> co_net_modu
-links_stat(co_net_modu, group = "module")
+if (requireNamespace("circlize")) {
+  links_stat(co_net, topN = 10)
+  module_detect(co_net) -> co_net_modu
+  links_stat(co_net_modu, group = "module")
+}
 }
 \seealso{
 Other topological: 

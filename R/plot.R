@@ -547,7 +547,7 @@ g_layout_nice <- function(go, group = "module", mode = "circlepack", ...) {
 #' cbind(taxonomy, num = rowSums(otutab))[1:20, ] -> test
 #' df2net_tree(test) -> ttt
 #' plot(ttt)
-#' if(requireNamespace("ggraph")) plot(ttt, coors = as_circle_tree())
+#' if (requireNamespace("ggraph")) plot(ttt, coors = as_circle_tree())
 df2net_tree <- function(test, fun = sum) {
   flag <- FALSE
   if (!is.numeric(test[, ncol(test)])) {

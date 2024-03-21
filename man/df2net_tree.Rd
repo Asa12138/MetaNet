@@ -22,5 +22,5 @@ data("otutab", package = "pcutils")
 cbind(taxonomy, num = rowSums(otutab))[1:20, ] -> test
 df2net_tree(test) -> ttt
 plot(ttt)
-if(requireNamespace("ggraph")) plot(ttt, coors = as_circle_tree())
+if (requireNamespace("ggraph")) plot(ttt, coors = as_circle_tree())
 }
