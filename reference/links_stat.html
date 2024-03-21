@@ -183,13 +183,12 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">links_stat</span><span class="op">(</span><span class="va">co_net</span>, topN <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in lib_ps("circlize", library = FALSE):</span> exit, because some packages need to be installed:</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> 1. circlize</span>
-<span class="r-in"><span><span class="fu"><a href="module_detect.html">module_detect</a></span><span class="op">(</span><span class="va">co_net</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">co_net_modu</span></span></span>
-<span class="r-in"><span><span class="fu">links_stat</span><span class="op">(</span><span class="va">co_net_modu</span>, group <span class="op">=</span> <span class="st">"module"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in lib_ps("circlize", library = FALSE):</span> exit, because some packages need to be installed:</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> 1. circlize</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"circlize"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu">links_stat</span><span class="op">(</span><span class="va">co_net</span>, topN <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="module_detect.html">module_detect</a></span><span class="op">(</span><span class="va">co_net</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">co_net_modu</span></span></span>
+<span class="r-in"><span>  <span class="fu">links_stat</span><span class="op">(</span><span class="va">co_net_modu</span>, group <span class="op">=</span> <span class="st">"module"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: circlize</span>
 </code></pre></div>
     </div>
   </div>
