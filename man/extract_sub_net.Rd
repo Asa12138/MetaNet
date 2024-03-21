@@ -5,7 +5,7 @@
 \title{Extract sub-network from the whole network}
 \usage{
 extract_sub_net(
-  a_net,
+  whole_net,
   otutab,
   threads = 1,
   save_net = FALSE,
@@ -14,7 +14,7 @@ extract_sub_net(
 )
 }
 \arguments{
-\item{a_net}{the whole network}
+\item{whole_net}{the whole network}
 
 \item{otutab}{otutab, these columns will be extract}
 
@@ -36,3 +36,15 @@ Extract sub-network from the whole network
 data(otutab, package = "pcutils")
 extract_sub_net(co_net, otutab) -> sub_net_pars
 }
+\seealso{
+Other topological: 
+\code{\link{fit_power}()},
+\code{\link{get_group_skeleton}()},
+\code{\link{links_stat}()},
+\code{\link{nc}()},
+\code{\link{net_par}()},
+\code{\link{rand_net_par}()},
+\code{\link{rand_net}()},
+\code{\link{smallworldness}()}
+}
+\concept{topological}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculate.R
 \name{check_tabs}
 \alias{check_tabs}
-\title{Check tables}
+\title{Check tables and extract common samples}
 \usage{
 check_tabs(...)
 }
@@ -10,10 +10,10 @@ check_tabs(...)
 \item{...}{tables}
 }
 \value{
-format tables
+formatted tables
 }
 \description{
-A short description...
+Check tables and extract common samples
 }
 \examples{
 data("otutab", package = "pcutils")

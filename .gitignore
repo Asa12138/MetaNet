@@ -39,22 +39,5 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-RMT_temp/
-net_res/
-MetaNet_tutorial.Rmd
-
-*.corr
-*.csv
 .DS_Store
-*.graphml
-*.pdf
-*.jpg
-*.svg
-*.png
-*.gif
-test/
-temp*
-*.docx
-article
-article/
-inst/doc
+docs

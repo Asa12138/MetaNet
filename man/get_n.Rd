@@ -4,10 +4,12 @@
 \alias{get_n}
 \title{Get network information}
 \usage{
-get_n(go, simple = FALSE)
+get_n(go, name = NULL, simple = FALSE)
 }
 \arguments{
-\item{go}{metanet}
+\item{go}{metanet object}
+
+\item{name}{attribute name, default: NULL}
 
 \item{simple}{logical, get simple index}
 }
@@ -17,3 +19,16 @@ data.frame
 \description{
 Get network information
 }
+\seealso{
+Other manipulate: 
+\code{\link{anno_edge}()},
+\code{\link{anno_vertex}()},
+\code{\link{c_net_annotate}()},
+\code{\link{c_net_filter}()},
+\code{\link{c_net_save}()},
+\code{\link{c_net_union}()},
+\code{\link{get_e}()},
+\code{\link{get_v}()},
+\code{\link{is_metanet}()}
+}
+\concept{manipulate}

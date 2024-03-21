@@ -15,3 +15,14 @@ list contains the igraph object and coordinates
 \description{
 Input a graphml file exported by Gephi
 }
+\seealso{
+Other plot: 
+\code{\link{as.ggig}()},
+\code{\link{c_net_plot}()},
+\code{\link{netD3plot}()},
+\code{\link{olympic_rings_net}()},
+\code{\link{plot.ggig}()},
+\code{\link{twocol_edgelist}()},
+\code{\link{venn_net}()}
+}
+\concept{plot}

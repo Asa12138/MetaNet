@@ -46,7 +46,20 @@ Plot the expression of each modules
 data("otutab", package = "pcutils")
 t(otutab) -> totu
 data("c_net")
-modu_dect(co_net, n_node_in_module = 30) -> co_net_modu
+module_detect(co_net, n_node_in_module = 30) -> co_net_modu
 module_eigen(co_net_modu, totu) -> co_net_modu
 module_expression(co_net_modu, totu)
 }
+\seealso{
+Other module: 
+\code{\link{filter_n_module}()},
+\code{\link{get_community}()},
+\code{\link{get_module_eigen}()},
+\code{\link{get_module}()},
+\code{\link{module_detect}()},
+\code{\link{module_net}()},
+\code{\link{summary_module}()},
+\code{\link{to_module_net}()},
+\code{\link{zp_analyse}()}
+}
+\concept{module}

@@ -1,0 +1,38 @@
+url: ~
+template:
+  params:
+    bootswatch: cosmo
+    docsearch:
+      api_key: 599cec31baffa4868cae4e79f180729b
+      index_name: docsearch
+
+navbar:
+  title: "MetaNet"
+  left:
+    - icon: fa-home fa-lg
+      href: index.html
+    - text: "Vignettes"
+      href: articles/index.html
+    - text: "Functions"
+      href: reference/index.html
+    - text: "News"
+      href: news/index.html
+    - text: "Other Packages"
+      menu:
+        - text: "pcutils"
+          href: https://asa12138.github.io/pcutils
+        - text: "pctax"
+          href: https://asa12138.github.io/pctax
+        - text: "ReporterScore"
+          href: https://asa12138.github.io/ReporterScore
+        - text: "MetaNet"
+          href: https://asa12138.github.io/MetaNet
+        - text: "iPhylo"
+          href: https://iphylo.net
+        - text: "plot4fun"
+          href: https://asa12138.github.io/plot4fun
+    - text: "Asa_web"
+      href: https://asa12138.github.io/
+  right:
+   - icon: fa-github
+     href: https://github.com/Asa12138/MetaNet

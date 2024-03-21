@@ -7,19 +7,27 @@
 p.adjust.table(pp, method = "BH", mode = "all")
 }
 \arguments{
-\item{pp}{table}
+\item{pp}{table of p-values}
 
-\item{method}{see \code{\link[stats]{p.adjust}}}
+\item{method}{see \code{\link[stats]{p.adjust}}, default: "BH".}
 
-\item{mode}{"all" for all values; "rows" adjust each row one by one; "columns" adjust each column one by one.}
+\item{mode}{"all" for all values; "rows" adjust each row one by one; "columns" adjust each column one by one. Default: "all".}
 }
 \value{
-matrix
+a table of adjusted p-values
 }
 \description{
 p.adjust apply on a correlation table (matrix or data.frame)
 }
 \examples{
 matrix(abs(rnorm(100, 0.01, 0.1)), 10, 10) -> pp
-p.adjust.table(pp)
+p.adjust.table(pp, method = "BH", mode = "all") -> pp_adj
 }
+\seealso{
+Other calculate: 
+\code{\link{c_net_calculate}()},
+\code{\link{cal_sim}()},
+\code{\link{fast_cor}()},
+\code{\link{input_corr}()}
+}
+\concept{calculate}

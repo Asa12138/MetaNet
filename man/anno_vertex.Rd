@@ -3,23 +3,38 @@
 \name{anno_vertex}
 \alias{anno_vertex}
 \alias{anno_node}
-\title{Use data.frame to annotate vertexes of an igraph}
+\title{Use data.frame to annotate vertexes of metanet}
 \usage{
-anno_vertex(go, anno_tab)
+anno_vertex(go, anno_tab, verbose = TRUE)
 }
 \arguments{
-\item{go}{metanet an igraph object}
+\item{go}{metanet object}
 
-\item{anno_tab}{a dataframe using to annotate (with rowname or a name column)}
+\item{anno_tab}{a dataframe using to annotate (with rowname or a "name" column)}
+
+\item{verbose}{logical}
 }
 \value{
-a annotated igraph object
+a annotated metanet object
 }
 \description{
-Use data.frame to annotate vertexes of an igraph
+Use data.frame to annotate vertexes of metanet
 }
 \examples{
 data("c_net")
 data("otutab", package = "pcutils")
 anno_vertex(co_net, taxonomy)
 }
+\seealso{
+Other manipulate: 
+\code{\link{anno_edge}()},
+\code{\link{c_net_annotate}()},
+\code{\link{c_net_filter}()},
+\code{\link{c_net_save}()},
+\code{\link{c_net_union}()},
+\code{\link{get_e}()},
+\code{\link{get_n}()},
+\code{\link{get_v}()},
+\code{\link{is_metanet}()}
+}
+\concept{manipulate}

@@ -20,6 +20,20 @@ D3 plot
 plot use networkD3
 }
 \examples{
+data("c_net")
 plot(co_net2)
-netD3plot(co_net2)
+if (requireNamespace("networkD3")) {
+  netD3plot(co_net2)
 }
+}
+\seealso{
+Other plot: 
+\code{\link{as.ggig}()},
+\code{\link{c_net_plot}()},
+\code{\link{input_gephi}()},
+\code{\link{olympic_rings_net}()},
+\code{\link{plot.ggig}()},
+\code{\link{twocol_edgelist}()},
+\code{\link{venn_net}()}
+}
+\concept{plot}

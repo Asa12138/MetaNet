@@ -3,9 +3,9 @@
 \name{Cohesion}
 \alias{Cohesion}
 \alias{plot.cohesion}
-\title{Cohesion calculate}
+\title{Cohesion calculation}
 \usage{
-Cohesion(otutab, reps = 200, threads = 1, mycor = NULL)
+Cohesion(otutab, reps = 200, threads = 1, mycor = NULL, verbose = TRUE)
 
 \method{plot}{cohesion}(x, group, metadata, mode = 1, ...)
 }
@@ -17,6 +17,8 @@ Cohesion(otutab, reps = 200, threads = 1, mycor = NULL)
 \item{threads}{threads}
 
 \item{mycor}{a correlation matrix you want to use, skip the null model build when mycor is not NULL, default: NULL}
+
+\item{verbose}{verbose}
 
 \item{x}{\code{Cohesion()} result (cohesion object)}
 
@@ -34,7 +36,7 @@ Cohesion object: a list with two dataframe
 a ggplot
 }
 \description{
-Cohesion calculate
+Cohesion calculation
 
 Plot cohesion
 }
@@ -48,7 +50,5 @@ plot(cohesion_res, group = "Group", metadata = metadata, mode = 2)
 }
 }
 \references{
-\enumerate{
-\item Herren, C. M. & McMahon, K. Cohesion: a method for quantifying the connectivity of microbial communities. (2017) doi:10.1038/ismej.2017.91.
-}
+Herren, C. M. & McMahon, K. (2017) Cohesion: a method for quantifying the connectivity of microbial communities. doi:10.1038/ismej.2017.91.
 }

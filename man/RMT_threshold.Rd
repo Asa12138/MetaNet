@@ -46,18 +46,13 @@ Get RMT threshold for a correlation matrix roughly
 \donttest{
 data(otutab, package = "pcutils")
 t(otutab) -> totu
-c_net_cal(totu) -> corr
+c_net_calculate(totu) -> corr
 rmt(corr)
 # recommend: 0.69
-c_net_build(corr, r_thres = 0.69) -> co_net_rmt
+c_net_build(corr, r_threshold = 0.69) -> co_net_rmt
 }
 }
 \references{
-\enumerate{
-\item J. Zhou, Y. Deng, FALSE. Luo, Z. He, Q. Tu, X. Zhi, Functional Molecular Ecological Networks (2010), doi:10.1128/mBio.00169-10.
-}
-
-\enumerate{
-\item \code{https://matstat.org/content_en/RMT/RMThreshold_Intro.pdf}
-}
+J. Zhou, Y. Deng, FALSE. Luo, Z. He, Q. Tu, X. Zhi, (2010) Functional Molecular Ecological Networks, doi:10.1128/mBio.00169-10.
+\url{https://matstat.org/content_en/RMT/RMThreshold_Intro.pdf}
 }

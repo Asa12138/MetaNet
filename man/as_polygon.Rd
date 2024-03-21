@@ -20,3 +20,13 @@ Layout as a polygon
 \examples{
 as_polygon()(co_net)
 }
+\seealso{
+Other layout: 
+\code{\link{as_arc}()},
+\code{\link{as_circle_tree}()},
+\code{\link{as_line}()},
+\code{\link{as_polyarc}()},
+\code{\link{as_polycircle}()},
+\code{\link{c_net_layout}()}
+}
+\concept{layout}

@@ -20,3 +20,15 @@ Fit power-law distribution for an igraph
 \examples{
 fit_power(co_net)
 }
+\seealso{
+Other topological: 
+\code{\link{extract_sub_net}()},
+\code{\link{get_group_skeleton}()},
+\code{\link{links_stat}()},
+\code{\link{nc}()},
+\code{\link{net_par}()},
+\code{\link{rand_net_par}()},
+\code{\link{rand_net}()},
+\code{\link{smallworldness}()}
+}
+\concept{topological}

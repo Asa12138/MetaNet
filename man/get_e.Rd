@@ -4,10 +4,12 @@
 \alias{get_e}
 \title{Get edge information}
 \usage{
-get_e(go)
+get_e(go, name = NULL)
 }
 \arguments{
-\item{go}{metanet}
+\item{go}{metanet object}
+
+\item{name}{attribute name, default: NULL}
 }
 \value{
 data.frame
@@ -15,3 +17,16 @@ data.frame
 \description{
 Get edge information
 }
+\seealso{
+Other manipulate: 
+\code{\link{anno_edge}()},
+\code{\link{anno_vertex}()},
+\code{\link{c_net_annotate}()},
+\code{\link{c_net_filter}()},
+\code{\link{c_net_save}()},
+\code{\link{c_net_union}()},
+\code{\link{get_n}()},
+\code{\link{get_v}()},
+\code{\link{is_metanet}()}
+}
+\concept{manipulate}

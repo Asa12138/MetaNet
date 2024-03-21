@@ -10,7 +10,7 @@ zp_analyse(go_m, mode = 2, use_origin = TRUE)
 zp_plot(go, label = TRUE, mode = 1)
 }
 \arguments{
-\item{go_m}{igraph object after \code{modu_dect()}}
+\item{go_m}{igraph object after \code{module_detect()}}
 
 \item{mode}{plot style, 1~3}
 
@@ -32,13 +32,28 @@ Zi-Pi plot of vertexes
 }
 \examples{
 data("c_net")
-modu_dect(co_net) -> co_net_modu
+module_detect(co_net) -> co_net_modu
 zp_analyse(co_net_modu) -> co_net_modu
-zp_plot(co_net_modu)
-zp_plot(co_net_modu, mode = 3)
+if (requireNamespace("ggrepel")) {
+  zp_plot(co_net_modu)
+  zp_plot(co_net_modu, mode = 3)
+}
 }
 \references{
 \enumerate{
 \item Guimerà, R. & Amaral, L. Functional cartography of complex metabolic networks. (2005) doi:10.1038/nature03288.
 }
 }
+\seealso{
+Other module: 
+\code{\link{filter_n_module}()},
+\code{\link{get_community}()},
+\code{\link{get_module_eigen}()},
+\code{\link{get_module}()},
+\code{\link{module_detect}()},
+\code{\link{module_eigen}()},
+\code{\link{module_net}()},
+\code{\link{summary_module}()},
+\code{\link{to_module_net}()}
+}
+\concept{module}

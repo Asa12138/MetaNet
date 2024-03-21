@@ -21,3 +21,14 @@ tab <- otutab[400:485, 1:3]
 venn_net(tab) -> v_net
 plot(v_net)
 }
+\seealso{
+Other plot: 
+\code{\link{as.ggig}()},
+\code{\link{c_net_plot}()},
+\code{\link{input_gephi}()},
+\code{\link{netD3plot}()},
+\code{\link{olympic_rings_net}()},
+\code{\link{plot.ggig}()},
+\code{\link{twocol_edgelist}()}
+}
+\concept{plot}

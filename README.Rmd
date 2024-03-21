@@ -1,0 +1,76 @@
+---
+output:
+  github_document:
+    html_preview: false
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+devtools::load_all("~/Documents/R/MetaNet/MetaNet/")
+library(badger)
+```
+
+```{r include=FALSE,eval=FALSE}
+library(hexSticker)
+showtext::showtext_auto()
+
+sticker("~/Documents/R/test/icons/网络.png",
+  package = "MetaNet",
+  p_size = 30, p_color = "black", p_y = 1.4,
+  p_fontface = "bold.italic", p_family = "Comic Sans MS",
+  s_x = 1, s_y = .75, s_width = 0.4, s_height = 0.4,
+  h_fill = "#D8E2DC", h_color = "#83A98C",
+  filename = "man/figures/MetaNet.png", dpi = 300
+)
+```
+
+# MetaNet <img src="man/figures/MetaNet.png" align="right" width="120" />
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/Asa12138/MetaNet/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Asa12138/MetaNet/actions/workflows/R-CMD-check.yaml)
+`r badge_custom("blog", "@asa", "blue", "https://asa-blog.netlify.app/")`
+`r badge_cran_download("MetaNet", type = "grand-total")`
+`r badge_cran_download("MetaNet", type = "last-month")`
+`r badge_cran_release("MetaNet","green")`
+`r badge_devel("Asa12138/MetaNet", color = "green")`
+<!-- badges: end -->
+
+MetaNet: Network analysis for multi-omics
+
+The HTML documentation of the latest version is available at [Github page](https://asa12138.github.io/MetaNet/).
+
+Please go to <https://asa12138.github.io/MetaNet_tutorial/> for the full vignette.
+
+## Installation
+
+You can install the released version of `MetaNet` from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("MetaNet")
+```
+
+You can install the development version of `MetaNet` from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("Asa12138/MetaNet")
+```
+
+## Citation
+
+Please cite:
+
+Chen Peng (2023). MetaNet: Network Analysis for Omics Data. _R package_, <https://github.com/Asa12138/MetaNet>.
+
+## Need helps?
+
+If you have questions/issues, please visit [MetaNet homepage](https://github.com/Asa12138/MetaNet) first. Your problems are mostly documented.
+
+If you think you found a bug, please post on [github issue](https://github.com/Asa12138/MetaNet/issues).

@@ -120,3 +120,14 @@ c_net_plot(co_net)
 c_net_plot(co_net2)
 c_net_plot(multi1)
 }
+\seealso{
+Other plot: 
+\code{\link{as.ggig}()},
+\code{\link{input_gephi}()},
+\code{\link{netD3plot}()},
+\code{\link{olympic_rings_net}()},
+\code{\link{plot.ggig}()},
+\code{\link{twocol_edgelist}()},
+\code{\link{venn_net}()}
+}
+\concept{plot}

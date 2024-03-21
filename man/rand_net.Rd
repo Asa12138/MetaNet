@@ -18,3 +18,15 @@ Degree distribution comparison with random network
 \examples{
 rand_net(co_net)
 }
+\seealso{
+Other topological: 
+\code{\link{extract_sub_net}()},
+\code{\link{fit_power}()},
+\code{\link{get_group_skeleton}()},
+\code{\link{links_stat}()},
+\code{\link{nc}()},
+\code{\link{net_par}()},
+\code{\link{rand_net_par}()},
+\code{\link{smallworldness}()}
+}
+\concept{topological}

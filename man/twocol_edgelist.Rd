@@ -17,10 +17,21 @@ Quick build a metanet from two columns table
 }
 \examples{
 twocol <- data.frame(
-    "col1" = sample(letters, 30, replace = TRUE),
-    "col2" = sample(c("A", "B"), 30, replace = TRUE)
+  "col1" = sample(letters, 30, replace = TRUE),
+  "col2" = sample(c("A", "B"), 30, replace = TRUE)
 )
 twocol_net <- twocol_edgelist(twocol)
 plot(twocol_net)
-c_net_plot(twocol_net, g_lay_polygon(twocol_net))
+c_net_plot(twocol_net, g_layout_polygon(twocol_net))
 }
+\seealso{
+Other plot: 
+\code{\link{as.ggig}()},
+\code{\link{c_net_plot}()},
+\code{\link{input_gephi}()},
+\code{\link{netD3plot}()},
+\code{\link{olympic_rings_net}()},
+\code{\link{plot.ggig}()},
+\code{\link{venn_net}()}
+}
+\concept{plot}

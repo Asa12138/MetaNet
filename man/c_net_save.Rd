@@ -19,3 +19,16 @@ No value
 \description{
 Save network file
 }
+\seealso{
+Other manipulate: 
+\code{\link{anno_edge}()},
+\code{\link{anno_vertex}()},
+\code{\link{c_net_annotate}()},
+\code{\link{c_net_filter}()},
+\code{\link{c_net_union}()},
+\code{\link{get_e}()},
+\code{\link{get_n}()},
+\code{\link{get_v}()},
+\code{\link{is_metanet}()}
+}
+\concept{manipulate}

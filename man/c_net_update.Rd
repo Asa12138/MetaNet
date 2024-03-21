@@ -3,12 +3,12 @@
 \name{c_net_update}
 \alias{c_net_update}
 \alias{as.metanet}
-\title{Update a metanet}
+\title{Update a metanet object or transform igraph object to metanet object}
 \usage{
 c_net_update(go, node_break = 5, edge_break = 5)
 }
 \arguments{
-\item{go}{metanet metanet object}
+\item{go}{a metanet object or igraph object}
 
 \item{node_break}{node_break if v_class is numeric, default: 5}
 
@@ -18,5 +18,13 @@ c_net_update(go, node_break = 5, edge_break = 5)
 metanet
 }
 \description{
-Update a metanet
+Update a metanet object or transform igraph object to metanet object
 }
+\seealso{
+Other build: 
+\code{\link{c_net_build}()},
+\code{\link{c_net_from_edgelist}()},
+\code{\link{c_net_set}()},
+\code{\link{multi_net_build}()}
+}
+\concept{build}

@@ -21,3 +21,15 @@ igraph::make_ring(10) \%>\% nc()
 \references{
 \code{`nc` in `ggClusterNet`}
 }
+\seealso{
+Other topological: 
+\code{\link{extract_sub_net}()},
+\code{\link{fit_power}()},
+\code{\link{get_group_skeleton}()},
+\code{\link{links_stat}()},
+\code{\link{net_par}()},
+\code{\link{rand_net_par}()},
+\code{\link{rand_net}()},
+\code{\link{smallworldness}()}
+}
+\concept{topological}

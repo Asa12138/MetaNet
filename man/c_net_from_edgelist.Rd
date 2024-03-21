@@ -32,5 +32,14 @@ Construct a network from edge_list dataframe
 \examples{
 data(edgelist)
 edge_net <- c_net_from_edgelist(arc_count, vertex = arc_taxonomy)
+edge_net <- c_net_set(edge_net, vertex_class = "Phylum", edge_width = "n")
 c_net_plot(edge_net)
 }
+\seealso{
+Other build: 
+\code{\link{c_net_build}()},
+\code{\link{c_net_set}()},
+\code{\link{c_net_update}()},
+\code{\link{multi_net_build}()}
+}
+\concept{build}

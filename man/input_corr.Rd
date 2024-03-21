@@ -10,11 +10,16 @@ input_corr(filename)
 \item{filename}{filename of .corr}
 }
 \value{
-a list with 7 elements:
-\item{r}{default: spearman correlation}
-\item{p.value}{default: p-value of spearman correlation}
-\item{p.adjust}{default p.adjust.method = NULL}
+a corr object
 }
 \description{
 Import corr from .csv file
 }
+\seealso{
+Other calculate: 
+\code{\link{c_net_calculate}()},
+\code{\link{cal_sim}()},
+\code{\link{fast_cor}()},
+\code{\link{p.adjust.table}()}
+}
+\concept{calculate}

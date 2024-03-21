@@ -19,3 +19,13 @@ Layout as a line
 as_line()(co_net)
 c_net_plot(co_net, coors = as_line(pi / 2))
 }
+\seealso{
+Other layout: 
+\code{\link{as_arc}()},
+\code{\link{as_circle_tree}()},
+\code{\link{as_polyarc}()},
+\code{\link{as_polycircle}()},
+\code{\link{as_polygon}()},
+\code{\link{c_net_layout}()}
+}
+\concept{layout}

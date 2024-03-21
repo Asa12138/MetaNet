@@ -34,3 +34,15 @@ Skeleton plot
 get_group_skeleton(co_net) -> ske_net
 skeleton_plot(ske_net)
 }
+\seealso{
+Other topological: 
+\code{\link{extract_sub_net}()},
+\code{\link{fit_power}()},
+\code{\link{links_stat}()},
+\code{\link{nc}()},
+\code{\link{net_par}()},
+\code{\link{rand_net_par}()},
+\code{\link{rand_net}()},
+\code{\link{smallworldness}()}
+}
+\concept{topological}

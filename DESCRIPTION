@@ -1,7 +1,7 @@
 Package: MetaNet
 Type: Package
 Title: Network Analysis for Omics Data
-Version: 0.1.1
+Version: 0.1.2
 Authors@R:
     person("Chen", "Peng", email ="pengchen2001@zju.edu.cn", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9449-7606"))
 Description: Comprehensive network analysis package.
@@ -22,13 +22,17 @@ Imports:
     graphics,
     dplyr,
     ggplot2 (>= 3.2.0),
+    ggnewscale,
+    ggrepel,
+    RColorBrewer,
     grDevices,
     magrittr,
     reshape2,
     stats,
     tibble,
     utils,
-    pcutils
+    pcutils (>= 0.2.5),
+    rlang
 Suggests:
     pheatmap,
     vegan,
@@ -36,22 +40,17 @@ Suggests:
     foreach,
     doSNOW,
     snow,
-    ggrepel,
-    ggpubr,
-    RColorBrewer,
     knitr,
     rmarkdown,
     prettydoc,
     Hmisc,
     gifski,
-    ggnewscale,
     ggraph,
     networkD3,
     ggpmisc,
     ggtree,
     treeio,
-    circlize,
-    rlang
+    circlize
 VignetteBuilder: knitr
 BugReports: https://github.com/Asa12138/MetaNet/issues
 URL: https://github.com/Asa12138/MetaNet

@@ -1,8 +1,14 @@
+# MetaNet v0.1.2 Notes
+
+## Fixed
+
+- fixed all issues on CRAN, submitted again <2024-03-21, Thu>
+
 # MetaNet v0.1.1 Notes
 
 ## Added
 
-- added treemap, backbone, and stress mode for `g_lay_nice()` <2024-02-02, Fri>
+- added treemap, backbone, and stress mode for `g_layout_nice()` <2024-02-02, Fri>
 - added layouts from `ggraph` to `c_net_lay()` <2024-02-02, Fri>
 - added `as_polycircle()` and `as_circle_tree()` for the graph layout. <2024-02-02, Fri>
 - added `module_label()` for `c_net_plot()`. <2024-01-19, Fri>

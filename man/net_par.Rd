@@ -3,7 +3,7 @@
 \name{net_par}
 \alias{net_par}
 \alias{c_net_index}
-\title{Calculate all indexes of a network}
+\title{Calculate all topological indexes of a network}
 \usage{
 net_par(go, mode = c("v", "e", "n", "all"), fast = TRUE)
 
@@ -16,7 +16,7 @@ c_net_index(go, force = FALSE)
 
 \item{fast}{less indexes for faster calculate ?}
 
-\item{force}{replace exist net_par}
+\item{force}{replace existed net_par}
 }
 \value{
 a 3-elements list
@@ -25,7 +25,7 @@ a 3-elements list
 \item{e_index}{indexs of each edge}
 }
 \description{
-Calculate all indexes of a network
+Calculate all topological indexes of a network
 
 Add topological indexes for a network
 }
@@ -33,3 +33,15 @@ Add topological indexes for a network
 igraph::make_graph("Walther") \%>\% net_par()
 c_net_index(co_net) -> co_net_with_par
 }
+\seealso{
+Other topological: 
+\code{\link{extract_sub_net}()},
+\code{\link{fit_power}()},
+\code{\link{get_group_skeleton}()},
+\code{\link{links_stat}()},
+\code{\link{nc}()},
+\code{\link{rand_net_par}()},
+\code{\link{rand_net}()},
+\code{\link{smallworldness}()}
+}
+\concept{topological}

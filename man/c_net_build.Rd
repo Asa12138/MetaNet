@@ -2,40 +2,48 @@
 % Please edit documentation in R/build.R
 \name{c_net_build}
 \alias{c_net_build}
-\title{Construct a network from correlation table}
+\title{Construct a metanet from a corr object}
 \usage{
 c_net_build(
   corr,
-  r_thres = 0.6,
-  p_thres = 0.05,
+  r_threshold = 0.6,
+  p_threshold = 0.05,
   use_p_adj = TRUE,
-  del_single = TRUE
+  delete_single = TRUE
 )
 }
 \arguments{
-\item{corr}{result of \code{c_net_cal}}
+\item{corr}{corr object from \code{c_net_calculate()} or \code{input_corr()}.}
 
-\item{r_thres}{r_threshold (default: >0.6)}
+\item{r_threshold}{r_threshold (default: >0.6).}
 
-\item{p_thres}{p_threshold (default: <0.05)}
+\item{p_threshold}{p_threshold (default: <0.05).}
 
-\item{use_p_adj}{use the p.adjust instead of p-value (default: TRUE)}
+\item{use_p_adj}{use the p.adjust instead of p.value (default: TRUE), if p.adjust not in the corr object, use p.value.}
 
-\item{del_single}{should delete single vertexes?}
+\item{delete_single}{should delete single vertexes?}
 }
 \value{
 an metanet object
 }
 \description{
-Construct a network from correlation table
+Construct a metanet from a corr object
 }
 \examples{
 data("otutab", package = "pcutils")
 t(otutab) -> totu
 metadata[, 3:10] -> env
-c_net_cal(totu) -> corr
-c_net_build(corr, r_thres = 0.65) -> co_net
+c_net_calculate(totu) -> corr
+c_net_build(corr, r_threshold = 0.65) -> co_net
 
-c_net_cal(totu, env) -> corr2
+c_net_calculate(totu, env) -> corr2
 c_net_build(corr2) -> co_net2
 }
+\seealso{
+Other build: 
+\code{\link{c_net_from_edgelist}()},
+\code{\link{c_net_set}()},
+\code{\link{c_net_update}()},
+\code{\link{multi_net_build}()}
+}
+\concept{build}

@@ -51,10 +51,18 @@ metadata[, 3:10] -> env
 
 data("c_net")
 co_net <- c_net_set(co_net, taxonomy, data.frame("Abundance" = colSums(totu)),
-    vertex_class = "Phylum", vertex_size = "Abundance"
+  vertex_class = "Phylum", vertex_size = "Abundance"
 )
 co_net2 <- c_net_set(co_net2, taxonomy, data.frame(name = colnames(env), env = colnames(env)),
-    vertex_class = c("Phylum", "env")
+  vertex_class = c("Phylum", "env")
 )
 co_net2 <- c_net_set(co_net2, data.frame("Abundance" = colSums(totu)), vertex_size = "Abundance")
 }
+\seealso{
+Other build: 
+\code{\link{c_net_build}()},
+\code{\link{c_net_from_edgelist}()},
+\code{\link{c_net_update}()},
+\code{\link{multi_net_build}()}
+}
+\concept{build}

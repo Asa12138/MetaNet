@@ -15,8 +15,8 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-    collapse = TRUE,
-    comment = "#>"
+  collapse = TRUE,
+  comment = "#>"
 )
 ```
 
@@ -30,13 +30,15 @@ devtools::install_github("Asa12138/MetaNet")
 
 ## Vignette
 
+The HTML documentation of the latest version is available at [Github page](https://asa12138.github.io/MetaNet/).
+
 Please go to <https://asa12138.github.io/MetaNet_tutorial/> for the full vignette.
 
 ## Citation
 
 Please cite:
 
-Chen Peng (2023). _MetaNet: Network Analysis for Multi-Omics Data_. R package, <https://github.com/Asa12138/MetaNet>.
+Chen Peng (2023). MetaNet: Network Analysis for Multi-Omics Data. _R package_, <https://github.com/Asa12138/MetaNet>.
 
 ## Need helps?
 

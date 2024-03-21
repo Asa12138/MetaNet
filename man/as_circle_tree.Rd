@@ -12,6 +12,13 @@ A two-column matrix, each row giving the coordinates of a vertex, according to t
 \description{
 Layout as a circle_tree
 }
-\examples{
-as_circle_tree()(co_net)
+\seealso{
+Other layout: 
+\code{\link{as_arc}()},
+\code{\link{as_line}()},
+\code{\link{as_polyarc}()},
+\code{\link{as_polycircle}()},
+\code{\link{as_polygon}()},
+\code{\link{c_net_layout}()}
 }
+\concept{layout}

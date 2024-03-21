@@ -15,3 +15,14 @@ Plot olympic rings using network
 \examples{
 olympic_rings_net()
 }
+\seealso{
+Other plot: 
+\code{\link{as.ggig}()},
+\code{\link{c_net_plot}()},
+\code{\link{input_gephi}()},
+\code{\link{netD3plot}()},
+\code{\link{plot.ggig}()},
+\code{\link{twocol_edgelist}()},
+\code{\link{venn_net}()}
+}
+\concept{plot}

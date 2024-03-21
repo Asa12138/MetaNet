@@ -25,8 +25,8 @@ Summaries two columns information
 }
 \examples{
 test <- data.frame(
-    a = sample(letters[1:4], 10, replace = TRUE),
-    b = sample(letters[1:4], 10, replace = TRUE)
+  a = sample(letters[1:4], 10, replace = TRUE),
+  b = sample(letters[1:4], 10, replace = TRUE)
 )
 summ_2col(test, direct = TRUE)
 summ_2col(test, direct = FALSE)

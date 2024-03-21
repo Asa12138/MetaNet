@@ -21,7 +21,7 @@ links_stat(
 )
 }
 \arguments{
-\item{go}{igraph}
+\item{go}{igraph or metanet}
 
 \item{group}{summary which group of vertex attribution in names(vertex_attr(go))}
 
@@ -53,6 +53,18 @@ Link summary of the network
 }
 \examples{
 links_stat(co_net, topN = 10)
-modu_dect(co_net) -> co_net_modu
+module_detect(co_net) -> co_net_modu
 links_stat(co_net_modu, group = "module")
 }
+\seealso{
+Other topological: 
+\code{\link{extract_sub_net}()},
+\code{\link{fit_power}()},
+\code{\link{get_group_skeleton}()},
+\code{\link{nc}()},
+\code{\link{net_par}()},
+\code{\link{rand_net_par}()},
+\code{\link{rand_net}()},
+\code{\link{smallworldness}()}
+}
+\concept{topological}

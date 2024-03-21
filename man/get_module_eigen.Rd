@@ -15,3 +15,16 @@ module_eigen
 \description{
 Get module_eigen
 }
+\seealso{
+Other module: 
+\code{\link{filter_n_module}()},
+\code{\link{get_community}()},
+\code{\link{get_module}()},
+\code{\link{module_detect}()},
+\code{\link{module_eigen}()},
+\code{\link{module_net}()},
+\code{\link{summary_module}()},
+\code{\link{to_module_net}()},
+\code{\link{zp_analyse}()}
+}
+\concept{module}

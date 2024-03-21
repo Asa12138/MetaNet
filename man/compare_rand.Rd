@@ -42,3 +42,15 @@ rand_net_par(co_net_rmt, reps = 30) -> randp
 net_par(co_net_rmt, fast = FALSE) -> pars
 compare_rand(pars, randp)
 }
+\seealso{
+Other topological: 
+\code{\link{extract_sub_net}()},
+\code{\link{fit_power}()},
+\code{\link{get_group_skeleton}()},
+\code{\link{links_stat}()},
+\code{\link{nc}()},
+\code{\link{net_par}()},
+\code{\link{rand_net}()},
+\code{\link{smallworldness}()}
+}
+\concept{topological}

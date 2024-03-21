@@ -43,9 +43,22 @@ Plot module tree
 }
 \examples{
 data("c_net")
-modu_dect(co_net) -> co_net_modu
+module_detect(co_net) -> co_net_modu
 filter_n_module(co_net_modu, n_node_in_module = 30) -> co_net_modu
-plot_module_tree(co_net_modu)
+if (requireNamespace("ggtree") && requireNamespace("treeio")) plot_module_tree(co_net_modu)
 combine_n_module(co_net_modu, 20) -> co_net_modu1
-plot_module_tree(co_net_modu1)
+if (requireNamespace("ggtree") && requireNamespace("treeio")) plot_module_tree(co_net_modu1)
 }
+\seealso{
+Other module: 
+\code{\link{get_community}()},
+\code{\link{get_module_eigen}()},
+\code{\link{get_module}()},
+\code{\link{module_detect}()},
+\code{\link{module_eigen}()},
+\code{\link{module_net}()},
+\code{\link{summary_module}()},
+\code{\link{to_module_net}()},
+\code{\link{zp_analyse}()}
+}
+\concept{module}

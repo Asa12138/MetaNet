@@ -3,20 +3,33 @@
 \name{is_metanet}
 \alias{is_metanet}
 \alias{is.metanet}
-\title{Is this object an metanet graph?}
+\title{Is this object a metanet object?}
 \usage{
 is_metanet(go)
 }
 \arguments{
-\item{go}{igraph object}
+\item{go}{a test object}
 }
 \value{
 logical
 }
 \description{
-Is this object an metanet graph?
+Is this object a metanet object?
 }
 \examples{
 data(c_net)
 is_metanet(co_net)
 }
+\seealso{
+Other manipulate: 
+\code{\link{anno_edge}()},
+\code{\link{anno_vertex}()},
+\code{\link{c_net_annotate}()},
+\code{\link{c_net_filter}()},
+\code{\link{c_net_save}()},
+\code{\link{c_net_union}()},
+\code{\link{get_e}()},
+\code{\link{get_n}()},
+\code{\link{get_v}()}
+}
+\concept{manipulate}
