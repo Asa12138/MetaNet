@@ -30,5 +30,7 @@ test <- data.frame(
 )
 summ_2col(test, direct = TRUE)
 summ_2col(test, direct = FALSE)
-summ_2col(test, direct = TRUE) \%>\% pcutils::my_circo()
+if (requireNamespace("circlize")) {
+  summ_2col(test, direct = TRUE) \%>\% pcutils::my_circo()
+}
 }

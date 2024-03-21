@@ -799,7 +799,9 @@ c_net_save <- function(go, filename = "net", format = "data.frame") {
 #' )
 #' summ_2col(test, direct = TRUE)
 #' summ_2col(test, direct = FALSE)
-#' summ_2col(test, direct = TRUE) %>% pcutils::my_circo()
+#' if (requireNamespace("circlize")) {
+#'   summ_2col(test, direct = TRUE) %>% pcutils::my_circo()
+#' }
 summ_2col <- function(df, from = 1, to = 2, count = 3, direct = FALSE) {
   if (ncol(df) < 2) stop("need at least two columns")
   if (ncol(df) == 2) {
