@@ -4,10 +4,12 @@
 \alias{rand_net}
 \title{Degree distribution comparison with random network}
 \usage{
-rand_net(go = go)
+rand_net(go = go, plot = TRUE)
 }
 \arguments{
 \item{go}{igraph object}
+
+\item{plot}{plot or not}
 }
 \value{
 ggplot
@@ -20,7 +22,7 @@ rand_net(co_net)
 }
 \seealso{
 Other topological: 
-\code{\link{extract_sub_net}()},
+\code{\link{extract_sample_net}()},
 \code{\link{fit_power}()},
 \code{\link{get_group_skeleton}()},
 \code{\link{links_stat}()},

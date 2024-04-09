@@ -29,6 +29,7 @@ Other manipulate:
 \code{\link{anno_vertex}()},
 \code{\link{c_net_annotate}()},
 \code{\link{c_net_filter}()},
+\code{\link{c_net_load}()},
 \code{\link{c_net_save}()},
 \code{\link{c_net_union}()},
 \code{\link{get_e}()},

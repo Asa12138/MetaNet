@@ -46,7 +46,7 @@ MetaNet: Network analysis for multi-omics
 
 The HTML documentation of the latest version is available at [Github page](https://asa12138.github.io/MetaNet/).
 
-Please go to <https://asa12138.github.io/MetaNet_tutorial/> for the full vignette.
+Please go to <https://bookdown.org/Asa12138/metanet_book/> for the full vignette.
 
 ## Installation
 

@@ -8,7 +8,7 @@ c_net_plot(
   go,
   coors = NULL,
   ...,
-  labels_num = 5,
+  labels_num = NULL,
   vertex_size_range = NULL,
   edge_width_range = NULL,
   plot_module = FALSE,
@@ -38,6 +38,7 @@ c_net_plot(
   lty_legend = FALSE,
   lty_legend_title = "Edge class",
   lty_legend_order = NULL,
+  params_list = NULL,
   seed = 1234
 )
 }
@@ -48,7 +49,7 @@ c_net_plot(
 
 \item{...}{additional parameters for \code{\link[igraph]{igraph.plotting}}}
 
-\item{labels_num}{show how many labels,>1 indicates number, <1 indicates fraction, "all" indicates all, default:5}
+\item{labels_num}{show how many labels, >1 indicates number, <1 indicates fraction, "all" indicates all.}
 
 \item{vertex_size_range}{the vertex size range, e.g. c(1,10)}
 
@@ -58,17 +59,17 @@ c_net_plot(
 
 \item{mark_module}{logical, mark the modules?}
 
-\item{mark_color}{mark colors}
+\item{mark_color}{mark color}
 
 \item{mark_alpha}{mark fill alpha, default 0.3}
 
-\item{module_label}{module_label}
+\item{module_label}{show module label?}
 
-\item{module_label_cex}{module_label_cex}
+\item{module_label_cex}{module label cex}
 
-\item{module_label_color}{module_label_color}
+\item{module_label_color}{module label color}
 
-\item{module_label_just}{module_label_just}
+\item{module_label_just}{module label just, default c(0.5,0.5)}
 
 \item{legend}{all legends}
 
@@ -105,6 +106,8 @@ c_net_plot(
 \item{lty_legend_title}{lty_legend_title}
 
 \item{lty_legend_order}{lty_legend_order}
+
+\item{params_list}{a list of parameters, e.g. list(edge_legend = TRUE, lty_legend = FALSE), when the parameter is duplicated, the format argument will be used rather than the argument in params_list.}
 
 \item{seed}{random seed, default:1234, make sure each plot is the same.}
 }

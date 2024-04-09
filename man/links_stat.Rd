@@ -8,14 +8,13 @@ links_stat(
   go,
   group = "v_class",
   e_type = "all",
-  topN = 6,
+  topN = 10,
   colors = NULL,
   legend_number = FALSE,
   legend = TRUE,
   legend_cex = 1,
-  legend_position = c(left_leg_x = -1.6, left_leg_y = 1, right_leg_x = 1.2, right_leg_y =
-    1),
-  col_legend_order = NULL,
+  legend_position = NULL,
+  color_legend_order = NULL,
   group_legend_title = NULL,
   group_legend_order = NULL
 )
@@ -27,7 +26,7 @@ links_stat(
 
 \item{e_type}{"positive", "negative", "all"}
 
-\item{topN}{topN of group, default:5}
+\item{topN}{topN of group, default: 10}
 
 \item{colors}{colors}
 
@@ -39,7 +38,7 @@ links_stat(
 
 \item{legend_position}{legend_position, default: c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1)}
 
-\item{col_legend_order}{col_legend_order vector,}
+\item{color_legend_order}{color_legend_order vector,}
 
 \item{group_legend_title}{group_legend_title, length must same to the numbers of v_group}
 
@@ -60,7 +59,7 @@ if (requireNamespace("circlize")) {
 }
 \seealso{
 Other topological: 
-\code{\link{extract_sub_net}()},
+\code{\link{extract_sample_net}()},
 \code{\link{fit_power}()},
 \code{\link{get_group_skeleton}()},
 \code{\link{nc}()},

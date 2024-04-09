@@ -2,7 +2,7 @@
 
 #' Construct a metanet from a corr object
 #'
-#' @param corr corr object from `c_net_calculate()` or `input_corr()`.
+#' @param corr corr object from `c_net_calculate()` or `read_corr()`.
 #' @param r_threshold r_threshold (default: >0.6).
 #' @param p_threshold p_threshold (default: <0.05).
 #' @param use_p_adj use the p.adjust instead of p.value (default: TRUE), if p.adjust not in the corr object, use p.value.
@@ -30,7 +30,7 @@ c_net_build <- function(corr, r_threshold = 0.6, p_threshold = 0.05, use_p_adj =
     stop("No r in the input corr object.")
   }
 
-  if (("p.adjust" %in% names(corr)) & use_p_adj) {
+  if (("p.adjust" %in% names(corr)) && use_p_adj) {
     occor.p <- corr$p.adjust
   } else {
     if ("p.value" %in% names(corr)) {
@@ -43,6 +43,10 @@ c_net_build <- function(corr, r_threshold = 0.6, p_threshold = 0.05, use_p_adj =
     }
   }
 
+  if (any(is.na(occor.r))) {
+    occor.r[is.na(occor.r)] <- 0
+    warning("NA values in the input corr object, set to 0.")
+  }
   occor.r[occor.p > p_threshold | abs(occor.r) < r_threshold] <- 0
 
   # make igraph
@@ -99,13 +103,15 @@ c_net_build <- function(corr, r_threshold = 0.6, p_threshold = 0.05, use_p_adj =
   # set edges width
   E(go)$width <- E(go)$weight
 
-  # set edges from_to
-  anno_edge(go, get_v(go)[, c("name", "v_group")]) -> go
+  if (!t_flag(occor.r)) {
+    # set edges from_to
+    anno_edge(go, get_v(go)[, c("name", "v_group")], verbose = FALSE) -> go
+    # set edge intra-inter
+    tmp_e <- igraph::edge.attributes(go)
+    E(go)$e_class <- ifelse(tmp_e$v_group_from == tmp_e$v_group_to, "intra", "inter")
+  }
 
-  # set edge intra-inter
-  tmp_e <- igraph::edge.attributes(go)
-  E(go)$e_class <- ifelse(tmp_e$v_group_from == tmp_e$v_group_to, "intra", "inter")
-  c_net_update(go) -> go
+  c_net_update(go, initialize = TRUE) -> go
 
   return(go)
 }
@@ -147,10 +153,13 @@ multi_net_build <- function(..., mode = "full", method = "spearman",
   tables <- check_tabs(tables)
   if (mode == "full") {
     all_totu <- do.call(cbind, tables)
-    message("Calculating ", nrow(all_totu), " samples and ", ncol(all_totu), " objects of ", length(tables), " groups.\n")
+    message("Calculating ", nrow(all_totu), " samples and ", ncol(all_totu), " features of ", length(tables), " groups.\n")
     all_corr <- c_net_calculate(all_totu, method = method, filename = filename, p.adjust.method = p.adjust.method)
 
-    c_net_build(all_corr, r_threshold = r_threshold, p_threshold = p_threshold, use_p_adj = use_p_adj, delete_single = delete_single) -> multi_net
+    c_net_build(all_corr,
+      r_threshold = r_threshold, p_threshold = p_threshold,
+      use_p_adj = use_p_adj, delete_single = delete_single
+    ) -> multi_net
 
     igraph::graph.attributes(multi_net)$n_type <- "multi_full"
 
@@ -163,11 +172,11 @@ multi_net_build <- function(..., mode = "full", method = "spearman",
     tmp_v %>% as.list() -> igraph::vertex_attr(multi_net)
 
     # set edges from_to
-    suppressMessages(anno_edge(multi_net, tmp_v[, c("name", "v_group")]) -> multi_net)
+    suppressMessages(anno_edge(multi_net, tmp_v[, c("name", "v_group")], verbose = FALSE) -> multi_net)
     # set edge intra-inter
     tmp_e <- igraph::edge.attributes(multi_net)
     E(multi_net)$e_class <- ifelse(tmp_e$v_group_from == tmp_e$v_group_to, "intra", "inter")
-    c_net_update(multi_net) -> multi_net
+    c_net_update(multi_net, initialize = TRUE, verbose = FALSE) -> multi_net
   }
   multi_net
 }
@@ -177,16 +186,22 @@ multi_net_build <- function(..., mode = "full", method = "spearman",
 #'
 #' @param go a metanet object or igraph object
 #' @param node_break node_break if v_class is numeric, default: 5
+#' @param initialize initialize?
 #' @param edge_break edge_break if e_type is numeric, default: 5
+#' @param verbose verbose?
+#'
 #' @aliases as.metanet
 #' @export
 #' @family build
 #' @return metanet
-c_net_update <- function(go, node_break = 5, edge_break = 5) {
+c_net_update <- function(go, node_break = 5, edge_break = 5, initialize = FALSE, verbose = TRUE) {
   stopifnot(inherits(go, "igraph"))
-
+  if (length(go) == 0) {
+    message("Empty graph, return empty metanet object.")
+    return(go)
+  }
   # name
-  if (!"name" %in% igraph::vertex_attr_names(go)) V(go)$name <- paste0("n", seq_len(length(go)))
+  if (!"name" %in% igraph::vertex_attr_names(go)) V(go)$name <- as.character(seq_len(length(go)))
   if (!"label" %in% igraph::vertex_attr_names(go)) V(go)$label <- V(go)$name
   get_v(go) -> tmp_v
   # v_size
@@ -198,7 +213,15 @@ c_net_update <- function(go, node_break = 5, edge_break = 5) {
     tmp_v$v_group <- "v_group1"
   }
   if ("shape" %in% colnames(tmp_v)) {
-    if (e_match(tmp_v[, c("v_group", "shape")], test = 1)) flag <- FALSE
+    if (initialize) {
+      if (e_match(tmp_v[, c("v_group", "shape")])) {
+        flag <- FALSE
+      } else if (verbose) message("'v_group' and 'shape' not match one by one, update 'shape'.")
+    } else {
+      if (e_match(tmp_v[, c("v_group", "shape")], test = 1)) {
+        flag <- FALSE
+      } else if (verbose) message("a 'v_group' should not match multiple shapes, update 'shape'.")
+    }
   }
   if (flag) tmp_v$shape <- pcutils::tidai(tmp_v$v_group, c("circle", "square"))
 
@@ -208,7 +231,15 @@ c_net_update <- function(go, node_break = 5, edge_break = 5) {
     tmp_v$v_class <- "v_class1"
   }
   if ("color" %in% colnames(tmp_v)) {
-    if (e_match(tmp_v[, c("v_group", "v_class", "color")], test = 1:2)) flag <- FALSE
+    if (initialize) {
+      if (e_match(tmp_v[, c("v_group", "v_class", "color")])) {
+        flag <- FALSE
+      } else if (verbose) message("'v_group'-'v_class' and 'color' not match one by one, update 'color'.")
+    } else {
+      if (e_match(tmp_v[, c("v_group", "v_class", "color")], test = 1:2)) {
+        flag <- FALSE
+      } else if (verbose) message("a 'v_group'-'v_class' should not match multiple colors, update 'color'.")
+    }
   }
   if (flag) {
     if (is.numeric(tmp_v$v_class)) {
@@ -222,7 +253,12 @@ c_net_update <- function(go, node_break = 5, edge_break = 5) {
       ))
     } else {
       tmp_col <- paste0(tmp_v$v_group, "-", tmp_v$v_class)
-      tmp_v$color <- pcutils::tidai(tmp_col, pcutils::get_cols(nlevels(factor(tmp_col)), "col3"), fac = TRUE)
+      default_v_color <- c(
+        "#a6bce3", "#fb9a99", "#fdbf6f", "#1f78b4", "#b2df8a",
+        "#cab2d6", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a",
+        "#F8CC00", "#b15928"
+      )
+      tmp_v$color <- pcutils::tidai(tmp_col, pcutils::get_cols(nlevels(factor(tmp_col)), default_v_color), fac = TRUE)
     }
   }
 
@@ -234,7 +270,15 @@ c_net_update <- function(go, node_break = 5, edge_break = 5) {
     E(go)$e_type <- "e_type1"
   }
   if ("color" %in% igraph::edge_attr_names(go)) {
-    if (e_match(data.frame(a = E(go)$e_type, b = E(go)$color))) flag <- FALSE
+    if (initialize) {
+      if (e_match(data.frame(a = E(go)$e_type, b = E(go)$color))) {
+        flag <- FALSE
+      } else if (verbose) message("'e_type' and 'color' not match one by one, update 'color'.")
+    } else {
+      if (e_match(data.frame(a = E(go)$e_type, b = E(go)$color), test = 1)) {
+        flag <- FALSE
+      } else if (verbose) message("a 'e_type' should not match multiple colors, update 'color'.")
+    }
   }
   if (flag) {
     if (is.numeric(E(go)$e_type)) {
@@ -250,7 +294,12 @@ c_net_update <- function(go, node_break = 5, edge_break = 5) {
       } else if (all(levels(edge.color) %in% c("inter-module", "intra-module"))) {
         ncols <- c("inter-module" = "#FA789A", "intra-module" = "#A6CEE3")
       } else {
-        ncols <- pcutils::get_cols(nlevels(edge.color), "col2")
+        default_e_color <- c(
+          "#a6cee3", "#78c679", "#c2a5cf", "#ff7f00", "#1f78b4",
+          "#810f7c", "#F8CC00", "#006d2c", "#4d4d4d", "#8c510a",
+          "#d73027", "#7f0000", "#41b6c4", "#e7298a", "#54278f"
+        )
+        ncols <- pcutils::get_cols(nlevels(edge.color), default_e_color)
       }
       E(go)$color <- pcutils::tidai(E(go)$e_type, ncols, fac = TRUE)
     }
@@ -262,7 +311,15 @@ c_net_update <- function(go, node_break = 5, edge_break = 5) {
     E(go)$e_class <- "e_class1"
   }
   if ("lty" %in% igraph::edge_attr_names(go)) {
-    if (e_match(data.frame(a = E(go)$e_class, b = E(go)$lty), test = 1)) flag <- FALSE
+    if (initialize) {
+      if (e_match(data.frame(a = E(go)$e_class, b = E(go)$lty))) {
+        flag <- FALSE
+      } else if (verbose) message("'e_class' and 'lty' not match one by one, update 'lty'.")
+    } else {
+      if (e_match(data.frame(a = E(go)$e_class, b = E(go)$lty), test = 1)) {
+        flag <- FALSE
+      } else if (verbose) message("a 'e_class' should not match multiple linetypes, update 'lty'.")
+    }
   }
   if (flag) E(go)$lty <- pcutils::tidai(E(go)$e_class, 1:4)
 
@@ -313,10 +370,11 @@ c_net_from_edgelist <- function(edgelist, vertex = NULL, direct = FALSE, e_type 
   go <- igraph::graph_from_data_frame(edgelist, directed = direct, vertices = vertex)
   if (!is.null(e_type)) E(go)$e_type <- edgelist[, e_type]
   if (!is.null(e_class)) E(go)$e_class <- edgelist[, e_class]
-  go <- c_net_update(go)
+  go <- c_net_update(go, initialize = TRUE)
   go
 }
 
+# ==========2.1 manipulate========
 
 #' Set basic attributes from totu table
 #'
@@ -350,7 +408,7 @@ c_net_from_edgelist <- function(edgelist, vertex = NULL, direct = FALSE, e_type 
 c_net_set <- function(go, ..., vertex_group = "v_group", vertex_class = "v_class", vertex_size = "size",
                       edge_type = "e_type", edge_class = "e_class", edge_width = "width", node_break = 5, edge_break = 5) {
   size <- e_class <- width <- NULL
-  c_net_update(go) -> go
+  c_net_update(go, verbose = FALSE) -> go
   name <- v_group <- v_class <- e_type <- color <- NULL
 
   # annotation vertex
@@ -389,7 +447,7 @@ c_net_set <- function(go, ..., vertex_group = "v_group", vertex_class = "v_class
     # tmp_col=c(tmp_col,`NA`=NA)
 
     # 可能某一个group用numeric做v_class，所以要分开上色
-    for (i in 1:ncol(tmp_ann)) {
+    for (i in seq_len(ncol(tmp_ann))) {
       if (is.numeric(tmp_ann[, i])) {
         tmp_color[[i]] <- as.character(cut(tmp_ann[, i],
           breaks = node_break,
@@ -427,7 +485,7 @@ c_net_set <- function(go, ..., vertex_group = "v_group", vertex_class = "v_class
     }
     # tmp_col=c(tmp_col,`NA`=NA)
 
-    for (i in 1:ncol(tmp_ann)) {
+    for (i in seq_len(ncol(tmp_ann))) {
       if (is.numeric(tmp_ann[, i])) {
         tmp_color[[i]] <- as.character(cut(tmp_ann[, i],
           breaks = edge_break,
@@ -452,11 +510,10 @@ c_net_set <- function(go, ..., vertex_group = "v_group", vertex_class = "v_class
   as.list(v_index) -> igraph::vertex.attributes(go)
   as.list(e_index) -> igraph::edge.attributes(go)
 
-  c_net_update(go) -> go
+  c_net_update(go, verbose = FALSE) -> go
   return(go)
 }
 
-# ==========2.1 manipulate========
 
 #' Is this object a metanet object?
 #'
@@ -575,6 +632,11 @@ c_net_filter <- function(go, ..., mode = "v") {
     go1 <- filter_v(go, ...)
   } else if (mode == "e") {
     go1 <- filter_e(go, ...)
+  } else {
+    stop("mode should be 'v' or 'e'")
+  }
+  if (length(V(go1)) == 0) {
+    message("The network is empty.")
   }
   go1
 }
@@ -630,7 +692,7 @@ c_net_union <- function(go1, go2) {
   go <- c_net_annotate(go, tmp_v, mode = "v")
   go <- c_net_annotate(go, tmp_e, mode = "e")
   go <- c_net_annotate(go, list(n_type = "combine_net"), mode = "n")
-  go <- c_net_update(go)
+  go <- c_net_update(go, initialize = TRUE)
   go
 }
 
@@ -775,13 +837,38 @@ c_net_save <- function(go, filename = "net", format = "data.frame") {
       write.csv(., paste0(filename, "_edges.csv"), row.names = FALSE)
   } else if (format == "graphml") {
     go <- igraph::delete_edge_attr(go, "id")
-    igraph::write.graph(go, paste0(filename, ".graphml"), format = "graphml")
+    if (!grepl("\\.graphml$", filename)) filename <- paste0(filename, ".graphml")
+    igraph::write_graph(go, filename, format = "graphml")
   } else {
-    igraph::write.graph(go, paste0(filename, ".", format), format = format)
+    if (!grepl(paste0("\\.", format), filename)) filename <- paste0(filename, ".", format)
+    igraph::write_graph(go, filename, format = format)
   }
-  print(paste0(filename, " saved sucessfully!"))
+  message(paste0(filename, " saved sucessfully!"))
 }
 
+#' Load network file
+#'
+#' @inheritParams c_net_save
+#'
+#' @return metanet
+#' @export
+#' @family manipulate
+c_net_load <- function(filename, format = "data.frame") {
+  if (format == "data.frame") {
+    nodes <- read.csv(paste0(filename, "_nodes.csv"), stringsAsFactors = FALSE)
+    edges <- read.csv(paste0(filename, "_edges.csv"), stringsAsFactors = FALSE)
+    c_net_from_edgelist(edges, nodes) -> go
+  } else if (format == "graphml") {
+    if (!grepl("\\.graphml$", filename)) filename <- paste0(filename, ".graphml")
+    igraph::read_graph(paste0(filename, ".graphml"), format = "graphml") -> go
+    go <- c_net_update(go, initialize = TRUE)
+  } else {
+    if (!grepl(paste0("\\.", format), filename)) filename <- paste0(filename, ".", format)
+    igraph::read_graph(filename, format = format) -> go
+    go <- c_net_update(go, initialize = TRUE)
+  }
+  go
+}
 
 #' Summaries two columns information
 #' @param df data.frame
@@ -1022,8 +1109,6 @@ get_sse <- \(ev.spacing){
   dens <- density(ev.spacing)
   N <- 20
   x <- seq(min(ev.spacing), max(ev.spacing), len = 1000)
-  observed <- approx(dens$x, dens$y, xout = x)$y
-  expected <- exp(-x)
   A <- exp(-min(ev.spacing)) - exp(-max(ev.spacing))
   xs <- numeric(N + 1)
   xs[1] <- min(ev.spacing)

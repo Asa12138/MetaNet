@@ -53,7 +53,7 @@ c_net_calculate(totu, env) -> corr2
 Other calculate: 
 \code{\link{cal_sim}()},
 \code{\link{fast_cor}()},
-\code{\link{input_corr}()},
-\code{\link{p.adjust.table}()}
+\code{\link{p.adjust.table}()},
+\code{\link{read_corr}()}
 }
 \concept{calculate}

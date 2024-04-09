@@ -4,14 +4,14 @@
 \alias{cal_sim}
 \title{Calculate similarity for one t(otutab)}
 \usage{
-cal_sim(totu, method = "bray", norm = FALSE)
+cal_sim(totu, totu2 = NULL, method = "bray")
 }
 \arguments{
 \item{totu}{t(otutab), row are samples, column are features.}
 
-\item{method}{Dissimilarity index, see \code{\link[vegan]{vegdist}}.}
+\item{totu2}{t(otutab) or NULL, row are samples, column are features.}
 
-\item{norm}{hellinger normalization in features (default: FALSE).}
+\item{method}{Dissimilarity index, see \code{\link[vegan]{vegdist}}.}
 }
 \value{
 similarity = 1-distance
@@ -32,7 +32,7 @@ if (requireNamespace("vegan")) {
 Other calculate: 
 \code{\link{c_net_calculate}()},
 \code{\link{fast_cor}()},
-\code{\link{input_corr}()},
-\code{\link{p.adjust.table}()}
+\code{\link{p.adjust.table}()},
+\code{\link{read_corr}()}
 }
 \concept{calculate}

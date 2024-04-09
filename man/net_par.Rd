@@ -35,7 +35,7 @@ c_net_index(co_net) -> co_net_with_par
 }
 \seealso{
 Other topological: 
-\code{\link{extract_sub_net}()},
+\code{\link{extract_sample_net}()},
 \code{\link{fit_power}()},
 \code{\link{get_group_skeleton}()},
 \code{\link{links_stat}()},

@@ -30,7 +30,7 @@ fast_cor(totu, method = "spearman") -> corr
 Other calculate: 
 \code{\link{c_net_calculate}()},
 \code{\link{cal_sim}()},
-\code{\link{input_corr}()},
-\code{\link{p.adjust.table}()}
+\code{\link{p.adjust.table}()},
+\code{\link{read_corr}()}
 }
 \concept{calculate}

@@ -5,7 +5,13 @@
 \alias{as.metanet}
 \title{Update a metanet object or transform igraph object to metanet object}
 \usage{
-c_net_update(go, node_break = 5, edge_break = 5)
+c_net_update(
+  go,
+  node_break = 5,
+  edge_break = 5,
+  initialize = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{go}{a metanet object or igraph object}
@@ -13,6 +19,10 @@ c_net_update(go, node_break = 5, edge_break = 5)
 \item{node_break}{node_break if v_class is numeric, default: 5}
 
 \item{edge_break}{edge_break if e_type is numeric, default: 5}
+
+\item{initialize}{initialize?}
+
+\item{verbose}{verbose?}
 }
 \value{
 metanet

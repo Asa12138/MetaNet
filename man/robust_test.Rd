@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{robust}(
   x,
-  indexes = c("Natural_connectivity", "Average_path_length", "Average_degree"),
+  indexes = c("Natural_connectivity", "Average_degree"),
   use_ratio = FALSE,
   mode = 1,
   ...

@@ -316,7 +316,7 @@ big_layout <- \(zoom1, layout1, nodeGroup){
 #' }
 g_layout <- function(go, group = "module", group_order = NULL, layout1 = in_circle(), zoom1 = 20, layout2 = in_circle(),
                      zoom2 = 3, show_big_layout = FALSE, ...) {
-  name <- ID <- NULL
+  name <- NULL
 
   stopifnot(is_igraph(go))
   if (!group %in% igraph::vertex_attr_names(go)) stop("no group named ", group, " !")
@@ -497,9 +497,7 @@ g_layout_polycircle <- function(go, group = "v_group", group_order = NULL, group
 #' @param ... add
 #'
 #' @export
-#'
-#' @rdname g_layout
-#'
+#' @family g_layout
 #' @examples
 #' \donttest{
 #' data("c_net")
@@ -510,7 +508,7 @@ g_layout_polycircle <- function(go, group = "v_group", group_order = NULL, group
 #' }
 #' }
 g_layout_nice <- function(go, group = "module", mode = "circlepack", ...) {
-  name <- leaf <- x <- y <- NULL
+  name <- x <- y <- NULL
   lib_ps("ggraph", library = FALSE)
   stopifnot(is_igraph(go))
 
@@ -534,47 +532,28 @@ g_layout_nice <- function(go, group = "module", mode = "circlepack", ...) {
   return(structure(list(coors = coor, curved = NULL), class = "coors"))
 }
 
-#' Transform a dataframe to a network edgelist.
-#'
-#' @param test df
-#' @param fun default: sum
-#'
-#' @return metanet
+#' @rdname g_layout_nice
 #' @export
-#'
-#' @examples
-#' data("otutab", package = "pcutils")
-#' cbind(taxonomy, num = rowSums(otutab))[1:20, ] -> test
-#' df2net_tree(test) -> ttt
-#' plot(ttt)
-#' if (requireNamespace("ggraph")) plot(ttt, coors = as_circle_tree())
-df2net_tree <- function(test, fun = sum) {
-  flag <- FALSE
-  if (!is.numeric(test[, ncol(test)])) {
-    test$num <- 1
-  } else {
-    flag <- TRUE
-    name <- colnames(test)[ncol(test)]
-  }
-  nc <- ncol(test)
-  if (nc < 3) stop("as least 3-columns dataframe")
+g_layout_circlepack <- \(go, group = "module", ...){
+  g_layout_nice(go, group = group, mode = "circlepack", ...)
+}
 
-  link <- pcutils::df2link(test, fun = fun)
+#' @rdname g_layout_nice
+#' @export
+g_layout_treemap <- \(go, group = "module", ...){
+  g_layout_nice(go, group = group, mode = "treemap", ...)
+}
 
-  nodes <- link$nodes
-  links <- link$links
-  if (flag) {
-    colnames(links)[3] <- colnames(nodes)[3] <- name
-  } else {
-    name <- "weight"
-  }
+#' @rdname g_layout_nice
+#' @export
+g_layout_backbone <- \(go, group = "module", ...){
+  g_layout_nice(go, group = group, mode = "backbone", ...)
+}
 
-  # c_net_from_edgelist(as.data.frame(links),vertex = nodes)
-  net <- igraph::graph_from_data_frame(as.data.frame(links), vertices = nodes)
-  net <- c_net_update(net)
-  net <- c_net_set(net, vertex_class = "level", vertex_size = name, edge_width = name)
-  graph_attr(net, "coors") <- c_net_layout(net, as_tree())
-  net
+#' @rdname g_layout_nice
+#' @export
+g_layout_stress <- \(go, group = "module", ...){
+  g_layout_nice(go, group = group, mode = "stress", ...)
 }
 
 # ========4.plot========
@@ -755,7 +734,14 @@ some_custom_paras <- function(tmp_v, tmp_e, ...) {
 }
 
 get_show_labels <- function(tmp_v, labels_num) {
-  name <- size <- color <- e_type <- lty <- e_class <- v_class <- shape <- NULL
+  name <- size <- NULL
+  if (is.null(labels_num)) {
+    if (nrow(tmp_v) < 20) {
+      labels_num <- "all"
+    } else {
+      labels_num <- 0
+    }
+  }
   {
     if (labels_num == "all") {
       tmp_v %>% dplyr::pull(name) -> toplabel
@@ -796,10 +782,9 @@ module_set_for_plot <- function(tmp_v, mark_module, mark_color) {
 }
 
 get_module_coors <- function(go = NULL, coors = NULL, tmp_v = NULL, ori_coors = NULL, module_label_just = c(0.5, 0.5), rescale_flag = TRUE) {
-  name <- size <- color <- e_type <- lty <- e_class <- v_class <- shape <- NULL
   X <- Y <- module <- minx <- maxx <- miny <- maxy <- NULL
   if (is.null(go)) {
-    if (is.null(tmp_v) & is.null(ori_coors)) message("input `tmp_v` and `ori_coors` when `go` is null.")
+    if (is.null(tmp_v) && is.null(ori_coors)) message("input `tmp_v` and `ori_coors` when `go` is null.")
   } else {
     tmp_v <- get_v(go)
     ori_coors <- get_coors(coors, go)
@@ -826,7 +811,7 @@ produce_c_net_legends <- function(tmp_v, tmp_e,
                                   edge_legend, edge_legend_title, edge_legend_order,
                                   width_legend, width_legend_title,
                                   lty_legend, lty_legend_title, lty_legend_order, ...) {
-  name <- size <- color <- e_type <- lty <- e_class <- v_class <- shape <- left_leg_x <- right_leg_x <- NULL
+  color <- e_type <- lty <- e_class <- v_class <- shape <- left_leg_x <- right_leg_x <- NULL
 
   legend_position_default <- c(left_leg_x = -2, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1)
 
@@ -950,18 +935,18 @@ produce_c_net_legends <- function(tmp_v, tmp_e,
 #' @param go an igraph or metanet object
 #' @param coors the coordinates you saved
 #' @param ... additional parameters for \code{\link[igraph]{igraph.plotting}}
-#' @param labels_num show how many labels,>1 indicates number, <1 indicates fraction, "all" indicates all, default:5
+#' @param labels_num show how many labels, >1 indicates number, <1 indicates fraction, "all" indicates all.
 #' @param vertex_size_range the vertex size range, e.g. c(1,10)
 #' @param edge_width_range the edge width range, e.g. c(1,10)
 #'
 #' @param plot_module logical, plot module?
 #' @param mark_module logical, mark the modules?
-#' @param mark_color mark colors
+#' @param mark_color mark color
 #' @param mark_alpha mark fill alpha, default 0.3
-#' @param module_label module_label
-#' @param module_label_cex module_label_cex
-#' @param module_label_color module_label_color
-#' @param module_label_just module_label_just
+#' @param module_label show module label?
+#' @param module_label_cex module label cex
+#' @param module_label_color module label color
+#' @param module_label_just module label just, default c(0.5,0.5)
 #'
 #' @param legend all legends
 #' @param legend_number legend with numbers
@@ -986,6 +971,7 @@ produce_c_net_legends <- function(tmp_v, tmp_e,
 #' @param lty_legend_order lty_legend_order
 #'
 #' @param seed random seed, default:1234, make sure each plot is the same.
+#' @param params_list a list of parameters, e.g. list(edge_legend = TRUE, lty_legend = FALSE), when the parameter is duplicated, the format argument will be used rather than the argument in params_list.
 #'
 #' @family plot
 #' @return a network plot
@@ -996,7 +982,7 @@ produce_c_net_legends <- function(tmp_v, tmp_e,
 #' c_net_plot(co_net)
 #' c_net_plot(co_net2)
 #' c_net_plot(multi1)
-c_net_plot <- function(go, coors = NULL, ..., labels_num = 5,
+c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
                        vertex_size_range = NULL, edge_width_range = NULL,
                        plot_module = FALSE,
                        mark_module = FALSE, mark_color = NULL, mark_alpha = 0.3,
@@ -1010,8 +996,25 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = 5,
                        edge_legend = TRUE, edge_legend_title = "Edge type", edge_legend_order = NULL,
                        width_legend = FALSE, width_legend_title = "Edge width",
                        lty_legend = FALSE, lty_legend_title = "Edge class", lty_legend_order = NULL,
+                       params_list = NULL,
                        seed = 1234) {
-  name <- size <- color <- e_type <- lty <- e_class <- v_class <- shape <- NULL
+  if (!is.null(params_list)) {
+    as.list(match.call()[-1]) -> set_params_list
+    set_params_list[["params_list"]] <- NULL
+    for (i in seq_along(params_list)) {
+      if (names(params_list)[i] %in% names(set_params_list)) {
+        message("The parameter `", names(params_list)[i], "` is duplicated, the format argument will be used.")
+      }
+    }
+    pcutils::update_param(params_list, set_params_list) -> set_params_list
+    do.call(c_net_plot, set_params_list)
+    return(invisible())
+  }
+
+  if (length(V(go)) == 0) {
+    message("The network is empty.")
+    return(invisible())
+  }
   new_modu <- module_color <- node_size_text <- edge_width_text <- NULL
   set.seed(seed)
 
@@ -1160,7 +1163,7 @@ as.ggig <- function(go, coors = NULL) {
 #' @return ggplot
 #' @exportS3Method
 #' @method plot ggig
-plot.ggig <- function(x, coors = NULL, ..., labels_num = 5,
+plot.ggig <- function(x, coors = NULL, ..., labels_num = NULL,
                       vertex_size_range = NULL, edge_width_range = NULL,
                       plot_module = FALSE,
                       mark_module = FALSE, mark_color = NULL, mark_alpha = 0.3,
@@ -1174,8 +1177,22 @@ plot.ggig <- function(x, coors = NULL, ..., labels_num = 5,
                       edge_legend = TRUE, edge_legend_title = "Edge type", edge_legend_order = NULL,
                       width_legend = FALSE, width_legend_title = "Edge width",
                       lty_legend = FALSE, lty_legend_title = "Edge class", lty_legend_order = NULL,
+                      params_list = NULL,
                       seed = 1234) {
-  rename <- size <- name <- color <- e_type <- lty <- e_class <- v_class <- shape <- X1 <- Y1 <- X2 <- Y2 <- width <- X <- Y <- label <- NULL
+  if (!is.null(params_list)) {
+    as.list(match.call()[-1]) -> set_params_list
+    set_params_list[["params_list"]] <- NULL
+    for (i in seq_along(params_list)) {
+      if (names(params_list)[i] %in% names(set_params_list)) {
+        message("The parameter `", names(params_list)[i], "` is duplicated, the format argument will be used.")
+      }
+    }
+    pcutils::update_param(params_list, set_params_list) -> set_params_list
+    do.call(c_net_plot, set_params_list)
+    return(invisible())
+  }
+
+  rename <- size <- color <- e_type <- lty <- e_class <- v_class <- shape <- X1 <- Y1 <- X2 <- Y2 <- width <- X <- Y <- label <- NULL
   edge_width_text <- NULL
 
   ggig <- x
@@ -1237,8 +1254,6 @@ plot.ggig <- function(x, coors = NULL, ..., labels_num = 5,
   }
 
   if (TRUE) {
-    pchls <- c("circle" = 21, "square" = 22)
-
     vgroups <- pcutils::change_fac_lev(tmp_v$v_group, group_legend_order)
 
     node_size_text <- c(
@@ -1360,7 +1375,7 @@ input_gephi <- function(file) {
     as.list() -> vertex.attributes(gephi)
   edge.attributes(gephi)["Edge Label"] <- edge.attributes(gephi)["id"] <- NULL
 
-  gephi <- c_net_update(gephi)
+  gephi <- c_net_update(gephi, initialize = TRUE)
   igraph::graph_attr(gephi, "coors") <- coors
   return(list(go = gephi, coors = coors))
 }
@@ -1490,6 +1505,50 @@ twocol_edgelist <- function(edgelist) {
   graph.attributes(venn_net)$n_type <- "twocol"
   # venn_net=c_net_set(venn_net,edge_type = "from")
   venn_net
+}
+
+
+#' Transform a dataframe to a network edgelist.
+#'
+#' @param test df
+#' @param fun default: sum
+#'
+#' @return metanet
+#' @export
+#'
+#' @examples
+#' data("otutab", package = "pcutils")
+#' cbind(taxonomy, num = rowSums(otutab))[1:20, ] -> test
+#' df2net_tree(test) -> ttt
+#' plot(ttt)
+#' if (requireNamespace("ggraph")) plot(ttt, coors = as_circle_tree())
+df2net_tree <- function(test, fun = sum) {
+  flag <- FALSE
+  if (!is.numeric(test[, ncol(test)])) {
+    test$num <- 1
+  } else {
+    flag <- TRUE
+    name <- colnames(test)[ncol(test)]
+  }
+  nc <- ncol(test)
+  if (nc < 3) stop("as least 3-columns dataframe")
+
+  link <- pcutils::df2link(test, fun = fun)
+
+  nodes <- link$nodes
+  links <- link$links
+  if (flag) {
+    colnames(links)[3] <- colnames(nodes)[3] <- name
+  } else {
+    name <- "weight"
+  }
+
+  # c_net_from_edgelist(as.data.frame(links),vertex = nodes)
+  net <- igraph::graph_from_data_frame(as.data.frame(links), vertices = nodes)
+  net <- c_net_update(net, initialize = TRUE)
+  net <- c_net_set(net, vertex_class = "level", vertex_size = name, edge_width = name)
+  graph_attr(net, "coors") <- c_net_layout(net, as_tree())
+  net
 }
 
 #' Plot olympic rings using network

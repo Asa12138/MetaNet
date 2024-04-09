@@ -2,7 +2,6 @@
 % Please edit documentation in R/plot.R
 \name{g_layout}
 \alias{g_layout}
-\alias{g_layout_nice}
 \title{Layout with group}
 \usage{
 g_layout(
@@ -16,11 +15,9 @@ g_layout(
   show_big_layout = FALSE,
   ...
 )
-
-g_layout_nice(go, group = "module", mode = "circlepack", ...)
 }
 \arguments{
-\item{go}{igraph or metanet}
+\item{go}{igraph or metanet object}
 
 \item{group}{group name (default: module)}
 
@@ -39,16 +36,12 @@ g_layout_nice(go, group = "module", mode = "circlepack", ...)
 \item{show_big_layout}{show the big layout to help you adjust.}
 
 \item{...}{add}
-
-\item{mode}{circlepack, treemap, backbone, stress}
 }
 \value{
 coors
 }
 \description{
 Layout with group
-
-Layout with group nicely
 }
 \examples{
 \donttest{
@@ -57,17 +50,10 @@ module_detect(co_net, method = "cluster_fast_greedy") -> co_net_modu
 g_layout(co_net_modu, group = "module", zoom1 = 30, zoom2 = "auto", layout2 = as_line()) -> oridata
 plot(co_net_modu, coors = oridata)
 }
-\donttest{
-data("c_net")
-module_detect(co_net, method = "cluster_fast_greedy") -> co_net_modu
-if (requireNamespace("ggraph")) {
-  plot(co_net_modu, coors = g_layout_nice(co_net_modu, group = "module"))
-  plot(co_net_modu, coors = g_layout_nice(co_net_modu, group = "module", mode = "treemap"))
-}
-}
 }
 \seealso{
 Other g_layout: 
+\code{\link{g_layout_nice}()},
 \code{\link{g_layout_polygon}()}
 }
 \concept{g_layout}

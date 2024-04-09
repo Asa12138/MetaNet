@@ -45,7 +45,7 @@ module_net <- function(module_number = 3, n_node_in_module = 30,
 
   g <- igraph::graph.adjacency(mat, mode = "undirected")
   # plot(g)
-  c_net_update(g) -> g1
+  c_net_update(g, initialize = TRUE, verbose = FALSE) -> g1
   g1 <- module_detect(g1)
   g1 <- to_module_net(g1)
   g1
@@ -92,8 +92,10 @@ module_detect <- function(go, method = "cluster_fast_greedy", n_node_in_module =
   V(go)$module <- igraph::membership(wc) %>% as.character()
   V(go)$original_module <- V(go)$module
 
-  go <- filter_n_module(go, n_node_in_module = n_node_in_module, delete = delete)
-  go <- c_net_update(go)
+  if (n_node_in_module > 0) {
+    go <- filter_n_module(go, n_node_in_module = n_node_in_module, delete = delete)
+    go <- c_net_update(go, initialize = TRUE, verbose = FALSE)
+  }
 
   graph_attr(go)$communities <- wc
   graph_attr(go)$modularity <- modularity(wc)
@@ -170,7 +172,8 @@ to_module_net <- function(go) {
   E(go)$e_type <- ifelse(tmp_e$module_from == tmp_e$module_to, "intra-module", "inter-module")
   # 刷新颜色
   # go=delete_edge_attr(go,"color")
-  go <- c_net_set(go, vertex_class = "module")
+  V(go)$v_class <- V(go)$module
+  go <- c_net_update(go, initialize = TRUE, verbose = FALSE)
   V(go)$color <- ifelse(V(go)$module == "others", "grey", V(go)$color)
   n_mod <- unique(V(go)$module)
   igraph::graph.attributes(go)$n_type <- "module"
@@ -225,7 +228,7 @@ get_module_eigen <- function(go_m) {
 #' summary_module(co_net_modu, var = "Abundance", module = "module")
 summary_module <- function(go_m, var = "v_class", module = "module", ...) {
   tmp_v <- get_v(go_m)
-  if ((length(module) > 1) | (length(var) > 1)) stop("var or module should be one column!")
+  if ((length(module) > 1) || (length(var) > 1)) stop("var or module should be one column!")
   a <- tmp_v %>% dplyr::select(!!module, !!var)
   colnames(a)[1] <- "module"
 
@@ -389,10 +392,9 @@ module_expression <- function(go_m, totu, group = NULL, r_threshold = 0.6,
 #' data("c_net")
 #' module_detect(co_net) -> co_net_modu
 #' zp_analyse(co_net_modu) -> co_net_modu
-#' if (requireNamespace("ggrepel")) {
-#'   zp_plot(co_net_modu)
-#'   zp_plot(co_net_modu, mode = 3)
-#' }
+#' zp_plot(co_net_modu)
+#' zp_plot(co_net_modu, mode = 3)
+#'
 zp_analyse <- function(go_m, mode = 2, use_origin = TRUE) {
   go_m -> go1
   v_index <- get_v(go_m)
@@ -440,8 +442,11 @@ zp_analyse <- function(go_m, mode = 2, use_origin = TRUE) {
     )
   }
   deter_role <- \(x, y, backs = backs){
-    for (i in 1:nrow(backs)) {
-      if (dplyr::between(as.numeric(x), backs$x1[i], backs$x2[i]) & dplyr::between(as.numeric(y), backs$y1[i], backs$y2[i])) {
+    for (i in seq_len(nrow(backs))) {
+      flag <- dplyr::between(as.numeric(x), backs$x1[i], backs$x2[i]) && dplyr::between(as.numeric(y), backs$y1[i], backs$y2[i])
+      if (is.na(flag)) {
+        return(NA)
+      } else if (flag) {
         # if((backs$x1[i]<=x)&(backs$x2[i]>=x)&(backs$y1[i]<=y)&(backs$y2[i]>=y)){
         role <- backs$lab[i]
         break
@@ -497,7 +502,6 @@ part_coeff <- function(g, A = NULL, weighted = FALSE) {
   }
   memb <- vertex_attr(g, "module")
   Ki <- colSums(A)
-  N <- max(memb)
   Kis <- t(rowsum(A, memb))
   Pi <- 1 - ((1 / Ki^2) * rowSums(Kis^2))
   names(Pi) <- rownames(A)
@@ -570,8 +574,10 @@ zp_plot <- function(go, label = TRUE, mode = 1) {
     ylab("Within-module connectivity z-score")
 
   if (label) {
+    label_dat <- taxa.roles[!taxa.roles$roles %in% c("Peripherals", "Ultra-peripherals"), ]
+    label_dat <- label_dat[!is.na(label_dat$roles), ]
     p <- p + ggrepel::geom_text_repel(
-      data = taxa.roles[!taxa.roles$roles %in% c("Peripherals", "Ultra-peripherals"), ],
+      data = label_dat,
       aes(x = Pi, y = Zi, label = name), size = 3
     )
   }

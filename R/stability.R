@@ -154,7 +154,7 @@ robust_test_in <- function(go, partial = 0.5, step = 10, reps = 9, threads = 1, 
 #' @method plot robust
 #' @exportS3Method
 #' @rdname robust_test
-plot.robust <- function(x, indexes = c("Natural_connectivity", "Average_path_length", "Average_degree"), use_ratio = FALSE, mode = 1, ...) {
+plot.robust <- function(x, indexes = c("Natural_connectivity", "Average_degree"), use_ratio = FALSE, mode = 1, ...) {
   i <- group <- variable <- value <- se <- eq.label <- adj.rr.label <- Natural_connectivity <- lm <- NULL
   robust_res <- x
   xlab <- "Removed_nodes"
@@ -442,7 +442,7 @@ Cohesion <- function(otutab, reps = 200, threads = 1, mycor = NULL, verbose = TR
         colnames(perm.rel.d) <- colnames(rel.d)
 
         # For each otu
-        for (j in 1:dim(rel.d)[2]) {
+        for (j in seq_len(dim(rel.d)[2])) {
           # Replace the original taxon vector with a permuted taxon vector
           perm.rel.d[, j] <- sample(rel.d[, j])
         }

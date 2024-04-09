@@ -7,10 +7,64 @@
 #' @method print corr
 #' @return No value
 print.corr <- function(x, ...) {
-  cat("Correlation table:\n")
+  if (is.null(x$r)) {
+    cat("NULL corr object.\n")
+    return(invisible())
+  }
+  if (attributes(x)$method %in% c("spearman", "pearson", "sparcc")) {
+    cat("Correlation table:\n")
+  } else {
+    cat("Similarity (1-Distance) table:\n")
+  }
   cat("Table dimensions:", nrow(x$r), "rows,", ncol(x$r), "columns\n")
+  cat("Use method: ", attributes(x)$method, "\n")
 }
 
+#' Summary method for 'corr' objects
+#'
+#' @param object 'corr' object
+#' @param ... Additional arguments
+#'
+#' @return No value
+#' @exportS3Method
+#' @method summary corr
+#'
+summary.corr <- function(object, ...) {
+  if (is.null(object$r)) {
+    cat("NULL corr object.\n")
+    return(invisible())
+  }
+  if (attributes(object)$method %in% c("spearman", "pearson", "sparcc")) {
+    cat("Correlation table:\n")
+  } else {
+    cat("Similarity (1-Distance) table:\n")
+  }
+
+  cat("Distribution of r:\n")
+  if (t_flag(object$r)) {
+    print(summary(object$r[upper.tri(object$r)]))
+  } else {
+    print(summary(as.vector(object$r)))
+  }
+
+  if (!attributes(object)$method %in% c("spearman", "pearson", "sparcc")) {
+    return(invisible())
+  }
+  cat("Distribution of p:\n")
+  if (t_flag(object$p)) {
+    print(summary(object$p[upper.tri(object$p)]))
+  } else {
+    print(summary(as.vector(object$p)))
+  }
+  if ("p.adjust" %in% names(object)) {
+    cat("Distribution of p.adjust:\n")
+    if (t_flag(object$p.adjust)) {
+      print(summary(object$p.adjust[upper.tri(object$p.adjust)]))
+    } else {
+      print(summary(as.vector(object$p.adjust)))
+    }
+  }
+}
 
 #' Print method for 'coors' objects
 #'

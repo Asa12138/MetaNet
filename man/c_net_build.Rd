@@ -13,7 +13,7 @@ c_net_build(
 )
 }
 \arguments{
-\item{corr}{corr object from \code{c_net_calculate()} or \code{input_corr()}.}
+\item{corr}{corr object from \code{c_net_calculate()} or \code{read_corr()}.}
 
 \item{r_threshold}{r_threshold (default: >0.6).}
 

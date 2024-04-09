@@ -28,6 +28,6 @@ Other calculate:
 \code{\link{c_net_calculate}()},
 \code{\link{cal_sim}()},
 \code{\link{fast_cor}()},
-\code{\link{input_corr}()}
+\code{\link{read_corr}()}
 }
 \concept{calculate}

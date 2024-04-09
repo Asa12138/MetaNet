@@ -34,10 +34,9 @@ Zi-Pi plot of vertexes
 data("c_net")
 module_detect(co_net) -> co_net_modu
 zp_analyse(co_net_modu) -> co_net_modu
-if (requireNamespace("ggrepel")) {
-  zp_plot(co_net_modu)
-  zp_plot(co_net_modu, mode = 3)
-}
+zp_plot(co_net_modu)
+zp_plot(co_net_modu, mode = 3)
+
 }
 \references{
 \enumerate{

@@ -39,6 +39,7 @@ c_net_calculate <- function(totu, totu2 = NULL, method = "spearman", filename = 
     if (!is.null(totu2)) warning("sparcc only take the totu, ignore the totu2.")
     message("sparcc is not supported on CRAN version. Please install `zdk123/SpiecEasi` from github and use the function `sparcc`.")
     # corr <- par_sparcc(totu, threads = threads, verbose = verbose)
+    corr <- NULL
   } else if (method %in% c(
     "manhattan", "euclidean", "canberra", "bray",
     "kulczynski", "gower", "morisita", "horn", "mountford",
@@ -46,8 +47,7 @@ c_net_calculate <- function(totu, totu2 = NULL, method = "spearman", filename = 
     "mahalanobis", "clark", "chisq", "chord", "hellinger",
     "aitchison", "robust.aitchison"
   )) {
-    if (!is.null(totu2)) warning("distance only take the totu, ignore the totu2.")
-    corr <- cal_sim(totu, method = method)
+    corr <- cal_sim(totu, totu2, method = method)
   } else {
     stop("method should be one of 'spearman', 'pearson', 'sparcc', or distance index from vegan.")
   }
@@ -60,13 +60,14 @@ c_net_calculate <- function(totu, totu2 = NULL, method = "spearman", filename = 
   }
 
   class(res) <- "corr"
+  attributes(res)$method <- method
 
   # save the correlation result
   if (is.logical(filename)) {
     if (filename) filename <- paste0("c_net_", date())
   }
   if (is.character(filename)) {
-    saveRDS(res, file = paste0(filename, ".corr"))
+    save_corr(res, filename)
   }
   return(res)
 }
@@ -91,14 +92,14 @@ check_tabs <- function(...) {
     if (all(lapply(tables, \(i)identical(rownames(i), comm)) %>% unlist())) {
       message("All samples matched.")
     } else {
-      message("Extract, ", length(comm), " commmon samples.")
+      message("Extract ", length(comm), " commmon samples.")
     }
     dup <- lapply(tables, colnames) %>% do.call(c, .)
     dup <- dup[duplicated(dup)]
     if (length(dup) > 0) {
       stop("Duplicated colnames found: ", paste0(dup, collapse = ", "), "\nPlease check colnames of input tables.")
     } else {
-      message("All objects are OK.")
+      message("All features are OK.")
     }
     tables <- lapply(tables, \(i)i[comm, ])
   }
@@ -107,19 +108,86 @@ check_tabs <- function(...) {
   return(tables)
 }
 
-#' Import corr from .csv file
+
+#' Save a corr object
+#'
+#' @param corr a corr object
+#' @param filename filename without extension, default: "corr"
+#'
+#' @return a .corr file
+#' @export
+#'
+save_corr <- function(corr, filename = "corr") {
+  stopifnot(inherits(corr, "corr"))
+  if (!grepl("\\.corr$", filename)) filename <- paste0(filename, ".corr")
+  if (t_flag(corr$r)) {
+    # 节约一半的储存空间
+    corr$r[upper.tri(corr$r)] -> r
+    corr$p.value[upper.tri(corr$p.value)] -> p.value
+    if (!is.null(corr$p.adjust)) {
+      corr$p.adjust[upper.tri(corr$p.adjust)] -> p.adj
+      if (all(p.value == p.adj)) {
+        p.adj <- FALSE
+      }
+    } else {
+      p.adj <- NULL
+    }
+
+    corr_names <- rownames(corr$r)
+    saveRDS(
+      list(
+        r = r, p.value = p.value, p.adjust = p.adj,
+        corr_names = corr_names, corr_attr = attributes(corr)
+      ),
+      file = filename
+    )
+  } else {
+    saveRDS(corr, file = filename)
+  }
+}
+
+#' Read a corr object
 #'
 #' @param filename filename of .corr
 #'
 #' @return a corr object
 #' @export
 #' @family calculate
-input_corr <- function(filename) {
+read_corr <- function(filename) {
   # r <- read.csv(paste0(filename, "_r.csv"), row.names = 1, check.names = FALSE)
   # p.value <- read.csv(paste0(filename, "_p.csv"), row.names = 1, check.names = FALSE)
   # p.adjust <- read.csv(paste0(filename, "_p_adj.csv"), row.names = 1, check.names = FALSE)
-  if (!grepl(".corr", filename)) filename <- paste0(filename, ".corr")
-  return(readRDS(filename))
+  if (!grepl("\\.corr$", filename)) filename <- paste0(filename, ".corr")
+  in_corr <- readRDS(filename)
+  if ("corr_names" %in% names(in_corr)) {
+    corr_names <- in_corr$corr_names
+    r <- in_corr$r
+    p.value <- in_corr$p.value
+    p.adj <- in_corr$p.adj
+    corr_attr <- in_corr$corr_attr
+
+    new_p.adjust <- new_p <- new_r <- matrix(0, nrow = length(corr_names), ncol = length(corr_names), dimnames = list(corr_names, corr_names))
+    new_r[upper.tri(new_r)] <- r
+    new_r <- new_r + t(new_r)
+    diag(new_r) <- 1
+    new_p[upper.tri(new_p)] <- p.value
+    new_p <- new_p + t(new_p)
+    if (is.null(p.adj)) {
+      new_p.adjust <- NULL
+    } else if (is.logical(p.adj)) {
+      new_p.adjust <- new_p
+    } else {
+      new_p.adjust[upper.tri(new_p.adjust)] <- p.adj
+      new_p.adjust <- new_p.adjust + t(new_p.adjust)
+      diag(new_p.adjust) <- 1
+    }
+    in_corr <- list()
+    in_corr$r <- new_r
+    in_corr$p.value <- new_p
+    if (!is.null(new_p.adjust)) in_corr$p.adjust <- new_p.adjust
+    attributes(in_corr) <- corr_attr
+  }
+  return(in_corr)
 }
 
 
@@ -181,7 +249,7 @@ Hmisc_cor <- function(totu, totu2 = NULL, method = c("spearman", "pearson")[1]) 
 #'
 #' @param totu t(otutab), row are samples, column are features.
 #' @param method Dissimilarity index, see \code{\link[vegan]{vegdist}}.
-#' @param norm hellinger normalization in features (default: FALSE).
+#' @param totu2 t(otutab) or NULL, row are samples, column are features.
 #'
 #' @family calculate
 #' @return similarity = 1-distance
@@ -193,15 +261,24 @@ Hmisc_cor <- function(totu, totu2 = NULL, method = c("spearman", "pearson")[1]) 
 #'   t(otutab) -> totu
 #'   cal_sim(totu) -> sim_corr
 #' }
-cal_sim <- function(totu, method = "bray", norm = FALSE) {
-  otu <- t(totu)
+cal_sim <- function(totu, totu2 = NULL, method = "bray") {
   lib_ps("vegan", library = FALSE)
-
-  if (norm) otu <- vegan::decostand(otu, "hellinger", 1) %>% as.data.frame()
-  vegan::vegdist(otu, method = method) %>% as.matrix() -> dist
+  if (is.null(totu2)) {
+    vegan::vegdist(t(totu), method = method) %>% as.matrix() -> dist
+  } else {
+    n1 <- ncol(totu)
+    n2 <- ncol(totu2)
+    dist <- matrix(NA, nrow = n1, ncol = n2, dimnames = list(colnames(totu), colnames(totu2)))
+    for (i in seq_len(n1)) {
+      for (j in seq_len(n2)) {
+        dist[i, j] <- vegan::vegdist(rbind(totu[, i], totu2[, j]), method = method)
+      }
+    }
+  }
 
   sim <- 1 - dist
   p <- dist
+  message("p-value is not supported for distance index, all set as 0.")
   p[p != 0] <- 0
 
   return(list(r = sim, p.value = p))

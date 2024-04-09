@@ -70,6 +70,7 @@ c_net_plot(co_net2, oridata)
 }
 \seealso{
 Other g_layout: 
+\code{\link{g_layout_nice}()},
 \code{\link{g_layout}()}
 }
 \concept{g_layout}
