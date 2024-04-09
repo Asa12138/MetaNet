@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">MetaNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.3</span>
       </span>
     </div>
 
@@ -99,14 +99,13 @@
 <span>  <span class="va">go</span>,</span>
 <span>  group <span class="op">=</span> <span class="st">"v_class"</span>,</span>
 <span>  e_type <span class="op">=</span> <span class="st">"all"</span>,</span>
-<span>  topN <span class="op">=</span> <span class="fl">6</span>,</span>
+<span>  topN <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  colors <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  legend_number <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  legend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  legend_cex <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  legend_position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>left_leg_x <span class="op">=</span> <span class="op">-</span><span class="fl">1.6</span>, left_leg_y <span class="op">=</span> <span class="fl">1</span>, right_leg_x <span class="op">=</span> <span class="fl">1.2</span>, right_leg_y <span class="op">=</span></span>
-<span>    <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  col_legend_order <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  legend_position <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  color_legend_order <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  group_legend_title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  group_legend_order <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -127,7 +126,7 @@
 
 
 <dt>topN</dt>
-<dd><p>topN of group, default:5</p></dd>
+<dd><p>topN of group, default: 10</p></dd>
 
 
 <dt>colors</dt>
@@ -150,8 +149,8 @@
 <dd><p>legend_position, default: c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1)</p></dd>
 
 
-<dt>col_legend_order</dt>
-<dd><p>col_legend_order vector,</p></dd>
+<dt>color_legend_order</dt>
+<dd><p>color_legend_order vector,</p></dd>
 
 
 <dt>group_legend_title</dt>
@@ -171,7 +170,7 @@
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p>Other topological: 
-<code><a href="extract_sub_net.html">extract_sub_net</a>()</code>,
+<code><a href="extract_sample_net.html">extract_sample_net</a>()</code>,
 <code><a href="fit_power.html">fit_power</a>()</code>,
 <code><a href="get_group_skeleton.html">get_group_skeleton</a>()</code>,
 <code><a href="nc.html">nc</a>()</code>,

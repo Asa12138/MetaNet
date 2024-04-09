@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">MetaNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.3</span>
       </span>
     </div>
 
@@ -99,7 +99,7 @@
 <span>  <span class="va">go</span>,</span>
 <span>  coors <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  labels_num <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  labels_num <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  vertex_size_range <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  edge_width_range <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  plot_module <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -129,6 +129,7 @@
 <span>  lty_legend <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  lty_legend_title <span class="op">=</span> <span class="st">"Edge class"</span>,</span>
 <span>  lty_legend_order <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  params_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">1234</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -148,7 +149,7 @@
 
 
 <dt>labels_num</dt>
-<dd><p>show how many labels,&gt;1 indicates number, &lt;1 indicates fraction, "all" indicates all, default:5</p></dd>
+<dd><p>show how many labels, &gt;1 indicates number, &lt;1 indicates fraction, "all" indicates all.</p></dd>
 
 
 <dt>vertex_size_range</dt>
@@ -168,7 +169,7 @@
 
 
 <dt>mark_color</dt>
-<dd><p>mark colors</p></dd>
+<dd><p>mark color</p></dd>
 
 
 <dt>mark_alpha</dt>
@@ -176,19 +177,19 @@
 
 
 <dt>module_label</dt>
-<dd><p>module_label</p></dd>
+<dd><p>show module label?</p></dd>
 
 
 <dt>module_label_cex</dt>
-<dd><p>module_label_cex</p></dd>
+<dd><p>module label cex</p></dd>
 
 
 <dt>module_label_color</dt>
-<dd><p>module_label_color</p></dd>
+<dd><p>module label color</p></dd>
 
 
 <dt>module_label_just</dt>
-<dd><p>module_label_just</p></dd>
+<dd><p>module label just, default c(0.5,0.5)</p></dd>
 
 
 <dt>legend</dt>
@@ -261,6 +262,10 @@
 
 <dt>lty_legend_order</dt>
 <dd><p>lty_legend_order</p></dd>
+
+
+<dt>params_list</dt>
+<dd><p>a list of parameters, e.g. list(edge_legend = TRUE, lty_legend = FALSE), when the parameter is duplicated, the format argument will be used rather than the argument in params_list.</p></dd>
 
 
 <dt>seed</dt>

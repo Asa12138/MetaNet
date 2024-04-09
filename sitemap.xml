@@ -79,6 +79,9 @@
     <loc>/reference/c_net_layout.html</loc>
   </url>
   <url>
+    <loc>/reference/c_net_load.html</loc>
+  </url>
+  <url>
     <loc>/reference/c_net_plot.html</loc>
   </url>
   <url>
@@ -121,7 +124,7 @@
     <loc>/reference/df2net_tree.html</loc>
   </url>
   <url>
-    <loc>/reference/extract_sub_net.html</loc>
+    <loc>/reference/extract_sample_net.html</loc>
   </url>
   <url>
     <loc>/reference/fast_cor.html</loc>
@@ -134,6 +137,9 @@
   </url>
   <url>
     <loc>/reference/g_layout.html</loc>
+  </url>
+  <url>
+    <loc>/reference/g_layout_nice.html</loc>
   </url>
   <url>
     <loc>/reference/g_layout_polygon.html</loc>
@@ -164,9 +170,6 @@
   </url>
   <url>
     <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/input_corr.html</loc>
   </url>
   <url>
     <loc>/reference/input_gephi.html</loc>
@@ -259,10 +262,16 @@
     <loc>/reference/rand_net.html</loc>
   </url>
   <url>
+    <loc>/reference/read_corr.html</loc>
+  </url>
+  <url>
     <loc>/reference/robust_test.html</loc>
   </url>
   <url>
     <loc>/reference/robustness.html</loc>
+  </url>
+  <url>
+    <loc>/reference/save_corr.html</loc>
   </url>
   <url>
     <loc>/reference/show_MetaNet_logo.html</loc>
@@ -272,6 +281,9 @@
   </url>
   <url>
     <loc>/reference/summ_2col.html</loc>
+  </url>
+  <url>
+    <loc>/reference/summary.corr.html</loc>
   </url>
   <url>
     <loc>/reference/summary_module.html</loc>

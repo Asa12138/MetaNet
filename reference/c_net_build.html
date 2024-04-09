@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">MetaNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.3</span>
       </span>
     </div>
 
@@ -107,7 +107,7 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>corr</dt>
-<dd><p>corr object from <code><a href="c_net_calculate.html">c_net_calculate()</a></code> or <code><a href="input_corr.html">input_corr()</a></code>.</p></dd>
+<dd><p>corr object from <code><a href="c_net_calculate.html">c_net_calculate()</a></code> or <code><a href="read_corr.html">read_corr()</a></code>.</p></dd>
 
 
 <dt>r_threshold</dt>
@@ -149,14 +149,12 @@
 <span class="r-in"><span><span class="fu"><a href="c_net_calculate.html">c_net_calculate</a></span><span class="op">(</span><span class="va">totu</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">corr</span></span></span>
 <span class="r-in"><span><span class="fu">c_net_build</span><span class="op">(</span><span class="va">corr</span>, r_threshold <span class="op">=</span> <span class="fl">0.65</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">co_net</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Have not do p-value adjustment! use the p.value to build network.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> No 'from' and 'to' columns in annotation table, will use 'name_from' and 'name_to' instead.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="c_net_calculate.html">c_net_calculate</a></span><span class="op">(</span><span class="va">totu</span>, <span class="va">env</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">corr2</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> All samples matched.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> All objects are OK.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> All features are OK.</span>
 <span class="r-in"><span><span class="fu">c_net_build</span><span class="op">(</span><span class="va">corr2</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">co_net2</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Have not do p-value adjustment! use the p.value to build network.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> No 'from' and 'to' columns in annotation table, will use 'name_from' and 'name_to' instead.</span>
 </code></pre></div>
     </div>
   </div>

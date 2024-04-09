@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">MetaNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.3</span>
       </span>
     </div>
 
@@ -95,7 +95,13 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">c_net_update</span><span class="op">(</span><span class="va">go</span>, node_break <span class="op">=</span> <span class="fl">5</span>, edge_break <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">c_net_update</span><span class="op">(</span></span>
+<span>  <span class="va">go</span>,</span>
+<span>  node_break <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  edge_break <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  initialize <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -110,6 +116,14 @@
 
 <dt>edge_break</dt>
 <dd><p>edge_break if e_type is numeric, default: 5</p></dd>
+
+
+<dt>initialize</dt>
+<dd><p>initialize?</p></dd>
+
+
+<dt>verbose</dt>
+<dd><p>verbose?</p></dd>
 
 </dl></div>
     <div id="value">
