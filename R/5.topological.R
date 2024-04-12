@@ -355,7 +355,6 @@ skeleton_plot <- function(ske_net, ...) {
     }
     if (flag) {
       # color legend
-      pchls <- c("circle" = 21, "square" = 22)
       for (i in seq_along(unique(tmp_v$v_group))) {
         g_i <- unique(tmp_v$v_group)[i]
         tmp_v1 <- tmp_v[tmp_v$v_group == g_i, c("v_class", "count", "color", "shape")]
@@ -368,7 +367,7 @@ skeleton_plot <- function(ske_net, ...) {
           cex = 0.7 * legend_cex, adj = 0,
           legend = le_text, title.cex = 0.8 * legend_cex,
           title = g_i, title.font = 2, title.adj = 0,
-          col = "black", pt.bg = unique(tmp_v1$color), bty = "n", pch = pchls[unique(tmp_v1$shape)]
+          col = "black", pt.bg = unique(tmp_v1$color), bty = "n", pch = default_v_shape[unique(tmp_v1$shape)]
         )
         left_leg_y <- left_leg_y - (length(unique(tmp_v1$v_class)) * 0.12 + 0.2) * legend_cex
       }
@@ -451,8 +450,6 @@ links_stat <- function(go, group = "v_class", e_type = "all", topN = 10, colors 
   vgroups <- levels(vgroups)
 
   if (legend) {
-    pchls <- c("circle" = 21, "square" = 22)
-
     if (is.null(group_legend_title)) {
       group_legend_title <- setNames(vgroups, vgroups)
     } else if (is.null(names(group_legend_title))) {
@@ -483,7 +480,7 @@ links_stat <- function(go, group = "v_class", e_type = "all", topN = 10, colors 
         cex = 0.7 * legend_cex, adj = 0,
         legend = le_text, title.cex = 0.8 * legend_cex,
         title = group_legend_title[g_i], title.font = 2, title.adj = 0,
-        col = "black", pt.bg = node_cols[vclass], bty = "n", pch = pchls[node_shapes[vclass]]
+        col = "black", pt.bg = node_cols[vclass], bty = "n", pch = default_v_shape[node_shapes[vclass]]
       )
 
       left_leg_y <- left_leg_y - (length(vclass) * 0.12 + 0.2) * legend_cex

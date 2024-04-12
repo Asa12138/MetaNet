@@ -67,10 +67,12 @@ module_net <- function(module_number = 3, n_node_in_module = 30,
 #' module_detect(co_net) -> co_net_modu
 module_detect <- function(go, method = "cluster_fast_greedy", n_node_in_module = 0, delete = FALSE) {
   stopifnot(is_igraph(go))
+  if (!is_metanet(go)) go <- c_net_update(go, initialize = TRUE, verbose = FALSE)
+
   if ("original_module" %in% vertex_attr_names(go)) message("'module' already exsited, start a new module detection!")
   ms <- c("cluster_walktrap", "cluster_edge_betweenness", "cluster_fast_greedy", "cluster_spinglass")
   method <- match.arg(method, ms)
-  if ("weight" %in% graph_attr_names(go)) E(go)$weight <- abs(igraph::E(go)$weight)
+  if ("weight" %in% edge_attr_names(go)) E(go)$weight <- abs(igraph::E(go)$weight)
 
   switch(method,
     "cluster_walktrap" = {
@@ -401,6 +403,11 @@ zp_analyse <- function(go_m, mode = 2, use_origin = TRUE) {
   if (!"module" %in% names(v_index)) stop("no modules, please `module_detect()` first")
   if ("roles" %in% names(v_index)) message("areadly has roles, overwrite!")
 
+  if (!"original_module" %in% names(v_index)) {
+    if (use_origin) {
+      use_origin <- FALSE
+    }
+  }
   # use original_module to do zp_analyse
   if (use_origin) {
     {
@@ -460,7 +467,16 @@ zp_analyse <- function(go_m, mode = 2, use_origin = TRUE) {
   return(go_m)
 }
 
-# calculate Zi
+
+#' calculate Zi
+#'
+#' @param g igraph object
+#' @param A adjacency matrix
+#' @param weighted logical, default: FALSE
+#'
+#' @return within_module_deg_z_score
+#' @noRd
+#' @references https://github.com/cwatson/brainGraph/blob/master/R/vertex_roles.R
 within_module_deg_z_score <- function(g, A = NULL, weighted = FALSE) {
   stopifnot(is_igraph(g))
   if (is.null(A)) {
@@ -470,7 +486,7 @@ within_module_deg_z_score <- function(g, A = NULL, weighted = FALSE) {
       A <- as_adj(g, sparse = FALSE, names = TRUE)
     }
   }
-  memb <- vertex_attr(g, "module")
+  memb <- vertex_attr(g, "module") %>% as.numeric()
   N <- max(memb)
   nS <- tabulate(memb)
   z <- Ki <- rep.int(0, dim(A)[1L])
@@ -500,7 +516,7 @@ part_coeff <- function(g, A = NULL, weighted = FALSE) {
       A <- as_adj(g, sparse = FALSE)
     }
   }
-  memb <- vertex_attr(g, "module")
+  memb <- vertex_attr(g, "module") %>% as.numeric()
   Ki <- colSums(A)
   Kis <- t(rowsum(A, memb))
   Pi <- 1 - ((1 / Ki^2) * rowSums(Kis^2))
@@ -508,6 +524,7 @@ part_coeff <- function(g, A = NULL, weighted = FALSE) {
   Pi <- data.frame(Pi)
   return(Pi)
 }
+
 
 #' Zi-Pi plot of vertexes
 #'

@@ -1,3 +1,9 @@
+# MetaNet v0.2.1 Notes
+
+## Added
+
+- v0.2.1, big change <2024-04-11, Thu>
+
 # MetaNet v0.1.3 Notes
 
 ## Added
