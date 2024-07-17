@@ -1,7 +1,6 @@
 pandoc: 3.1.11
-pkgdown: 2.0.7
+pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   MetaNet: MetaNet.html
-last_built: 2024-04-09T15:10Z
-
+last_built: 2024-07-17T02:54Z
