@@ -86,12 +86,12 @@ c_net_build <- function(corr, r_threshold = 0.6, p_threshold = 0.05, use_p_adj =
     tmp_e <- get_e(go)
     if ("p.value" %in% names(corr)) {
       # E(go)$p.value <-get_e(go)%>%dplyr::select(from,to)%>%apply(., 1, \(x)occor.r$p.value[x[1],x[2]])
-      tmp <- reshape2::melt(corr$p.value, varnames = c("from", "to"), value.name = "p.value")
+      tmp <- reshape2::melt(corr$p.value, varnames = c("from", "to"), value.name = "p.value", as.is = TRUE)
       tmp_e <- dplyr::left_join(tmp_e, tmp, by = c("from", "to"))
     }
     if ("p.adjust" %in% names(corr)) {
       # E(go)$p.adjust <-get_e(go)%>%dplyr::select(from,to)%>%apply(., 1, \(x)occor.r$p.adjust[x[1],x[2]])
-      tmp <- reshape2::melt(corr$p.adjust, varnames = c("from", "to"), value.name = "p.adjust")
+      tmp <- reshape2::melt(corr$p.adjust, varnames = c("from", "to"), value.name = "p.adjust", as.is = TRUE)
       tmp_e <- dplyr::left_join(tmp_e, tmp, by = c("from", "to"))
     }
     # 应该直接expand，再left_join快很多
@@ -237,9 +237,9 @@ color_generate <- function(v_class, n_break = 5, mode = "v",
     } else if (mode == "e") {
       v_class <- droplevels(as.factor(v_class))
       if (all(levels(v_class) %in% c("negative", "positive"))) {
-        ncols <- c(negative = "#E85D5D", positive = "#48A4F0")
+        ncols <- c(negative = "#E85D5D", positive = "#48A4F0")[levels(v_class)]
       } else if (all(levels(v_class) %in% c("inter-module", "intra-module"))) {
-        ncols <- c("inter-module" = "#FA789A", "intra-module" = "#A6CEE3")
+        ncols <- c("inter-module" = "#FA789A", "intra-module" = "#A6CEE3")[levels(v_class)]
       } else {
         ncols <- e_color
       }
@@ -405,7 +405,7 @@ clean_igraph <- function(go, direct = TRUE) {
 #' Construct a network from edge_list dataframe
 #'
 #' @param edgelist first is source, second is target, others are annotation
-#' @param vertex vertex metadata
+#' @param vertex_df vertex metadata data.frame
 #' @param direct logical
 #' @param e_type set e_type
 #' @param e_class set e_class
@@ -414,11 +414,21 @@ clean_igraph <- function(go, direct = TRUE) {
 #' @family build
 #' @examples
 #' data(edgelist)
-#' edge_net <- c_net_from_edgelist(arc_count, vertex = arc_taxonomy)
+#' edge_net <- c_net_from_edgelist(arc_count, vertex_df = arc_taxonomy)
 #' edge_net <- c_net_set(edge_net, vertex_class = "Phylum", edge_width = "n")
 #' c_net_plot(edge_net)
-c_net_from_edgelist <- function(edgelist, vertex = NULL, direct = FALSE, e_type = NULL, e_class = NULL) {
-  go <- igraph::graph_from_data_frame(edgelist, directed = direct, vertices = vertex)
+c_net_from_edgelist <- function(edgelist, vertex_df = NULL, direct = FALSE, e_type = NULL, e_class = NULL) {
+  if (!"name" %in% colnames(vertex_df)) {
+    vertex_df$name <- rownames(vertex_df)
+    message("No 'name' in the colnames(vertex_df), use rownames(vertex_df) as the 'name'.")
+  }
+  vertex_df <- data.frame(vertex_df[, "name", drop = FALSE], vertex_df[, setdiff(colnames(vertex_df), "name"), drop = FALSE])
+  if (!all(c("from", "to") %in% colnames(edgelist))) {
+    message("No 'from' and 'to' in the colnames(edgelist), use the first two columns as the 'from' and 'to'.")
+    colnames(edgelist)[1:2] <- c("from", "to")
+  }
+  edgelist <- data.frame(edgelist[, c("from", "to"), drop = FALSE], edgelist[, setdiff(colnames(edgelist), c("from", "to")), drop = FALSE])
+  go <- igraph::graph_from_data_frame(edgelist, directed = direct, vertices = vertex_df)
   if (!is.null(e_type)) E(go)$e_type <- edgelist[, e_type]
   if (!is.null(e_class)) E(go)$e_class <- edgelist[, e_class]
   go <- c_net_update(go, initialize = TRUE)

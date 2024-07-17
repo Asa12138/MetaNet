@@ -284,6 +284,19 @@ cal_sim <- function(totu, totu2 = NULL, method = "bray") {
   return(list(r = sim, p.value = p))
 }
 
+cal_KLD <- function(totu, totu2 = NULL, method = "KLD") {
+  # Kullback-Leibler divergence
+  # KLD = function(p, q) {
+  #   sum(p * log(p / q))
+  # }
+  # p = c(0.1, 0.2, 0.3, 0.4)
+  # q = c(0.2, 0.3, 0.2, 0.3)
+  # KLD(p, q)
+  lib_ps("philentropy", library = FALSE)
+  dat <- t(totu) / rowSums(t(totu))
+  philentropy::KL(dat, unit = "log")
+}
+
 #' p.adjust apply on a correlation table (matrix or data.frame)
 #'
 #' @param pp table of p-values

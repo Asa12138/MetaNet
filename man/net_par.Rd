@@ -5,7 +5,12 @@
 \alias{c_net_index}
 \title{Calculate all topological indexes of a network}
 \usage{
-net_par(go, mode = c("v", "e", "n", "all"), fast = TRUE)
+net_par(
+  go,
+  mode = c("v", "e", "n", "all"),
+  fast = TRUE,
+  remove_negative = FALSE
+)
 
 c_net_index(go, force = FALSE)
 }
@@ -15,6 +20,8 @@ c_net_index(go, force = FALSE)
 \item{mode}{calculate what? c("v", "e", "n", "all")}
 
 \item{fast}{less indexes for faster calculate ?}
+
+\item{remove_negative}{remove negative edge or not? default: FALSE}
 
 \item{force}{replace existed net_par}
 }

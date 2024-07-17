@@ -19,6 +19,8 @@ c_net_plot(
   module_label_cex = 2,
   module_label_color = "black",
   module_label_just = c(0.5, 0.5),
+  pie_value = NULL,
+  pie_color = NULL,
   legend = TRUE,
   legend_number = FALSE,
   legend_cex = 1,
@@ -38,6 +40,12 @@ c_net_plot(
   lty_legend = FALSE,
   lty_legend_title = "Edge class",
   lty_legend_order = NULL,
+  module_legend = FALSE,
+  module_legend_title = "Module",
+  module_legend_order = NULL,
+  pie_legend = FALSE,
+  pie_legend_title = "Pie part",
+  pie_legend_order = NULL,
   params_list = NULL,
   seed = 1234
 )
@@ -70,6 +78,10 @@ c_net_plot(
 \item{module_label_color}{module label color}
 
 \item{module_label_just}{module label just, default c(0.5,0.5)}
+
+\item{pie_value}{a dataframe using to plot pie (with rowname or a "name" column)}
+
+\item{pie_color}{color vector}
 
 \item{legend}{all legends}
 
@@ -106,6 +118,18 @@ c_net_plot(
 \item{lty_legend_title}{lty_legend_title}
 
 \item{lty_legend_order}{lty_legend_order}
+
+\item{module_legend}{logical}
+
+\item{module_legend_title}{module_legend_title}
+
+\item{module_legend_order}{module_legend_order}
+
+\item{pie_legend}{logical}
+
+\item{pie_legend_title}{pie_legend_title}
+
+\item{pie_legend_order}{pie_legend_order}
 
 \item{params_list}{a list of parameters, e.g. list(edge_legend = TRUE, lty_legend = FALSE), when the parameter is duplicated, the format argument will be used rather than the argument in params_list.}
 

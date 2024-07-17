@@ -89,7 +89,7 @@ get_net_main <- function(n_index) {
 
 scale_size_width <- function(tmp_v, tmp_e, vertex_size_range, edge_width_range) {
   {        v_groups <- unique(tmp_v$v_group)
-    nice_size <- ceiling(60 / sqrt(nrow(tmp_v))) + 1
+    nice_size <- ceiling(100 / sqrt(nrow(tmp_v))) + 1
 
     vertex_size_range_default <- rep(list(c(max(nice_size * 0.4, 3), min(nice_size * 1.6, 12))), length(v_groups))
     names(vertex_size_range_default) <- v_groups
@@ -113,13 +113,14 @@ scale_size_width <- function(tmp_v, tmp_e, vertex_size_range, edge_width_range) 
       )
       tmp_v[tmp_v$v_group == i, "size"] <- do.call(pcutils::mmscale, append(
         list(tmp_v[tmp_v$v_group == i, "size"]),
-        as.list(vertex_size_range[[i]][1:2])
+        as.list(sort(vertex_size_range[[i]][1:2]))
       ))
     }    }
 
   {
     edge_width_range_default <- vertex_size_range_default[[1]] / 6
     if (is.null(edge_width_range)) edge_width_range <- edge_width_range_default
+    edge_width_range <- sort(edge_width_range)
     edge_width_text <- c(min(tmp_e$width, na.rm = TRUE), max(tmp_e$width, na.rm = TRUE))
     tmp_e$width <- pcutils::mmscale(tmp_e$width, edge_width_range[1], edge_width_range[2])
   }
@@ -137,7 +138,7 @@ some_custom_paras <- function(tmp_v, tmp_e, ...) {
 
   # 下列都是mapping好的颜色，形状等，无法单独修改某一个vertex或edge的颜色，形状等
   # ！！！考虑增加额外参数，用于单独修改某一个vertex或edge的颜色，形状等
-  tmp_v$vertex.label.color <- "black"
+  tmp_v$label.color <- "black"
   if ("vertex.size" %in% params_name) tmp_v$size <- params[["vertex.size"]]
   if ("vertex.color" %in% params_name) {
     tmp_v$color <- condance(data.frame(
@@ -153,22 +154,22 @@ some_custom_paras <- function(tmp_v, tmp_e, ...) {
   }
   if ("vertex.label" %in% params_name) tmp_v$label <- params[["vertex.label"]]
   if ("vertex.label.color" %in% params_name) {
-    tmp_v$vertex.label.color <- condance(data.frame(
+    tmp_v$label.color <- condance(data.frame(
       "black",
-      pcutils::tidai(tmp_v$v_group, params[["vertex.label.color"]])
+      pcutils::tidai(tmp_v$v_group, params[["vertex.label.color"]], fac = TRUE)
     ))
   }
 
   if ("edge.color" %in% params_name) {
     tmp_e$color <- condance(data.frame(
       tmp_e$color,
-      pcutils::tidai(tmp_e$e_type, params[["edge.color"]])
+      pcutils::tidai(tmp_e$e_type, params[["edge.color"]], fac = TRUE)
     ))
   }
   if ("edge.lty" %in% params_name) {
     tmp_e$lty <- condance(data.frame(
       tmp_e$lty,
-      pcutils::tidai(tmp_e$e_class, params[["edge.lty"]])
+      pcutils::tidai(tmp_e$e_class, params[["edge.lty"]], fac = TRUE)
     ))
   }
   if ("edge.width" %in% params_name) tmp_e$width <- params[["edge.width"]]
@@ -176,6 +177,48 @@ some_custom_paras <- function(tmp_v, tmp_e, ...) {
   envir <- parent.frame()
   assign("tmp_e", tmp_e, envir)
   assign("tmp_v", tmp_v, envir)
+}
+
+pie_set_for_plot <- function(tmp_v, pie_value, pie_color) {
+  if ("pie" %in% tmp_v$shape) {
+    if (!is.null(pie_value)) {
+      if (!is.data.frame(pie_value)) stop("pie_value must be a data.frame.")
+      if (!"name" %in% colnames(pie_value)) {
+        pie_value$name <- rownames(pie_value)
+      }
+      if (any(duplicated(pie_value$name))) {
+        stop(
+          "Duplicated name in annotation tables: ",
+          paste0(pie_value$name[duplicated(pie_value$name)], collapse = ", ")
+        )
+      }
+      tmp_merge_df <- left_join(tmp_v["name"], pie_value, by = "name")
+      pie_value <- tmp_merge_df[, -1]
+      pie_parts <- colnames(pie_value)
+
+      pie_value[is.na(pie_value)] <- 0
+      pie_value$`__others` <- ifelse(rowSums(pie_value) > 0, 0, 1)
+      pie_value_list <- as.list(pcutils::t2(pie_value))
+
+      default_pie_color <- setNames(pcutils::get_cols(length(pie_parts), "col1"), pie_parts)
+      if (is.null(pie_color)) pie_color <- default_pie_color
+      if (is.null(names(pie_color))) {
+        pie_color <- setNames(pie_color, pie_parts)
+      } else {
+        pie_color <- pcutils::update_param(default_pie_color, pie_color)
+      }
+
+      pie_color <- pie_color[pie_parts]
+      pie_color <- c(pie_color, `__others` = NA)
+    } else {
+      pie_value_list <- pie_color <- NULL
+    }
+  } else {
+    pie_value_list <- pie_color <- NULL
+  }
+  envir <- parent.frame()
+  assign("pie_value_list", pie_value_list, envir)
+  assign("pie_color", pie_color, envir)
 }
 
 get_show_labels <- function(tmp_v, labels_num) {
@@ -194,11 +237,13 @@ get_show_labels <- function(tmp_v, labels_num) {
       if (labels_num >= 1) {
         tmp_v %>%
           dplyr::top_n(labels_num, size) %>%
+          dplyr::arrange(-size) %>%
           dplyr::pull(name) %>%
           head(labels_num) -> toplabel
       } else {
         tmp_v %>%
           dplyr::top_frac(labels_num, size) %>%
+          dplyr::arrange(-size) %>%
           dplyr::pull(name) %>%
           head(ceiling(labels_num * nrow(tmp_v))) -> toplabel
       }
@@ -255,7 +300,10 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
                                   size_legend, size_legend_title,
                                   edge_legend, edge_legend_title, edge_legend_order,
                                   width_legend, width_legend_title,
-                                  lty_legend, lty_legend_title, lty_legend_order, ...) {
+                                  lty_legend, lty_legend_title, lty_legend_order,
+                                  module_legend, module_legend_title, module_legend_order, module_color, mark_alpha,
+                                  pie_legend, pie_legend_title, pie_legend_order, pie_color,
+                                  ...) {
   color <- e_type <- lty <- e_class <- v_class <- shape <- left_leg_x <- right_leg_x <- NULL
 
   legend_position_default <- c(left_leg_x = -2, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1)
@@ -282,8 +330,20 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
       group_legend_title <- setNames(rep(group_legend_title, len = length(vgroups)), vgroups)
     }
 
+    this_shape <- unique(tmp_v$shape)
+    if (!all(this_shape %in% names(default_v_shape))) {
+      default_v_shape <- pcutils::update_param(
+        default_v_shape,
+        setNames(rep(21, length(this_shape)), this_shape)
+      )
+    }
+
     for (g_i in vgroups) {
-      tmp_v1 <- tmp_v[tmp_v$v_group == g_i, c("v_class", "color", "shape")]
+      if ("count" %in% names(tmp_v)) {
+        tmp_v1 <- tmp_v[tmp_v$v_group == g_i, c("v_class", "color", "shape", "count")]
+      } else {
+        tmp_v1 <- tmp_v[tmp_v$v_group == g_i, c("v_class", "color", "shape")]
+      }
 
       tmp_v1$v_class <- factor(tmp_v1$v_class, levels = custom_sort(unique(tmp_v1$v_class)))
 
@@ -297,6 +357,10 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
 
       if (legend_number) {
         eee <- table(tmp_v1$v_class)
+        if (!is.null(attributes(tmp_v)$skeleton)) {
+          eee <- setNames(tmp_v1$count, tmp_v1$v_class)
+          legend_number <- FALSE
+        }
         le_text <- paste(vclass, eee[vclass], sep = ": ")
       } else {
         le_text <- vclass
@@ -311,6 +375,44 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
 
       left_leg_y <- left_leg_y - (length(vclass) * 0.12 + 0.2) * legend_cex
     }
+  }
+
+  if (module_legend) {
+    tmp_v$module <- factor(tmp_v$module, levels = custom_sort(unique(tmp_v$module)))
+    modules <- pcutils::change_fac_lev(tmp_v$module, module_legend_order)
+    modules <- levels(modules)
+
+    if (legend_number) {
+      eee <- table(tmp_v$module)
+      le_text <- paste(modules, eee[modules], sep = ": ")
+    } else {
+      le_text <- modules
+    }
+    legend(left_leg_x, left_leg_y,
+      cex = 0.7 * legend_cex, adj = 0,
+      legend = le_text, title.cex = 0.8 * legend_cex,
+      title = module_legend_title, title.font = 2, title.adj = 0,
+      fill = pcutils::add_alpha(module_color[modules], mark_alpha),
+      border = module_color[modules], bty = "n"
+    )
+
+    left_leg_y <- left_leg_y - (length(modules) * 0.12 + 0.2) * legend_cex
+  }
+
+  if (pie_legend) {
+    pie_color <- pie_color[names(pie_color) != "__others"]
+    pies <- pcutils::change_fac_lev(names(pie_color), pie_legend_order)
+    pies <- levels(pies)
+
+    le_text <- pies
+    legend(left_leg_x, left_leg_y,
+      cex = 0.7 * legend_cex, adj = 0,
+      legend = le_text, title.cex = 0.8 * legend_cex,
+      title = pie_legend_title, title.font = 2, title.adj = 0,
+      fill = pie_color[pies],
+      border = "black", bty = "n"
+    )
+    left_leg_y <- left_leg_y - (length(pies) * 0.12 + 0.2) * legend_cex
   }
 
   if (size_legend) {
@@ -394,6 +496,9 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
 #' @param module_label_color module label color
 #' @param module_label_just module label just, default c(0.5,0.5)
 #'
+#' @param pie_value a dataframe using to plot pie (with rowname or a "name" column)
+#' @param pie_color color vector
+#'
 #' @param legend all legends
 #' @param legend_number legend with numbers
 #' @param legend_cex character expansion factor relative to current par("cex"), default: 1
@@ -416,6 +521,14 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
 #' @param lty_legend_title lty_legend_title
 #' @param lty_legend_order lty_legend_order
 #'
+#' @param module_legend logical
+#' @param module_legend_title module_legend_title
+#' @param module_legend_order module_legend_order
+#'
+#' @param pie_legend logical
+#' @param pie_legend_title pie_legend_title
+#' @param pie_legend_order pie_legend_order
+#'
 #' @param seed random seed, default:1234, make sure each plot is the same.
 #' @param params_list a list of parameters, e.g. list(edge_legend = TRUE, lty_legend = FALSE), when the parameter is duplicated, the format argument will be used rather than the argument in params_list.
 #'
@@ -434,6 +547,7 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
                        mark_module = FALSE, mark_color = NULL, mark_alpha = 0.3,
                        module_label = FALSE, module_label_cex = 2, module_label_color = "black",
                        module_label_just = c(0.5, 0.5),
+                       pie_value = NULL, pie_color = NULL,
                        legend = TRUE, legend_number = FALSE, legend_cex = 1,
                        legend_position = c(left_leg_x = -2, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1),
                        group_legend_title = NULL, group_legend_order = NULL,
@@ -442,6 +556,8 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
                        edge_legend = TRUE, edge_legend_title = "Edge type", edge_legend_order = NULL,
                        width_legend = FALSE, width_legend_title = "Edge width",
                        lty_legend = FALSE, lty_legend_title = "Edge class", lty_legend_order = NULL,
+                       module_legend = FALSE, module_legend_title = "Module", module_legend_order = NULL,
+                       pie_legend = FALSE, pie_legend_title = "Pie part", pie_legend_order = NULL,
                        params_list = NULL,
                        seed = 1234) {
   if (!is.null(params_list)) {
@@ -482,7 +598,7 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
   ori_coors <- get_coors(coors, go, seed = seed)
   coors <- ori_coors$coors[, c("X", "Y")] %>% as.matrix()
   if (is.null(ori_coors$curved)) {
-    edge_curved <- 0
+    edge_curved <- NULL
   } else {
     edge_curved <- ori_coors$curved$curved
   }
@@ -493,12 +609,23 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
   # some custom parameters
   some_custom_paras(tmp_v, tmp_e, ...)
 
+  # set pie
+  pie_set_for_plot(tmp_v, pie_value, pie_color)
+  if (is.null(pie_value) || !"pie" %in% tmp_v$shape) pie_legend <- FALSE
+  if (is.null(pie_color)) {
+    pie_color_list <- NULL
+  } else {
+    pie_color_list <- list(pie_color)
+  }
+
   # show labels
   tmp_v <- get_show_labels(tmp_v, labels_num)
 
   # modules set
   module_set_for_plot(tmp_v, mark_module, mark_color)
+  if (!mark_module) module_legend <- FALSE
 
+  if (any(igraph::is.loop(go))) go <- clean_multi_edge_metanet(go)
   # main plot
   {
     old_xpd <- graphics::par(mar = c(4, 2, 2, 2), xpd = TRUE)
@@ -509,21 +636,23 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
       vertex.size = tmp_v$size,
       vertex.color = tmp_v$color,
       vertex.shape = tmp_v$shape,
-      vertex.label.color = tmp_v$vertex.label.color,
+      vertex.label.color = tmp_v$label.color,
       edge.color = tmp_e$color,
       edge.lty = tmp_e$lty,
       edge.width = tmp_e$width,
       mark.groups = new_modu,
       mark.col = pcutils::add_alpha(module_color[names(new_modu)], mark_alpha),
       mark.border = module_color[names(new_modu)],
+      vertex.pie = pie_value_list,
+      vertex.pie.color = pie_color_list,
       ...,
       vertex.frame.width = 0.5,
       main = main,
       vertex.label.font = 1,
       vertex.label.cex = 0.07 * tmp_v$size,
       vertex.label = tmp_v$label,
-      edge.arrow.size = 0.3,
-      edge.arrow.width = 0.5,
+      edge.arrow.size = 0.3 * tmp_e$width * 3,
+      edge.arrow.width = 0.6 * tmp_e$width * 3,
       edge.curved = edge_curved,
       margin = c(0, 0, 0, 0)
     )
@@ -563,6 +692,7 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
     vertex_frame_width <- 0.5
   }
   # produce legends
+  if (grepl("skeleton", main)) attributes(tmp_v)$skeleton <- TRUE
   produce_c_net_legends(
     tmp_v, tmp_e, vertex_frame_width,
     legend_position, legend_number, legend_cex,
@@ -572,6 +702,8 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
     size_legend, size_legend_title,
     edge_legend, edge_legend_title, edge_legend_order,
     width_legend, width_legend_title,
-    lty_legend, lty_legend_title, lty_legend_order, ...
+    lty_legend, lty_legend_title, lty_legend_order,
+    module_legend, module_legend_title, module_legend_order, module_color, mark_alpha,
+    pie_legend, pie_legend_title, pie_legend_order, pie_color, ...
   )
 }

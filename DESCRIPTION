@@ -30,7 +30,7 @@ Imports:
     stats,
     tibble,
     utils,
-    pcutils (>= 0.2.5),
+    pcutils (>= 0.2.6),
     rlang
 Suggests:
     pheatmap,
@@ -50,7 +50,9 @@ Suggests:
     ggtree,
     treeio,
     circlize,
-    ggpubr
+    ggpubr,
+    corrplot,
+    philentropy
 VignetteBuilder: knitr
 BugReports: https://github.com/Asa12138/MetaNet/issues
 URL: https://github.com/Asa12138/MetaNet

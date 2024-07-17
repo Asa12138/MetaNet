@@ -27,6 +27,9 @@ g_layout_stress(go, group = "module", ...)
 
 \item{...}{add}
 }
+\value{
+coors
+}
 \description{
 Layout with group nicely
 }

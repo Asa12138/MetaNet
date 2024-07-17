@@ -497,6 +497,7 @@ g_layout_polycircle <- function(go, group = "v_group", group_order = NULL, group
 #' @param ... add
 #'
 #' @export
+#' @return coors
 #' @family g_layout
 #' @examples
 #' \donttest{

@@ -14,7 +14,8 @@ c_net_set(
   edge_class = "e_class",
   edge_width = "width",
   node_break = 5,
-  edge_break = 5
+  edge_break = 5,
+  initialize = TRUE
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ c_net_set(
 \item{node_break}{node_break if v_class is numeric, default: 5}
 
 \item{edge_break}{edge_break if e_type is numeric, default: 5}
+
+\item{initialize}{initialize, default: TRUE}
 }
 \value{
 a metanet object

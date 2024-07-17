@@ -4,12 +4,12 @@
 \alias{get_n}
 \title{Get network information}
 \usage{
-get_n(go, name = NULL, simple = FALSE)
+get_n(go, index = NULL, simple = FALSE)
 }
 \arguments{
 \item{go}{metanet object}
 
-\item{name}{attribute name, default: NULL}
+\item{index}{attribute name, default: NULL}
 
 \item{simple}{logical, get simple index}
 }

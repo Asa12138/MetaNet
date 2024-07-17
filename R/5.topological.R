@@ -8,6 +8,7 @@
 #' @param save_net should save these sub_nets? FALSE or a filename
 #' @param fast less indexes for faster calculate ?
 #' @param verbose verbose
+#' @param remove_negative remove negative edge or not? default: FALSE
 #'
 #' @return a dataframe contains all sub_net parameters
 #' @export
@@ -15,7 +16,7 @@
 #' @examples
 #' data(otutab, package = "pcutils")
 #' extract_sample_net(co_net, otutab) -> sub_net_pars
-extract_sample_net <- function(whole_net, otutab, threads = 1, save_net = FALSE, fast = TRUE, verbose = TRUE) {
+extract_sample_net <- function(whole_net, otutab, threads = 1, save_net = FALSE, fast = TRUE, remove_negative = FALSE, verbose = TRUE) {
   i <- NULL
   V(whole_net)$name -> v_name
   reps <- ncol(otutab)
@@ -34,7 +35,7 @@ extract_sample_net <- function(whole_net, otutab, threads = 1, save_net = FALSE,
   # main function
   loop <- function(i) {
     spe_sub <- sub_nets[[i]]
-    indexs <- net_par(spe_sub, mode = "n", fast = fast)[["n_index"]]
+    indexs <- net_par(spe_sub, mode = "n", fast = fast, remove_negative = remove_negative)[["n_index"]]
     wc <- igraph::cluster_fast_greedy(spe_sub, weights = abs(igraph::E(spe_sub)$weight))
     indexs$modularity <- igraph::modularity(wc)
     indexs
@@ -103,6 +104,7 @@ nc <- function(p) {
 #' @param go an igraph or metanet object
 #' @param fast less indexes for faster calculate ?
 #' @param mode calculate what? c("v", "e", "n", "all")
+#' @param remove_negative remove negative edge or not? default: FALSE
 #'
 #' @return a 3-elements list
 #' \item{n_index}{indexs of the whole network}
@@ -113,7 +115,7 @@ nc <- function(p) {
 #' @examples
 #' igraph::make_graph("Walther") %>% net_par()
 #' c_net_index(co_net) -> co_net_with_par
-net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE) {
+net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE, remove_negative = FALSE) {
   from <- to <- NULL
   stopifnot(is_igraph(go))
   if ("all" %in% mode) mode <- c("v", "e", "n")
@@ -121,9 +123,20 @@ net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE) {
   n_index <- NULL
   v_index <- NULL
   e_index <- NULL
+
+  Negative_percentage <- ifelse(!is.null(E(go)$cor), sum(igraph::E(go)$cor < 0) / length(igraph::E(go)), NA)
+  # remove negative weight
+  if (remove_negative) {
+    if (!is.null(E(go)$cor)) {
+      # message("Remove negative correlation edges")
+      c_net_filter(go, cor > 0, mode = "e") -> go
+    }
+  }
+
   # non-weighted network
   up <- go
   if (!is.null(igraph::edge_attr(up)[["weight"]])) up <- igraph::delete_edge_attr(up, "weight")
+
   if ("n" %in% mode) {
     # Calculate Network Parameters
     n_index <- data.frame(
@@ -131,14 +144,14 @@ net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE) {
       `Node_number` = length(igraph::V(go)), # number of nodes
       `Edge_number` = length(igraph::E(go)), # number of edges
       `Edge_density` = igraph::edge_density(go), # density of network, connectance
-      `Negative_percentage` = ifelse(!is.null(E(go)$cor), sum(igraph::E(go)$cor < 0) / length(igraph::E(go)), NA), # negative edges percentage
+      `Negative_percentage` = Negative_percentage, # negative edges percentage
       `Average_path_length` = igraph::average.path.length(up), # Average path length
 
       `Global_efficiency` = igraph::global_efficiency(up),
       `Average_degree` = mean(igraph::degree(go)), # Average degree
       `Average_weighted_degree` = ifelse(is.null(igraph::E(go)$weight), mean(igraph::degree(go)), sum(igraph::E(go)$weight) / length(igraph::V(go))), # weighted degree
       Diameter = igraph::diameter(up), # network diameter
-      `Clustering_coefficent` = igraph::transitivity(go), # Clustering coefficient
+      `Clustering_coefficient` = igraph::transitivity(go), # Clustering coefficient
       `Centralized_betweenness` = igraph::centralization.betweenness(go)$centralization, # Betweenness centralization
       `Natural_connectivity` = nc(go) # natural
     )
@@ -174,7 +187,7 @@ net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE) {
     v_index <- data.frame(
       check.names = F,
       Degree = igraph::degree(go),
-      `Clustering_coefficent` = igraph::transitivity(go, type = "local"), # local clustering coefficient
+      `Clustering_coefficient` = igraph::transitivity(go, type = "local"), # local clustering coefficient
       Betweenness = igraph::betweenness(go), # betweenness
       Eccentricity = igraph::eccentricity(go),
       Closeness = igraph::closeness(go),
@@ -228,269 +241,6 @@ c_net_index <- function(go, force = FALSE) {
 }
 
 
-#' Get skeleton network according to a group
-#'
-#' @param go network
-#' @param Group vertex column name
-#' @param count take which column count, default: NULL
-#' @param top_N top_N
-#'
-#' @return skeleton network
-#' @export
-#' @family topological
-#' @examples
-#' get_group_skeleton(co_net) -> ske_net
-#' skeleton_plot(ske_net)
-get_group_skeleton <- function(go, Group = "v_class", count = NULL, top_N = 8) {
-  name <- v_group <- n <- NULL
-  stopifnot(is_igraph(go))
-  direct <- igraph::is_directed(go)
-
-  if (!Group %in% vertex_attr_names(go)) stop("no Group named ", Group, " !")
-  get_v(go) -> tmp_v
-  tmp_v %>% dplyr::select(name, !!Group) -> nodeGroup
-  colnames(nodeGroup) <- c("name", "Group")
-  nodeGroup$Group <- as.factor(nodeGroup$Group)
-  # summary edges counts in each e_type
-  suppressMessages(anno_edge(go, nodeGroup) %>% get_e() -> edge)
-  {
-    if (is.null(count)) {
-      edge$count <- 1
-    } else {
-      edge$count <- edge[, count]
-    }
-  }
-  bb <- data.frame()
-  for (i in unique(edge$e_type)) {
-    tmp <- edge[edge$e_type == i, c("Group_from", "Group_to", "count")]
-    tmp <- dplyr::mutate_if(tmp, is.factor, as.character)
-    # tmp=pcutils:::gettop(tmp,top_N)
-    bb <- rbind(bb, data.frame(summ_2col(tmp,
-      direct = direct
-    ), e_type = i))
-  }
-  tmp_go <- igraph::graph_from_data_frame(bb, directed = direct)
-  nodeGroup <- cbind_new(nodeGroup, data.frame(v_group = tmp_v$v_group))
-
-  # nodeGroup=mutate_all(nodeGroup,as.character)
-  # nodeGroup=rbind(nodeGroup,c("others","others","others"))
-
-  dplyr::distinct(nodeGroup, Group, v_group) %>% tibble::column_to_rownames("Group") -> v_group_tab
-
-  V(tmp_go)$v_group <- v_group_tab[V(tmp_go)$name, "v_group"]
-  V(tmp_go)$v_class <- V(tmp_go)$name
-  V(tmp_go)$size <- stats::aggregate(tmp_v$size, by = list(tmp_v[, Group]), sum)[["x"]]
-  suppressWarnings({
-    V(tmp_go)$count <- tmp_v %>%
-      dplyr::group_by_(Group) %>%
-      dplyr::count() %>%
-      dplyr::pull(n)
-  })
-
-  tmp_go <- c_net_update(tmp_go, initialize = TRUE)
-  get_e(tmp_go) -> tmp_e
-
-  E(tmp_go)$width <- E(tmp_go)$label <- tmp_e$count
-
-  graph.attributes(tmp_go)$n_type <- "skeleton"
-  graph.attributes(tmp_go)$skeleton <- Group
-  tmp_go
-}
-
-#' Skeleton plot
-#'
-#' @param ske_net skeleton
-#' @param ... additional parameters for \code{\link[igraph]{igraph.plotting}}
-#' @export
-#' @rdname get_group_skeleton
-skeleton_plot <- function(ske_net, ...) {
-  parms <- e_type <- NULL
-  flag <- TRUE
-  tmp_go <- ske_net
-  if (get_n(tmp_go)$n_type != "skeleton") stop("Not a skeleton network")
-  get_e(tmp_go) -> tmp_e
-  get_v(tmp_go) -> tmp_v
-
-  # some
-  params <- list(...)
-  params_name <- names(params)
-  legend_position <- params[["legend_position"]]
-  legend_position_default <- c(left_leg_x = -2, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1)
-  if (!"legend_position" %in% params_name) {
-    legend_position <- legend_position_default
-  } else {
-    if (is.null(names(legend_position))) legend_position <- setNames(legend_position, names(legend_position_default)[seq_along(legend_position)])
-    legend_position <- pcutils::update_param(legend_position_default, legend_position)
-  }
-  if ("vertex.color" %in% params_name) tmp_v$color <- condance(data.frame(tmp_v$color, tidai(tmp_v$v_class, params[["vertex.color"]])))
-  if ("legend_cex" %in% params_name) {
-    legend_cex <- parms[["legend_cex"]]
-  } else {
-    legend_cex <- 1
-  }
-
-  old_xpd <- graphics::par(mar = c(4, 2, 2, 2), xpd = TRUE)
-  on.exit(graphics::par(old_xpd), add = TRUE)
-  for (i in unique(tmp_e$e_type)) {
-    left_leg_x <- legend_position["left_leg_x"]
-    left_leg_y <- legend_position["left_leg_y"]
-
-    # main plot
-    tmp_go1 <- c_net_filter(tmp_go, e_type == i, mode = "e")
-    do.call(c_net_plot, pcutils::update_param(
-      list(
-        go = tmp_go1,
-        vertex.size = pcutils::mmscale(V(tmp_go1)$size, 10, 16),
-        edge.width = pcutils::mmscale(E(tmp_go1)$width, 0.5, 8),
-        color_legend = FALSE, lty_legend = FALSE, legend_number = FALSE,
-        size_legend = FALSE
-      ), params[names(params) != "color_legend"]
-    ))
-
-    if ("legend" %in% params_name) {
-      if (!params[["legend"]]) flag <- FALSE
-    }
-    if ("color_legend" %in% params_name) {
-      if (!params[["color_legend"]]) flag <- FALSE
-    }
-    if (flag) {
-      # color legend
-      for (i in seq_along(unique(tmp_v$v_group))) {
-        g_i <- unique(tmp_v$v_group)[i]
-        tmp_v1 <- tmp_v[tmp_v$v_group == g_i, c("v_class", "count", "color", "shape")]
-        if (TRUE) {
-          le_text <- paste(tmp_v1$v_class, tmp_v1$count, sep = ": ")
-        } else {
-          le_text <- unique(tmp_v1$v_class)
-        }
-        legend(left_leg_x, left_leg_y,
-          cex = 0.7 * legend_cex, adj = 0,
-          legend = le_text, title.cex = 0.8 * legend_cex,
-          title = g_i, title.font = 2, title.adj = 0,
-          col = "black", pt.bg = unique(tmp_v1$color), bty = "n", pch = default_v_shape[unique(tmp_v1$shape)]
-        )
-        left_leg_y <- left_leg_y - (length(unique(tmp_v1$v_class)) * 0.12 + 0.2) * legend_cex
-      }
-    }
-  }
-}
-
-#' Link summary of the network
-#'
-#' @param go igraph or metanet
-#' @param group summary which group of vertex attribution in names(vertex_attr(go))
-#' @param e_type "positive", "negative", "all"
-#' @param topN topN of group, default: 10
-#' @param colors colors
-#' @param legend_number legend with numbers
-#' @param legend all legends
-#' @param legend_position legend_position, default: c(left_leg_x=-1.9,left_leg_y=1,right_leg_x=1.2,right_leg_y=1)
-#' @param legend_cex 	character expansion factor relative to current par("cex"), default: 1
-#' @param color_legend_order color_legend_order vector,
-#' @param group_legend_title group_legend_title, length must same to the numbers of v_group
-#' @param group_legend_order group_legend_order vector
-#'
-#' @return plot
-#' @export
-#' @family topological
-#' @examples
-#' if (requireNamespace("circlize")) {
-#'   links_stat(co_net, topN = 10)
-#'   module_detect(co_net) -> co_net_modu
-#'   links_stat(co_net_modu, group = "module")
-#' }
-links_stat <- function(go, group = "v_class", e_type = "all", topN = 10, colors = NULL,
-                       legend_number = FALSE, legend = TRUE, legend_cex = 1,
-                       legend_position = NULL,
-                       color_legend_order = NULL,
-                       group_legend_title = NULL, group_legend_order = NULL) {
-  color <- v_class <- shape <- left_leg_x <- from <- to <- n <- NULL
-  direct <- is_directed(go)
-  go <- c_net_set(go, vertex_class = group)
-
-  get_v(go) -> v_index
-  v_index %>% dplyr::select("name", "v_class") -> map
-
-  suppressMessages(anno_edge(go, map) %>% get_e() -> edge)
-  # statistics
-  if (e_type != "all") edge %>% dplyr::filter(e_type == !!e_type) -> edge
-  summ_2col(edge[, paste0("v_class", c("_from", "_to"))], direct = direct) -> bb
-  colnames(bb) <- c("from", "to", "count")
-
-  dplyr::group_by(bb, from) %>%
-    dplyr::summarise(n = sum(count)) %>%
-    dplyr::arrange(-n) %>%
-    dplyr::top_n(topN, n) %>%
-    dplyr::pull(from) -> nnn
-
-  get_v(go) -> tmp_v
-  if (is.null(colors)) {
-    colors <- setNames(unique(tmp_v$color), unique(tmp_v$v_class))
-  }
-  # plot
-  bb2 <- mutate(bb,
-    from = ifelse(from %in% nnn, from, "Others"),
-    to = ifelse(to %in% nnn, to, "Others")
-  ) %>% summ_2col(direct = direct)
-
-  pcutils::my_circo(bb2, reorder = FALSE, pal = colors)
-
-  legend_position_default <- c(left_leg_x = -1.6, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1)
-  if (is.null(legend_position)) legend_position <- legend_position_default
-  if (is.null(names(legend_position))) {
-    legend_position <- setNames(legend_position, names(legend_position_default)[seq_along(legend_position)])
-  }
-  legend_position <- pcutils::update_param(legend_position_default, legend_position)
-  here_env <- environment()
-  lapply(names(legend_position), \(i){
-    assign(i, legend_position[i], here_env)
-  })
-
-  vgroups <- pcutils::change_fac_lev(tmp_v$v_group, group_legend_order)
-  vgroups <- levels(vgroups)
-
-  if (legend) {
-    if (is.null(group_legend_title)) {
-      group_legend_title <- setNames(vgroups, vgroups)
-    } else if (is.null(names(group_legend_title))) {
-      group_legend_title <- setNames(rep(group_legend_title, len = length(vgroups)), vgroups)
-    }
-
-    for (g_i in vgroups) {
-      tmp_v1 <- tmp_v[tmp_v$v_group == g_i, c("v_class", "color", "shape")]
-
-      tmp_v1$v_class <- factor(tmp_v1$v_class, levels = stringr::str_sort(unique(tmp_v1$v_class), numeric = TRUE))
-
-      vclass <- pcutils::change_fac_lev(tmp_v1$v_class, color_legend_order)
-      vclass <- levels(vclass)
-
-      node_cols <- dplyr::distinct(tmp_v1, color, v_class)
-      node_cols <- setNames(node_cols$color, node_cols$v_class)
-      node_shapes <- dplyr::distinct(tmp_v1, shape, v_class)
-      node_shapes <- setNames(node_shapes$shape, node_shapes$v_class)
-
-      if (legend_number) {
-        eee <- table(tmp_v1$v_class)
-        le_text <- paste(vclass, eee[vclass], sep = ": ")
-      } else {
-        le_text <- vclass
-      }
-      if (length(le_text) == 0) le_text <- ""
-      legend(left_leg_x, left_leg_y,
-        cex = 0.7 * legend_cex, adj = 0,
-        legend = le_text, title.cex = 0.8 * legend_cex,
-        title = group_legend_title[g_i], title.font = 2, title.adj = 0,
-        col = "black", pt.bg = node_cols[vclass], bty = "n", pch = default_v_shape[node_shapes[vclass]]
-      )
-
-      left_leg_y <- left_leg_y - (length(vclass) * 0.12 + 0.2) * legend_cex
-    }
-  }
-}
-
-# 每个分组可以构建一个网络，每个网络都可以用link_stat得到一些互作的数量（互作强度），可以再看这些数量和分组间某些指标的相关性。
-
-
 #' Fit power-law distribution for an igraph
 #'
 #' @param go igraph
@@ -527,7 +277,7 @@ fit_power <- function(go, p.value = FALSE) {
       R2_rand <- 1 - SSre_rand / SStot_rand
       R2_rand > R2
     })
-    p_value <- (sum(p_num) + 1) / (999 + 1)
+    p_value <- (sum(unlist(p_num)) + 1) / (999 + 1)
   }
 
   p <- ggplot(dat, aes(x = degree, y = count)) +
@@ -660,7 +410,7 @@ rand_net_par <- function(go, reps = 99, threads = 1, verbose = TRUE) {
 #'
 #' @param pars your net pars resulted by net_pars()
 #' @param randp random networks pars resulted by rand_net_par()
-#' @param index compared indexes: "Average_path_length","Clustering_coefficent" or else
+#' @param index compared indexes: "Average_path_length","Clustering_coefficient" or else
 #'
 #' @return ggplot
 #' @export
@@ -670,7 +420,7 @@ rand_net_par <- function(go, reps = 99, threads = 1, verbose = TRUE) {
 #' rand_net_par(co_net_rmt, reps = 30) -> randp
 #' net_par(co_net_rmt, fast = FALSE) -> pars
 #' compare_rand(pars, randp)
-compare_rand <- function(pars, randp, index = c("Average_path_length", "Clustering_coefficent")) {
+compare_rand <- function(pars, randp, index = c("Average_path_length", "Clustering_coefficient")) {
   V1 <- NULL
   labss <- t(pars$n_index[, index, drop = FALSE]) %>% as.data.frame()
   rownames(labss) -> labss$indexes
@@ -706,7 +456,7 @@ compare_rand <- function(pars, randp, index = c("Average_path_length", "Clusteri
 #' }
 smallworldness <- function(go, reps = 99, threads = 1, verbose = TRUE) {
   rand_net_par(go, reps = reps, threads = threads, verbose = verbose) -> rands
-  small_world_coefficient <- (igraph::transitivity(go) / mean(rands$Clustering_coefficent)) /
+  small_world_coefficient <- (igraph::transitivity(go) / mean(rands$Clustering_coefficient)) /
     (igraph::average.path.length(go) / mean(rands$`Average_path_length`))
   small_world_coefficient
 }

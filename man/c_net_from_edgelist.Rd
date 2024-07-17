@@ -6,7 +6,7 @@
 \usage{
 c_net_from_edgelist(
   edgelist,
-  vertex = NULL,
+  vertex_df = NULL,
   direct = FALSE,
   e_type = NULL,
   e_class = NULL
@@ -15,7 +15,7 @@ c_net_from_edgelist(
 \arguments{
 \item{edgelist}{first is source, second is target, others are annotation}
 
-\item{vertex}{vertex metadata}
+\item{vertex_df}{vertex metadata data.frame}
 
 \item{direct}{logical}
 
@@ -31,7 +31,7 @@ Construct a network from edge_list dataframe
 }
 \examples{
 data(edgelist)
-edge_net <- c_net_from_edgelist(arc_count, vertex = arc_taxonomy)
+edge_net <- c_net_from_edgelist(arc_count, vertex_df = arc_taxonomy)
 edge_net <- c_net_set(edge_net, vertex_class = "Phylum", edge_width = "n")
 c_net_plot(edge_net)
 }

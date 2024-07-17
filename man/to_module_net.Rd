@@ -4,10 +4,12 @@
 \alias{to_module_net}
 \title{Transformation a network to a module network}
 \usage{
-to_module_net(go)
+to_module_net(go, edge_type = c("module", "module_from", "module_to")[1])
 }
 \arguments{
 \item{go}{metanet}
+
+\item{edge_type}{"module", "module_from", "module_to"}
 }
 \value{
 metanet with modules

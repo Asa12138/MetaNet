@@ -10,6 +10,7 @@ extract_sample_net(
   threads = 1,
   save_net = FALSE,
   fast = TRUE,
+  remove_negative = FALSE,
   verbose = TRUE
 )
 }
@@ -23,6 +24,8 @@ extract_sample_net(
 \item{save_net}{should save these sub_nets? FALSE or a filename}
 
 \item{fast}{less indexes for faster calculate ?}
+
+\item{remove_negative}{remove negative edge or not? default: FALSE}
 
 \item{verbose}{verbose}
 }

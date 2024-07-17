@@ -163,20 +163,32 @@ combine_n_module <- function(go_m, module_number = 5) {
 
 #' Transformation a network to a module network
 #'
+#' @param edge_type "module", "module_from", "module_to"
 #' @param go metanet
+#'
 #' @export
 #' @family module
 #' @return metanet with modules
-to_module_net <- function(go) {
+to_module_net <- function(go, edge_type = c("module", "module_from", "module_to")[1]) {
   if (!"module" %in% vertex_attr_names(go)) stop("no 'module', please `module_detect()` first or set the V(net)$module.")
+  edge_type <- match.arg(edge_type, c("module", "module_from", "module_to"))
   go <- anno_edge(go, get_v(go)[, c("name", "module")], verbose = FALSE)
+
   tmp_e <- igraph::edge.attributes(go)
-  E(go)$e_type <- ifelse(tmp_e$module_from == tmp_e$module_to, "intra-module", "inter-module")
+  if (edge_type == "module") {
+    E(go)$e_type <- ifelse(tmp_e$module_from == tmp_e$module_to, "intra-module", "inter-module")
+  } else if (edge_type == "module_from") {
+    E(go)$e_type <- tmp_e$module_from
+  } else if (edge_type == "module_to") {
+    E(go)$e_type <- tmp_e$module_to
+  }
+
   # 刷新颜色
   # go=delete_edge_attr(go,"color")
   V(go)$v_class <- V(go)$module
   go <- c_net_update(go, initialize = TRUE, verbose = FALSE)
   V(go)$color <- ifelse(V(go)$module == "others", "grey", V(go)$color)
+
   n_mod <- unique(V(go)$module)
   igraph::graph.attributes(go)$n_type <- "module"
   igraph::graph.attributes(go)$n_modules <- length(n_mod[n_mod != "others"])
@@ -587,8 +599,8 @@ zp_plot <- function(go, label = TRUE, mode = 1) {
     MetaNet_theme +
     guides(colour = "none") +
     theme(strip.background = element_rect(fill = "white")) +
-    xlab("Participation Coefficient") +
-    ylab("Within-module connectivity z-score")
+    xlab("Participation Coefficient (Pi)") +
+    ylab("Within-module connectivity (Zi)")
 
   if (label) {
     label_dat <- taxa.roles[!taxa.roles$roles %in% c("Peripherals", "Ultra-peripherals"), ]

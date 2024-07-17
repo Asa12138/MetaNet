@@ -4,12 +4,12 @@
 \alias{get_e}
 \title{Get edge information}
 \usage{
-get_e(go, name = NULL)
+get_e(go, index = NULL)
 }
 \arguments{
 \item{go}{metanet object}
 
-\item{name}{attribute name, default: NULL}
+\item{index}{attribute name, default: NULL}
 }
 \value{
 data.frame

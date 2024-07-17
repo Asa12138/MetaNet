@@ -348,7 +348,7 @@ venn_net <- function(tab) {
     data.frame(name = groupss, v_group = "Group", v_class = paste0("Group: ", groupss)),
     data.frame(name = unique(edgelist$elements), v_group = "elements", v_class = "elements")
   )
-  venn_net <- c_net_from_edgelist(edgelist, vertex = nodelist)
+  venn_net <- c_net_from_edgelist(edgelist, vertex_df = nodelist)
   graph.attributes(venn_net)$n_type <- "venn"
   all_group <- get_e(venn_net)[, c("from", "to")] %>%
     pcutils::squash("from") %>%
@@ -379,7 +379,7 @@ twocol_edgelist <- function(edgelist) {
     data.frame(name = unique(edgelist[, 1]), v_group = names(edgelist)[1], v_class = names(edgelist)[1]),
     data.frame(name = unique(edgelist[, 2]), v_group = names(edgelist)[2], v_class = names(edgelist)[2])
   )
-  venn_net <- c_net_from_edgelist(edgelist, vertex = nodelist)
+  venn_net <- c_net_from_edgelist(edgelist, vertex_df = nodelist)
   graph.attributes(venn_net)$n_type <- "twocol"
   # venn_net=c_net_set(venn_net,edge_type = "from")
   venn_net
@@ -423,8 +423,8 @@ df2net_tree <- function(test, fun = sum) {
 
   # c_net_from_edgelist(as.data.frame(links),vertex = nodes)
   net <- igraph::graph_from_data_frame(as.data.frame(links), vertices = nodes)
-  net <- c_net_update(net, initialize = TRUE)
   net <- c_net_set(net, vertex_class = "level", vertex_size = name, edge_width = name)
+  net <- c_net_update(net, initialize = TRUE, verbose = FALSE)
   graph_attr(net, "coors") <- c_net_layout(net, as_tree())
   net
 }

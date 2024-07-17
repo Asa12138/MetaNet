@@ -106,6 +106,17 @@ custom_sort <- function(x) {
   }
 }
 
+paste_df <- function(df, collapse = ",") {
+  apply(df, 1, paste, collapse = collapse)
+}
+
+paste_df2pielist <- function(df, collapse = ",") {
+  pcutils::strsplit2(df, split = collapse) %>%
+    pcutils::t2() %>%
+    as.list() %>%
+    lapply(function(x) as.numeric(x))
+}
+
 deprecated <- function(old, new) {
   assign(old, new, envir = asNamespace(packageName()))
 }

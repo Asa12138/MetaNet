@@ -10,7 +10,7 @@ rand_net_par(go, reps = 99, threads = 1, verbose = TRUE)
 compare_rand(
   pars,
   randp,
-  index = c("Average_path_length", "Clustering_coefficent")
+  index = c("Average_path_length", "Clustering_coefficient")
 )
 }
 \arguments{
@@ -26,7 +26,7 @@ compare_rand(
 
 \item{randp}{random networks pars resulted by rand_net_par()}
 
-\item{index}{compared indexes: "Average_path_length","Clustering_coefficent" or else}
+\item{index}{compared indexes: "Average_path_length","Clustering_coefficient" or else}
 }
 \value{
 ggplot

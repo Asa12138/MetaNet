@@ -12,6 +12,7 @@
 #' @param edge_width choose which column to be edge_width (map to edge_width)
 #' @param node_break node_break if v_class is numeric, default: 5
 #' @param edge_break edge_break if e_type is numeric, default: 5
+#' @param initialize initialize, default: TRUE
 #'
 #' @return a metanet object
 #' @export
@@ -30,7 +31,8 @@
 #' )
 #' co_net2 <- c_net_set(co_net2, data.frame("Abundance" = colSums(totu)), vertex_size = "Abundance")
 c_net_set <- function(go, ..., vertex_group = "v_group", vertex_class = "v_class", vertex_size = "size",
-                      edge_type = "e_type", edge_class = "e_class", edge_width = "width", node_break = 5, edge_break = 5) {
+                      edge_type = "e_type", edge_class = "e_class", edge_width = "width",
+                      node_break = 5, edge_break = 5, initialize = TRUE) {
   size <- e_class <- width <- NULL
   c_net_update(go, verbose = FALSE) -> go
   name <- v_group <- v_class <- e_type <- color <- NULL
@@ -78,11 +80,11 @@ c_net_set <- function(go, ..., vertex_group = "v_group", vertex_class = "v_class
       if (is.numeric(tmp_v_class)) {
         tmp_v_color <- color_generate(tmp_v_class, n_break = node_break, mode = "v")
         tmp_v_class <- color_generate(tmp_v_class, n_break = node_break, mode = "label")
-        v_index[v_index$v_group == i, "v_class"] <- tmp_v_class
         v_index[v_index$v_group == i, "color"] <- tmp_v_color
       } else {
         new_color_name <- c(new_color_name, unique(tmp_index$v_class))
       }
+      v_index[v_index$v_group == i, "v_class"] <- as.character(tmp_v_class)
     }
     # 总体分类颜色是否改变，没变的话就不该，变了的话全部重新赋
     new_color_name <- unique(new_color_name)
@@ -112,7 +114,7 @@ c_net_set <- function(go, ..., vertex_group = "v_group", vertex_class = "v_class
   as.list(v_index) -> igraph::vertex.attributes(go)
   as.list(e_index) -> igraph::edge.attributes(go)
 
-  c_net_update(go, verbose = FALSE) -> go2
+  c_net_update(go, initialize = initialize, verbose = FALSE) -> go2
   return(go2)
 }
 
@@ -135,18 +137,19 @@ is_metanet <- function(go) {
 #' Get vertex information
 #'
 #' @param go metanet object
-#' @param name attribute name, default: NULL
+#' @param index attribute name, default: NULL
 #' @family manipulate
 #' @return data.frame
 #' @export
-get_v <- function(go, name = NULL) {
+get_v <- function(go, index = NULL) {
   # 规定name只能为字符
   if (is.null(V(go)$name)) V(go)$name <- as.character(V(go))
   # df <- as.data.frame(igraph::vertex.attributes(go))
   igraph::as_data_frame(go, what = "v") -> df
+  df <- dplyr::select(df, name, dplyr::everything())
   rownames(df) <- NULL
-  if (!is.null(name)) {
-    return(dplyr::select(df, !!name))
+  if (!is.null(index)) {
+    return(dplyr::select(df, !!index))
   } else {
     return(df)
   }
@@ -154,16 +157,16 @@ get_v <- function(go, name = NULL) {
 
 #' Get edge information
 #' @param go metanet object
-#' @param name attribute name, default: NULL
+#' @param index attribute name, default: NULL
 #' @return data.frame
 #' @family manipulate
 #' @export
-get_e <- function(go, name = NULL) {
+get_e <- function(go, index = NULL) {
   id <- NULL
   tmp_e <- cbind_new(igraph::as_data_frame(go), data.frame(id = seq_len(igraph::ecount(go))))
   tmp_e <- dplyr::select(tmp_e, id, dplyr::everything())
-  if (!is.null(name)) {
-    return(dplyr::select(tmp_e, !!name))
+  if (!is.null(index)) {
+    return(dplyr::select(tmp_e, !!index))
   } else {
     return(tmp_e)
   }
@@ -172,12 +175,12 @@ get_e <- function(go, name = NULL) {
 #' Get network information
 #'
 #' @param go metanet object
-#' @param name attribute name, default: NULL
+#' @param index attribute name, default: NULL
 #' @param simple logical, get simple index
 #' @family manipulate
 #' @return data.frame
 #' @export
-get_n <- function(go, name = NULL, simple = FALSE) {
+get_n <- function(go, index = NULL, simple = FALSE) {
   gls <- igraph::graph.attributes(go)
   if (simple) {
     gls <- lapply(gls, \(x){
@@ -213,8 +216,8 @@ get_n <- function(go, name = NULL, simple = FALSE) {
     })
   }
   df <- as.data.frame(do.call(cbind, gls))
-  if (!is.null(name)) {
-    return(dplyr::select(df, !!name))
+  if (!is.null(index)) {
+    return(dplyr::select(df, !!index))
   } else {
     return(df)
   }
@@ -462,10 +465,10 @@ c_net_load <- function(filename, format = "data.frame") {
   if (format == "data.frame") {
     nodes <- read.csv(paste0(filename, "_nodes.csv"), stringsAsFactors = FALSE)
     edges <- read.csv(paste0(filename, "_edges.csv"), stringsAsFactors = FALSE)
-    c_net_from_edgelist(edges, nodes) -> go
+    c_net_from_edgelist(edges, vertex_df = nodes) -> go
   } else if (format == "graphml") {
     if (!grepl("\\.graphml$", filename)) filename <- paste0(filename, ".graphml")
-    igraph::read_graph(paste0(filename, ".graphml"), format = "graphml") -> go
+    igraph::read_graph(filename, format = "graphml") -> go
     go <- c_net_update(go, initialize = TRUE)
   } else {
     if (!grepl(paste0("\\.", format), filename)) filename <- paste0(filename, ".", format)
@@ -525,3 +528,239 @@ summ_2col <- function(df, from = 1, to = 2, count = 3, direct = FALSE) {
   colnames(tmp1) <- cols
   return(as.data.frame(tmp1))
 }
+
+
+#' Get skeleton network according to a group
+#'
+#' @param go network
+#' @param Group vertex column name
+#' @param count take which column count, default: NULL
+#' @param top_N top_N
+#'
+#' @return skeleton network
+#' @export
+#' @family topological
+#' @examples
+#' get_group_skeleton(co_net) -> ske_net
+#' skeleton_plot(ske_net)
+get_group_skeleton <- function(go, Group = "v_class", count = NULL, top_N = 8) {
+  name <- v_group <- n <- NULL
+  stopifnot(is_igraph(go))
+  direct <- igraph::is_directed(go)
+
+  if (!Group %in% vertex_attr_names(go)) stop("no Group named ", Group, " !")
+  get_v(go) -> tmp_v
+  tmp_v %>% dplyr::select(name, !!Group) -> nodeGroup
+  colnames(nodeGroup) <- c("name", "Group")
+  nodeGroup$Group <- as.factor(nodeGroup$Group)
+  # summary edges counts in each e_type
+  suppressMessages(anno_edge(go, nodeGroup) %>% get_e() -> edge)
+  {
+    if (is.null(count)) {
+      edge$count <- 1
+    } else {
+      edge$count <- edge[, count]
+    }
+  }
+  bb <- data.frame()
+  for (i in unique(edge$e_type)) {
+    tmp <- edge[edge$e_type == i, c("Group_from", "Group_to", "count")]
+    tmp <- dplyr::mutate_if(tmp, is.factor, as.character)
+    # tmp=pcutils:::gettop(tmp,top_N)
+    bb <- rbind(bb, data.frame(summ_2col(tmp,
+      direct = direct
+    ), e_type = i))
+  }
+  tmp_go <- igraph::graph_from_data_frame(bb, directed = direct)
+  nodeGroup <- cbind_new(nodeGroup, data.frame(v_group = tmp_v$v_group))
+
+  # nodeGroup=mutate_all(nodeGroup,as.character)
+  # nodeGroup=rbind(nodeGroup,c("others","others","others"))
+
+  dplyr::distinct(nodeGroup, Group, v_group) %>% tibble::column_to_rownames("Group") -> v_group_tab
+
+  V(tmp_go)$v_group <- v_group_tab[V(tmp_go)$name, "v_group"]
+  V(tmp_go)$v_class <- V(tmp_go)$name
+  V(tmp_go)$size <- stats::aggregate(tmp_v$size, by = list(tmp_v[, Group]), sum) %>%
+    tibble::column_to_rownames("Group.1") %>%
+    .[V(tmp_go)$name, "x"]
+  suppressWarnings({
+    V(tmp_go)$count <- tmp_v %>%
+      dplyr::group_by_(Group) %>%
+      dplyr::count() %>%
+      tibble::column_to_rownames(Group) %>%
+      .[V(tmp_go)$name, "n"]
+  })
+
+  tmp_go <- c_net_update(tmp_go, initialize = TRUE)
+  get_e(tmp_go) -> tmp_e
+
+  E(tmp_go)$width <- E(tmp_go)$label <- tmp_e$count
+
+  graph.attributes(tmp_go)$n_type <- "skeleton"
+  graph.attributes(tmp_go)$skeleton <- Group
+  tmp_go
+}
+
+#' Skeleton plot
+#'
+#' @param ske_net skeleton
+#' @param split_e_type split by e_type? default: TRUE
+#' @param ... additional parameters for \code{\link[igraph]{igraph.plotting}}
+#'
+#' @export
+#' @rdname get_group_skeleton
+skeleton_plot <- function(ske_net, split_e_type = TRUE, ...) {
+  e_type <- NULL
+  params <- list(...)
+  tmp_go <- ske_net
+  if (get_n(tmp_go)$n_type != "skeleton") stop("Not a skeleton network")
+  get_e(tmp_go) -> tmp_e
+
+  if (split_e_type) {
+    for (i in unique(tmp_e$e_type)) {
+      # main plot
+      tmp_go1 <- c_net_filter(tmp_go, e_type == i, mode = "e")
+      do.call(c_net_plot, pcutils::update_param(
+        list(go = tmp_go1, legend_number = TRUE, edge_width_range = c(1, 5)), params
+      ))
+    }
+  } else {
+    tmp_go <- clean_multi_edge_metanet(tmp_go)
+    do.call(c_net_plot, pcutils::update_param(
+      list(go = tmp_go, legend_number = TRUE, edge_width_range = c(1, 5)), params
+    ))
+  }
+}
+
+# 整理skeleton网络的边，使其尽量不重叠。
+# 1.from-to都是自己时，添加edge.loop.angle
+# 2.from-to一致时，添加edge.curved
+# 3.from-to刚好相反时，添加edge.curved
+
+
+#' Clean multi edge metanet to plot
+#' @param go metanet object
+#'
+#' @return metanet object
+#' @export
+#'
+#' @examples
+#' g <- igraph::make_ring(2)
+#' g <- igraph::add.edges(g, c(1, 1, 1, 1, 2, 1))
+#' plot(g)
+#' plot(clean_multi_edge_metanet(g))
+clean_multi_edge_metanet <- function(go) {
+  tmp_e <- get_e(go)
+  tmp_e$loop.angle <- 0
+  # tmp_e$curved=0
+
+  summ_2col(tmp_e[, c("from", "to")], direct = FALSE) -> e_count
+  filter(e_count, count > 1) -> multi_e_count
+  for (i in seq_len(nrow(multi_e_count))) {
+    from <- multi_e_count$from[i]
+    to <- multi_e_count$to[i]
+    count <- multi_e_count$count[i]
+    if (from == to) {
+      tmp_e[tmp_e$from == from & tmp_e$to == to, "loop.angle"] <- seq(0, 2 * pi, length = count + 1)[-(count + 1)]
+    }
+    # else {
+    #   tmp_e[tmp_e$from%in%c(from,to) & tmp_e$to%in%c(from,to),"curved"] <- 0.2 # seq(0,1,length=count)
+    # }
+  }
+
+  #   summ_2col(tmp_e[,c("from","to")],direct = TRUE) -> e_count
+  #   filter(e_count,count>1) -> multi_e_count
+  #   for (i in seq_len(nrow(multi_e_count))) {
+  #     from=multi_e_count$from[i]
+  #     to=multi_e_count$to[i]
+  #     count=multi_e_count$count[i]
+  #     if(from!=to){
+  #       tmp_e[tmp_e$from==from & tmp_e$to==to,"curved"] <- seq(0.2,1,length=count)
+  #     }
+  #   }
+
+  igraph::edge.attributes(go) <- as.list(tmp_e)
+  go
+}
+
+#' Link summary of the network
+#'
+#' @param go igraph or metanet
+#' @param group summary which group of vertex attribution in names(vertex_attr(go))
+#' @param e_type "positive", "negative", "all"
+#' @param topN topN of group, default: 10
+#' @param mode 1~2
+#' @param colors colors
+#' @param plot_param plot parameters
+#'
+#' @return plot
+#' @export
+#' @family topological
+#' @examples
+#' if (requireNamespace("circlize")) {
+#'   links_stat(co_net, topN = 10)
+#'   module_detect(co_net) -> co_net_modu
+#'   links_stat(co_net_modu, group = "module")
+#' }
+#' if (requireNamespace("corrplot")) {
+#'   links_stat(co_net, topN = 10, mode = 2)
+#' }
+links_stat <- function(go, group = "v_class", e_type = "all",
+                       topN = 10, colors = NULL, mode = 1, plot_param = list()) {
+  color <- v_class <- shape <- left_leg_x <- from <- to <- n <- NULL
+  direct <- is_directed(go)
+  go <- c_net_set(go, vertex_class = group)
+
+  get_v(go) -> v_index
+  v_index %>% dplyr::select("name", "v_class") -> map
+
+  suppressMessages(anno_edge(go, map) %>% get_e() -> edge)
+  # statistics
+  if (e_type != "all") edge %>% dplyr::filter(e_type == !!e_type) -> edge
+  summ_2col(edge[, paste0("v_class", c("_from", "_to"))], direct = direct) -> bb
+  colnames(bb) <- c("from", "to", "count")
+
+  dplyr::group_by(bb, from) %>%
+    dplyr::summarise(n = sum(count)) %>%
+    dplyr::arrange(-n) %>%
+    dplyr::top_n(topN, n) %>%
+    dplyr::pull(from) -> nnn
+
+  # plot
+  bb2 <- mutate(bb,
+    from = ifelse(from %in% nnn, from, "Others"),
+    to = ifelse(to %in% nnn, to, "Others")
+  ) %>% summ_2col(direct = direct)
+
+  if (mode == 1) {
+    do.call(pcutils::my_circo, pcutils::update_param(
+      list(
+        df = bb2,
+        reorder = FALSE,
+        pal = colors
+      ), plot_param
+    ))
+  }
+  if (mode == 2) {
+    tab <- pcutils::df2distance(bb2)
+    tab2 <- tab
+    tab2[tab2 > 0] <- 1
+    tab2[tab2 != 1] <- 0
+    # tab2 <- trans(tab, "pa") %>% as.matrix()
+    do.call(corrplot::corrplot, pcutils::update_param(
+      list(
+        corr = tab2,
+        type = "lower",
+        method = "color",
+        col = c("white", "white", "red"),
+        addgrid.col = "black",
+        cl.pos = "n",
+        tl.col = "black"
+      ),
+      plot_param
+    ))
+  }
+}
+
+# 每个分组可以构建一个网络，每个网络都可以用link_stat得到一些互作的数量（互作强度），可以再看这些数量和分组间某些指标的相关性。

@@ -4,12 +4,12 @@
 \alias{get_v}
 \title{Get vertex information}
 \usage{
-get_v(go, name = NULL)
+get_v(go, index = NULL)
 }
 \arguments{
 \item{go}{metanet object}
 
-\item{name}{attribute name, default: NULL}
+\item{index}{attribute name, default: NULL}
 }
 \value{
 data.frame

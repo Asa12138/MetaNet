@@ -2,13 +2,18 @@
 
 ## Added
 
+- added `clean_multi_edge_metanet` and modified the `skeleton_plot`, now `c_net_plot` can plot skeleton network perfectly. <2024-06-05, Wed>
+- added `remove_negative` in `extract_sample_net` <2024-05-23, Thu>
+- added `cal_KLD` <2024-05-23, Thu>
+- added plot pie function in `c_net_plot` <2024-04-12, Fri>
+- added `metanet_shapes()`, including diamond, triangle1-2 <2024-04-12, Fri>
 - v0.2.1, big change <2024-04-11, Thu>
 
 # MetaNet v0.1.3 Notes
 
 ## Added
 
-- added `co_net_union` <2024-03-29, Fri>
+- added `c_net_union` <2024-03-29, Fri>
 - added `params_list` argument for `c_net_plot`, easy to repeat calls to set default parameters <2024-03-28, Thu>
 
 ## Fixed
