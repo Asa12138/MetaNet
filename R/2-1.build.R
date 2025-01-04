@@ -418,11 +418,14 @@ clean_igraph <- function(go, direct = TRUE) {
 #' edge_net <- c_net_set(edge_net, vertex_class = "Phylum", edge_width = "n")
 #' c_net_plot(edge_net)
 c_net_from_edgelist <- function(edgelist, vertex_df = NULL, direct = FALSE, e_type = NULL, e_class = NULL) {
-  if (!"name" %in% colnames(vertex_df)) {
-    vertex_df$name <- rownames(vertex_df)
-    message("No 'name' in the colnames(vertex_df), use rownames(vertex_df) as the 'name'.")
+  if(!is.null(vertex_df)){
+    if (!"name" %in% colnames(vertex_df)) {
+      vertex_df$name <- rownames(vertex_df)
+      message("No 'name' in the colnames(vertex_df), use rownames(vertex_df) as the 'name'.")
+    }
+    vertex_df <- data.frame(vertex_df[, "name", drop = FALSE], vertex_df[, setdiff(colnames(vertex_df), "name"), drop = FALSE])
   }
-  vertex_df <- data.frame(vertex_df[, "name", drop = FALSE], vertex_df[, setdiff(colnames(vertex_df), "name"), drop = FALSE])
+
   if (!all(c("from", "to") %in% colnames(edgelist))) {
     message("No 'from' and 'to' in the colnames(edgelist), use the first two columns as the 'from' and 'to'.")
     colnames(edgelist)[1:2] <- c("from", "to")

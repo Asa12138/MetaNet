@@ -258,6 +258,8 @@ input_gephi <- function(file) {
   return(list(go = gephi, coors = coors))
 }
 
+
+
 #' plot use networkD3
 #'
 #' @param go metanet

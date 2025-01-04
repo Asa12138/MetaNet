@@ -145,7 +145,7 @@ get_v <- function(go, index = NULL) {
   # 规定name只能为字符
   if (is.null(V(go)$name)) V(go)$name <- as.character(V(go))
   # df <- as.data.frame(igraph::vertex.attributes(go))
-  igraph::as_data_frame(go, what = "v") -> df
+  igraph::as_data_frame(go, what = "vertices") -> df
   df <- dplyr::select(df, name, dplyr::everything())
   rownames(df) <- NULL
   if (!is.null(index)) {
@@ -444,7 +444,7 @@ c_net_save <- function(go, filename = "net", format = "data.frame") {
       dplyr::select(-1) %>%
       write.csv(., paste0(filename, "_edges.csv"), row.names = FALSE)
   } else if (format == "graphml") {
-    go <- igraph::delete_edge_attr(go, "id")
+    if("id"%in%edge.attributes(go))go <- igraph::delete_edge_attr(go, "id")
     if (!grepl("\\.graphml$", filename)) filename <- paste0(filename, ".graphml")
     igraph::write_graph(go, filename, format = "graphml")
   } else {
@@ -466,6 +466,20 @@ c_net_load <- function(filename, format = "data.frame") {
     nodes <- read.csv(paste0(filename, "_nodes.csv"), stringsAsFactors = FALSE)
     edges <- read.csv(paste0(filename, "_edges.csv"), stringsAsFactors = FALSE)
     c_net_from_edgelist(edges, vertex_df = nodes) -> go
+  } else if (format == "cyjs") {
+    lib_ps("jsonify",library = FALSE)
+    if (!grepl("\\.cyjs$", filename)) filename <- paste0(filename, ".cyjs")
+    jsonify::from_json(filename)->G
+    node=cbind_new(G$elements$nodes$data,G$elements$nodes$position)
+    tmp_fac=max(diff(range(node$x)),diff(range(node$y)))
+    node$x=node$x*2/tmp_fac
+    node$y=-node$y*2/tmp_fac
+    node=node[,colnames(node)!="name"]
+    colnames(node)[1]="name"
+    edge=G$elements$edges$data
+    edge=edge[,!colnames(edge)%in%c("from","to")]
+    colnames(edge)[1:3]=c("id","from","to")
+    c_net_from_edgelist(edge,node)->go
   } else if (format == "graphml") {
     if (!grepl("\\.graphml$", filename)) filename <- paste0(filename, ".graphml")
     igraph::read_graph(filename, format = "graphml") -> go

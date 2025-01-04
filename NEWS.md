@@ -1,3 +1,9 @@
+# MetaNet v0.2.2 Notes
+
+## Added
+
+- added `cyjs` format for function `c_net_load` <2024-11-19, Tue>
+
 # MetaNet v0.2.1 Notes
 
 ## Added
