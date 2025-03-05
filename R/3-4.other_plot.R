@@ -243,7 +243,11 @@ input_gephi <- function(file) {
 
   # transform color
   pcutils::rgb2code(tmp_v[, c("r", "g", "b")]) %>% dplyr::pull(code) -> tmp_v$color
-  E(gephi)$color <- ifelse(E(gephi)$cor > 0, "#48A4F0", "#E85D5D")
+  if("cor"%in%edge.attributes(gephi)){
+    E(gephi)$color <- ifelse(E(gephi)$cor > 0, "#48A4F0", "#E85D5D")}
+  else {
+    E(gephi)$color <- "#48A4F0"
+    }
   # scale size
   tmp_v$size <- pcutils::mmscale(tmp_v$size, 1, 5)
   E(gephi)$width <- pcutils::mmscale(E(gephi)$width, 0.05, 0.2)
