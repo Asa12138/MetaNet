@@ -138,7 +138,7 @@ some_custom_paras <- function(tmp_v, tmp_e, ...) {
 
   # 下列都是mapping好的颜色，形状等，无法单独修改某一个vertex或edge的颜色，形状等
   # ！！！考虑增加额外参数，用于单独修改某一个vertex或edge的颜色，形状等
-  tmp_v$label.color <- "black"
+  if(!"label.color"%in%colnames(tmp_v))tmp_v$label.color <- "black"
   if ("vertex.size" %in% params_name) tmp_v$size <- params[["vertex.size"]]
   if ("vertex.color" %in% params_name) {
     tmp_v$color <- condance(data.frame(
