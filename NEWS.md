@@ -1,3 +1,9 @@
+# MetaNet v0.2.5 Notes
+
+## Others
+
+- Reconstruct the 'coors' object, now it is a dataframe rather than list. <2025-04-07, Mon>
+
 # MetaNet v0.2.2 Notes
 
 ## Added

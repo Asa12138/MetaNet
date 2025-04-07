@@ -18,7 +18,6 @@ as.ggig <- function(go, coors = NULL) {
 
   if (is.null(coors)) coors <- c_net_layout(go)
   coors <- get_coors(coors, go)
-  coors <- coors$coors
 
   # add coors
   coors <- coors[, 1:3] %>% na.omit()
@@ -239,10 +238,8 @@ input_gephi <- function(file) {
   }
   coors <- tmp_v[, c("x", "y")]
   coors <- data.frame(name = tmp_v$label, X = coors[, 1], Y = coors[, 2])
-
-  tmp_fac <- max(diff(range(coors$X)), diff(range(coors$Y)))
-  coors$X <- coors$X * 2 / tmp_fac
-  coors$Y <- coors$Y * 2 / tmp_fac
+  class(coors) <- "coors"
+  coors <- rescale_coors(coors)
 
   # transform color
   pcutils::rgb2code(tmp_v[, c("r", "g", "b")]) %>% dplyr::pull(code) -> tmp_v$color
@@ -279,11 +276,13 @@ input_cytoscape <- function(file) {
   get_v(cyto) -> tmp_v
   coors <- tmp_v[, c("x", "y")]
   coors <- data.frame(name = tmp_v$name, X = coors[, 1], Y = coors[, 2])
-  coors <- structure(list(coors = coors, curved = NULL), class = "coors") %>% rescale_coors(keep_asp = TRUE)
+
+  class(coors) <- "coors"
+  coors <- rescale_coors(coors)
 
   cyto <- c_net_update(cyto, initialize = TRUE)
-  igraph::graph_attr(cyto, "coors") <- coors$coors
-  return(list(go = cyto, coors = coors$coors))
+  igraph::graph_attr(cyto, "coors") <- coors
+  return(list(go = cyto, coors = coors))
 }
 
 

@@ -278,9 +278,8 @@ get_module_coors <- function(go = NULL, coors = NULL, tmp_v = NULL, ori_coors = 
   } else {
     tmp_v <- get_v(go)
     ori_coors <- get_coors(coors, go)
-    coors <- ori_coors$coors[, c("X", "Y")] %>% as.matrix()
   }
-  module_coors <- dplyr::left_join(tmp_v[, c("name", "module")], ori_coors$coors, by = "name")
+  module_coors <- dplyr::left_join(tmp_v[, c("name", "module")], ori_coors, by = "name")
   if (rescale_flag) module_coors <- dplyr::mutate(module_coors, X = mmscale(X, -1, 1), Y = mmscale(Y, -1, 1))
   module_coors <- dplyr::group_by(module_coors, module) %>%
     dplyr::summarise(minx = min(X), maxx = max(X), miny = min(Y), maxy = max(Y))
@@ -597,11 +596,11 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
 
   # get coordinates
   ori_coors <- get_coors(coors, go, seed = seed)
-  coors <- ori_coors$coors[, c("X", "Y")] %>% as.matrix()
-  if (is.null(ori_coors$curved)) {
+  coors <- ori_coors[, c("X", "Y")] %>% as.matrix()
+  if (is.null(attributes(ori_coors)$curved)) {
     edge_curved <- NULL
   } else {
-    edge_curved <- ori_coors$curved$curved
+    edge_curved <- attributes(ori_coors)$curved$curved
   }
 
   # scale the size and width

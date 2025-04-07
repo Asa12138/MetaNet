@@ -69,7 +69,8 @@ c_net_layout <- function(go, method = igraph::nicely(), order_by = NULL, order_l
     }
   }
   coors <- data.frame(coors, row.names = NULL)
-  coors <- structure(list(coors = coors, curved = curved), class = "coors")
+  attributes(coors)$class <- c("coors", class(coors))
+  attributes(coors)$curved <- curved
   if (rescale) {
     coors <- rescale_coors(coors)
   }
@@ -110,16 +111,11 @@ get_coors <- \(coors, go, ...){
   if (is_layout(coors)) coors <- c_net_layout(go, coors, ...)
   # 3.如果是一个提供的coors对象（list），那就把curved传到edge里，coors导出为df
   if (inherits(coors, "coors")) {
-    if (!is.null(coors$curved)) {
-      edge_curved <- dplyr::left_join(get_e(go), coors$curved, by = c("from", "to"), suffix = c(".x", "")) %>%
+    if (!is.null(attributes(coors)$curved)) {
+      edge_curved <- dplyr::left_join(get_e(go), attributes(coors)$curved, by = c("from", "to"), suffix = c(".x", "")) %>%
         dplyr::select("from", "to", "curved")
       edge_curved[is.na(edge_curved)] <- 0
       edge_curved <- data.frame(edge_curved, row.names = NULL)
-    }
-    if (!is.null(coors$coors)) {
-      coors <- coors$coors
-    } else {
-      coors <- c_net_layout(go, igraph::nicely(), ...)
     }
   }
   # 4.如果是matrix，变成df
@@ -130,26 +126,28 @@ get_coors <- \(coors, go, ...){
   # 5.如果是df了，那就对齐name用于下一步的绘图，
   if (is.data.frame(coors)) {
     coors <- coors[match(V(go)$name, coors$name), ]
-    return(structure(list(coors = coors, curved = edge_curved), class = "coors"))
+    attributes(coors)$class <- c("coors", class(coors))
+    attributes(coors)$curved <- edge_curved
+    return(coors)
   }
   stop("coors wrong!")
 }
 
-rescale_coors <- function(coors, keep_asp = FALSE) {
+rescale_coors <- function(coors, keep_asp = TRUE) {
   stopifnot(inherits(coors, "coors"))
   if (keep_asp) {
-    diff_x <- diff(range(coors$coors$X))
-    diff_y <- diff(range(coors$coors$Y))
+    diff_x <- diff(range(coors$X))
+    diff_y <- diff(range(coors$Y))
     if (diff_x > diff_y) {
-      coors$coors$X <- mmscale(coors$coors$X, -1, 1)
-      coors$coors$Y <- mmscale(coors$coors$Y, -1 * diff_y / diff_x, 1 * diff_y / diff_x)
+      coors$X <- mmscale(coors$X, -1, 1)
+      coors$Y <- mmscale(coors$Y, -1 * diff_y / diff_x, 1 * diff_y / diff_x)
     } else {
-      coors$coors$X <- mmscale(coors$coors$X, -1 * diff_x / diff_y, 1 * diff_x / diff_y)
-      coors$coors$Y <- mmscale(coors$coors$Y, -1, 1)
+      coors$X <- mmscale(coors$X, -1 * diff_x / diff_y, 1 * diff_x / diff_y)
+      coors$Y <- mmscale(coors$Y, -1, 1)
     }
   } else {
-    coors$coors$X <- mmscale(coors$coors$X, -1, 1)
-    coors$coors$Y <- mmscale(coors$coors$Y, -1, 1)
+    coors$X <- mmscale(coors$X, -1, 1)
+    coors$Y <- mmscale(coors$Y, -1, 1)
   }
   coors
 }
@@ -158,18 +156,19 @@ combine_coors <- function(..., list = NULL) {
   name <- from <- to <- NULL
   list <- c(list(...), list)
   if (!all(vapply(list, \(i)inherits(i, "coors"), logical(1)))) stop("some input are not coors object")
-  coors <- lapply(list, \(i)i[["coors"]]) %>% do.call(rbind, .)
-  curved <- lapply(list, \(i)i[["curved"]]) %>% do.call(rbind, .)
+  coors <- lapply(list, \(i)i) %>% do.call(rbind, .)
+  curved <- lapply(list, \(i)attributes(i)$curved) %>% do.call(rbind, .)
   if (any(duplicated(coors$name))) {
-    warning("some duplicated name in coors$coors")
+    warning("some duplicated name in coors")
     coors <- dplyr::distinct(coors, name, .keep_all = TRUE)
   }
   if (!is.null(curved)) {
     curved2 <- dplyr::distinct(curved, from, to, .keep_all = TRUE)
-    if (nrow(curved2) != nrow(curved)) warning("some duplicates in coors$curved")
+    if (nrow(curved2) != nrow(curved)) warning("some duplicates in attributes(i)$curved")
     curved <- curved2
   }
-  coors <- structure(list(coors = coors, curved = curved), class = "coors")
+  attributes(coors)$class <- c("coors", class(coors))
+  attributes(coors)$curved <- curved
   return(coors)
 }
 
@@ -195,7 +194,7 @@ transform_coors <- function(coors, scale = 1, aspect_ratio = 1,
   stopifnot(inherits(coors, "coors"))
 
   # 复制原始数据
-  new_coor <- coors$coors
+  new_coor <- coors
 
   # 放大/缩小
   new_coor$X <- new_coor$X * scale
@@ -216,7 +215,7 @@ transform_coors <- function(coors, scale = 1, aspect_ratio = 1,
   if (mirror_x) new_coor$X <- -new_coor$X
   if (mirror_y) new_coor$Y <- -new_coor$Y
 
-  coors$coors <- new_coor
+  coors <- new_coor
   return(coors)
 }
 
@@ -352,7 +351,7 @@ as_circle_tree <- \(){
 
 big_layout <- \(zoom1, layout1, nodeGroup){
   c_net_update(igraph::make_ring(nlevels(nodeGroup$group))) -> tmp_da_net
-  da <- get_coors(layout1, tmp_da_net)[["coors"]]
+  da <- get_coors(layout1, tmp_da_net)
   da$name <- NULL
 
   if (!all(levels(nodeGroup$group) %in% rownames(da))) rownames(da) <- levels(nodeGroup$group)
@@ -444,14 +443,14 @@ g_layout <- function(go, group = "module", group_order = NULL, layout1 = in_circ
     igraph::subgraph(go, tmpid) -> tmp_net
 
     get_coors(layoutls[[i]], tmp_net, ...) -> coors
-    data <- coors$coors
+    data <- coors
     if ("igraph_layout_spec" %in% class(layoutls[[i]])) {
       data[, c("X", "Y")] <- igraph::norm_coords(as.matrix(data[, c("X", "Y")]))
     }
     data[, "X"] <- data[, "X"] * zoom2[i] + da[i, "X"]
     data[, "Y"] <- data[, "Y"] * zoom2[i] + da[i, "Y"]
 
-    coors$coors <- data
+    coors <- data
     all_coors[[i]] <- coors
   }
   coors <- combine_coors(list = all_coors)
@@ -553,7 +552,8 @@ g_layout_polyarc <- function(go, group = "v_group", group_order = NULL,
     coors <- rbind(coors, tmp_coor)
     theta1 <- theta1 + arc_r[i] + sep
   }
-  coors <- structure(list(coors = coors, curved = NULL), class = "coors")
+  attributes(coors)$class <- c("coors", class(coors))
+  attributes(coors)$curved <- NULL
   coors <- rescale_coors(coors)
   coors
 }
@@ -658,9 +658,11 @@ g_layout_nice <- function(go, group = "module", mode = "circlepack", ...) {
 
   mygraph <- igraph::graph_from_data_frame(edge, directed = directed)
   data <- ggraph::create_layout(mygraph, layout = mode, ...)
-  coor <- data %>% dplyr::select(name, x, y)
-  colnames(coor) <- c("name", "X", "Y")
-  coors <- structure(list(coors = coor, curved = NULL), class = "coors")
+  coors <- data %>% dplyr::select(name, x, y)
+  colnames(coors) <- c("name", "X", "Y")
+  attributes(coors)$class <- c("coors", class(coors))
+  attributes(coors)$curved <- NULL
+
   coors <- rescale_coors(coors)
   return(coors)
 }
