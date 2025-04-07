@@ -30,6 +30,7 @@ if (requireNamespace("networkD3")) {
 Other plot: 
 \code{\link{as.ggig}()},
 \code{\link{c_net_plot}()},
+\code{\link{input_cytoscape}()},
 \code{\link{input_gephi}()},
 \code{\link{olympic_rings_net}()},
 \code{\link{plot.ggig}()},

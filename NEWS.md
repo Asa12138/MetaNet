@@ -2,6 +2,8 @@
 
 ## Added
 
+- added `g_layout_multi_layer` function <2025-04-04, Fri>
+- added `transform_coors` function <2025-04-03, Thu>
 - added `cyjs` format for function `c_net_load` <2024-11-19, Tue>
 
 # MetaNet v0.2.1 Notes

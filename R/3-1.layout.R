@@ -12,7 +12,9 @@
 #' @param order_ls manual the discrete variable with a vector, or continuous variable with "desc" to decreasing
 #' @param seed random seed
 #' @param line_curved consider line curved, only for some layout methods like as_line(), as_polygon().default:0
+#' @param rescale logical, scale the X, Y to (-1,1)
 #' @param ... add
+#'
 #' @aliases c_net_lay
 #' @family layout
 #' @return coors object: coordinates for nodes, columns: name, X, Y; curved for edges, columns: from, to, curved;
@@ -26,7 +28,7 @@
 #' c_net_plot(co_net, c_net_layout(co_net, in_circle(), order_by = "size", order_ls = "desc"))
 #' c_net_plot(co_net, c_net_layout(co_net, as_polygon(3)))
 c_net_layout <- function(go, method = igraph::nicely(), order_by = NULL, order_ls = NULL,
-                         seed = 1234, line_curved = 0.5, ...) {
+                         seed = 1234, line_curved = 0.5, rescale = TRUE, ...) {
   set.seed(seed)
   name <- x <- y <- NULL
   if ("igraph_layout_spec" %in% class(method)) {
@@ -44,7 +46,11 @@ c_net_layout <- function(go, method = igraph::nicely(), order_by = NULL, order_l
   } else {
     stop("No valid method")
   }
+
   if (inherits(coors, "coors")) {
+    if (rescale) {
+      coors <- rescale_coors(coors)
+    }
     return(coors)
   }
 
@@ -64,6 +70,9 @@ c_net_layout <- function(go, method = igraph::nicely(), order_by = NULL, order_l
   }
   coors <- data.frame(coors, row.names = NULL)
   coors <- structure(list(coors = coors, curved = curved), class = "coors")
+  if (rescale) {
+    coors <- rescale_coors(coors)
+  }
   return(coors)
 }
 
@@ -126,6 +135,25 @@ get_coors <- \(coors, go, ...){
   stop("coors wrong!")
 }
 
+rescale_coors <- function(coors, keep_asp = FALSE) {
+  stopifnot(inherits(coors, "coors"))
+  if (keep_asp) {
+    diff_x <- diff(range(coors$coors$X))
+    diff_y <- diff(range(coors$coors$Y))
+    if (diff_x > diff_y) {
+      coors$coors$X <- mmscale(coors$coors$X, -1, 1)
+      coors$coors$Y <- mmscale(coors$coors$Y, -1 * diff_y / diff_x, 1 * diff_y / diff_x)
+    } else {
+      coors$coors$X <- mmscale(coors$coors$X, -1 * diff_x / diff_y, 1 * diff_x / diff_y)
+      coors$coors$Y <- mmscale(coors$coors$Y, -1, 1)
+    }
+  } else {
+    coors$coors$X <- mmscale(coors$coors$X, -1, 1)
+    coors$coors$Y <- mmscale(coors$coors$Y, -1, 1)
+  }
+  coors
+}
+
 combine_coors <- function(..., list = NULL) {
   name <- from <- to <- NULL
   list <- c(list(...), list)
@@ -142,6 +170,53 @@ combine_coors <- function(..., list = NULL) {
     curved <- curved2
   }
   coors <- structure(list(coors = coors, curved = curved), class = "coors")
+  return(coors)
+}
+
+#' Transform the layout of a 'coors' object
+#'
+#' This function applies various transformations to a 'coors' object, including
+#' scaling, aspect ratio adjustment, rotation, mirroring, and pseudo-3D perspective transformation.
+#'
+#' @param coors An object of class 'coors', containing node coordinates.
+#' @param scale A numeric value to scale the layout (default = 1).
+#' @param aspect_ratio A numeric value to adjust the Y-axis scaling (default = 1).
+#' @param rotation A numeric value in degrees to rotate the layout (default = 0).
+#' @param mirror_x A logical value indicating whether to mirror along the X-axis (default = FALSE).
+#' @param mirror_y A logical value indicating whether to mirror along the Y-axis (default = FALSE).
+#' @param shear_x A numeric value to apply a shear transformation in the X direction (default = 0).
+#' @param shear_y A numeric value to apply a shear transformation in the Y direction (default = 0).
+#'
+#' @return A transformed 'coors' object with updated coordinates.
+#' @export
+transform_coors <- function(coors, scale = 1, aspect_ratio = 1,
+                            rotation = 0, mirror_x = FALSE, mirror_y = FALSE,
+                            shear_x = 0, shear_y = 0) {
+  stopifnot(inherits(coors, "coors"))
+
+  # 复制原始数据
+  new_coor <- coors$coors
+
+  # 放大/缩小
+  new_coor$X <- new_coor$X * scale
+  new_coor$Y <- new_coor$Y * scale * aspect_ratio
+
+  # 旋转（角度转换为弧度）
+  theta <- rotation * pi / 180
+  new_x <- new_coor$X * cos(theta) - new_coor$Y * sin(theta)
+  new_y <- new_coor$X * sin(theta) + new_coor$Y * cos(theta)
+  new_coor$X <- new_x
+  new_coor$Y <- new_y
+
+  # 透视投影（shear变换）
+  new_coor$X <- new_coor$X + shear_x * new_coor$Y
+  new_coor$Y <- new_coor$Y + shear_y * new_coor$X
+
+  # 镜像变换
+  if (mirror_x) new_coor$X <- -new_coor$X
+  if (mirror_y) new_coor$Y <- -new_coor$Y
+
+  coors$coors <- new_coor
   return(coors)
 }
 
@@ -179,7 +254,7 @@ as_line <- function(angle = 0) {
 #' @family layout
 #' @examples
 #' as_arc()(co_net)
-#' c_net_plot(co_net, coors = as_arc(pi / 2), rescale = FALSE)
+#' c_net_plot(co_net, coors = as_arc(pi / 2))
 as_arc <- function(angle = 0, arc = pi) {
   fun <- \(go){
     # (0,0) is the midpoint of circle
@@ -303,6 +378,7 @@ big_layout <- \(zoom1, layout1, nodeGroup){
 #' @param show_big_layout show the big layout to help you adjust.
 #' @param ... add
 #' @param group_order group_order
+#' @param rescale logical, scale the X, Y to (-1,1)
 #'
 #' @return coors
 #' @export
@@ -315,7 +391,7 @@ big_layout <- \(zoom1, layout1, nodeGroup){
 #' plot(co_net_modu, coors = oridata)
 #' }
 g_layout <- function(go, group = "module", group_order = NULL, layout1 = in_circle(), zoom1 = 20, layout2 = in_circle(),
-                     zoom2 = 3, show_big_layout = FALSE, ...) {
+                     zoom2 = 3, show_big_layout = FALSE, rescale = TRUE, ...) {
   name <- NULL
 
   stopifnot(is_igraph(go))
@@ -379,6 +455,9 @@ g_layout <- function(go, group = "module", group_order = NULL, layout1 = in_circ
     all_coors[[i]] <- coors
   }
   coors <- combine_coors(list = all_coors)
+  if (rescale) {
+    coors <- rescale_coors(coors)
+  }
   return(coors)
 }
 
@@ -401,17 +480,33 @@ g_layout <- function(go, group = "module", group_order = NULL, layout1 = in_circ
 #' c_net_plot(multi1, oridata)
 #' g_layout_polycircle(co_net2, group2 = "v_class") -> oridata
 #' c_net_plot(co_net2, oridata)
+#' g_layout_multi_layer(co_net2, group2 = "v_class") -> oridata
+#' c_net_plot(co_net2, oridata)
 g_layout_polygon <- function(go, group = "v_group", group_order = NULL, group2 = NULL, group2_order = NULL, line_curved = 0.5) {
   n <- length(unique(igraph::vertex.attributes(go)[[group]]))
 
   if (n < 2) stop("n should bigger than 1")
+
+  get_v(go) %>% dplyr::pull(!!group) -> group1
+  group1_level <- table(group1)
+  V(go)$`_internal_group` <- group1
+
   angle_ls <- -pi / 2 + (seq(0, n - 1, 1)) * 2 * pi / n
-  fun_ls <- lapply(angle_ls, \(i)as_line(i))
+  names(angle_ls) <- pcutils::change_fac_lev(names(group1_level), group_order) %>% levels()
+
+  layout2_ls <- list()
+  for (i in names(group1_level)) {
+    c_net_filter(go, `_internal_group` == i) %>%
+      c_net_layout(
+        method = as_line(angle_ls[i]), order_by = group2,
+        order_ls = group2_order, rescale = FALSE
+      ) -> layout2_ls[[i]]
+  }
 
   g_layout(go,
     group_order = group_order,
     group = group, zoom1 = 1, zoom2 = 0.9 * (ifelse(n > 2, tan(pi / n), 2)),
-    layout2 = fun_ls, order_by = group2, order_ls = group2_order
+    layout2 = layout2_ls, order_by = group2, order_ls = group2_order
   ) -> oridata
 
   if (is.data.frame(oridata$curved)) oridata$curved$curved <- line_curved
@@ -427,7 +522,8 @@ g_layout_polygon <- function(go, group = "v_group", group_order = NULL, group2 =
 #' @rdname g_layout_polygon
 #' @export
 g_layout_polyarc <- function(go, group = "v_group", group_order = NULL,
-                             group2 = NULL, group2_order = NULL, space = pi / 4, scale_node_num = TRUE) {
+                             group2 = NULL, group2_order = NULL, space = pi / 4,
+                             scale_node_num = TRUE) {
   get_v(go) -> tmp_v
   group1 <- as.factor(tmp_v[, group])
   n <- nlevels(group1)
@@ -457,6 +553,8 @@ g_layout_polyarc <- function(go, group = "v_group", group_order = NULL,
     coors <- rbind(coors, tmp_coor)
     theta1 <- theta1 + arc_r[i] + sep
   }
+  coors <- structure(list(coors = coors, curved = NULL), class = "coors")
+  coors <- rescale_coors(coors)
   coors
 }
 
@@ -485,6 +583,39 @@ g_layout_polycircle <- function(go, group = "v_group", group_order = NULL, group
     group = group, layout1 = matrix(0, nrow = n, ncol = 2),
     zoom1 = 1, zoom2 = 1:n,
     layout2 = igraph::in_circle(), order_by = group2, order_ls = group2_order
+  ) -> oridata
+  oridata
+}
+
+#' Layout with group as a polyarc
+#'
+#' @param scale_node_num scale with the node number in each group
+#' @param layout see method in \code{\link[MetaNet]{c_net_layout}}
+#'
+#' @rdname g_layout_polygon
+#' @export
+g_layout_multi_layer <- function(go, layout = igraph::in_circle(), group = "v_group", group_order = NULL,
+                                 group2 = NULL, group2_order = NULL, scale_node_num = TRUE) {
+  n <- length(unique(igraph::vertex.attributes(go)[[group]]))
+  if (n < 2) stop("n should bigger than 1")
+
+  get_v(go) %>% dplyr::pull(!!group) -> group1
+  group1_level <- table(group1)
+
+  V(go)$`_internal_group` <- group1
+
+  layout2_ls <- list()
+  for (i in names(group1_level)) {
+    c_net_filter(go, `_internal_group` == i) %>%
+      c_net_layout(method = layout, order_by = group2, order_ls = group2_order) %>%
+      transform_coors(shear_x = 3, aspect_ratio = 0.2) -> layout2_ls[[i]]
+  }
+
+  g_layout(go,
+    group_order = group_order,
+    group = group, layout1 = data.frame(X = 0, Y = seq(-1, 1, length = length(group1_level))),
+    zoom1 = 1, zoom2 = group1_level / mean(group1_level),
+    layout2 = layout2_ls
   ) -> oridata
   oridata
 }
@@ -529,8 +660,9 @@ g_layout_nice <- function(go, group = "module", mode = "circlepack", ...) {
   data <- ggraph::create_layout(mygraph, layout = mode, ...)
   coor <- data %>% dplyr::select(name, x, y)
   colnames(coor) <- c("name", "X", "Y")
-
-  return(structure(list(coors = coor, curved = NULL), class = "coors"))
+  coors <- structure(list(coors = coor, curved = NULL), class = "coors")
+  coors <- rescale_coors(coors)
+  return(coors)
 }
 
 #' @rdname g_layout_nice

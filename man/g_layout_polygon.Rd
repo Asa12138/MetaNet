@@ -4,6 +4,7 @@
 \alias{g_layout_polygon}
 \alias{g_layout_polyarc}
 \alias{g_layout_polycircle}
+\alias{g_layout_multi_layer}
 \title{Layout with group as a polygon}
 \usage{
 g_layout_polygon(
@@ -32,6 +33,16 @@ g_layout_polycircle(
   group2 = NULL,
   group2_order = NULL
 )
+
+g_layout_multi_layer(
+  go,
+  layout = igraph::in_circle(),
+  group = "v_group",
+  group_order = NULL,
+  group2 = NULL,
+  group2_order = NULL,
+  scale_node_num = TRUE
+)
 }
 \arguments{
 \item{go}{igraph}
@@ -49,12 +60,16 @@ g_layout_polycircle(
 \item{space}{the space between each arc, default: pi/4}
 
 \item{scale_node_num}{scale with the node number in each group}
+
+\item{layout}{see method in \code{\link[MetaNet]{c_net_layout}}}
 }
 \value{
 coors
 }
 \description{
 Layout with group as a polygon
+
+Layout with group as a polyarc
 
 Layout with group as a polyarc
 
@@ -66,6 +81,8 @@ c_net_plot(multi1, oridata)
 g_layout_polyarc(multi1, group2 = "v_class", group2_order = c(LETTERS[4:1])) -> oridata
 c_net_plot(multi1, oridata)
 g_layout_polycircle(co_net2, group2 = "v_class") -> oridata
+c_net_plot(co_net2, oridata)
+g_layout_multi_layer(co_net2, group2 = "v_class") -> oridata
 c_net_plot(co_net2, oridata)
 }
 \seealso{

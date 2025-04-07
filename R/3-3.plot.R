@@ -138,7 +138,7 @@ some_custom_paras <- function(tmp_v, tmp_e, ...) {
 
   # 下列都是mapping好的颜色，形状等，无法单独修改某一个vertex或edge的颜色，形状等
   # ！！！考虑增加额外参数，用于单独修改某一个vertex或edge的颜色，形状等
-  if(!"label.color"%in%colnames(tmp_v))tmp_v$label.color <- "black"
+  if (!"label.color" %in% colnames(tmp_v)) tmp_v$label.color <- "black"
   if ("vertex.size" %in% params_name) tmp_v$size <- params[["vertex.size"]]
   if ("vertex.color" %in% params_name) {
     tmp_v$color <- condance(data.frame(
@@ -531,6 +531,7 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
 #'
 #' @param seed random seed, default:1234, make sure each plot is the same.
 #' @param params_list a list of parameters, e.g. list(edge_legend = TRUE, lty_legend = FALSE), when the parameter is duplicated, the format argument will be used rather than the argument in params_list.
+#' @param rescale Logical constant, whether to rescale the coordinates to the (-1,1).
 #'
 #' @family plot
 #' @return a network plot
@@ -558,7 +559,7 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
                        lty_legend = FALSE, lty_legend_title = "Edge class", lty_legend_order = NULL,
                        module_legend = FALSE, module_legend_title = "Module", module_legend_order = NULL,
                        pie_legend = FALSE, pie_legend_title = "Pie part", pie_legend_order = NULL,
-                       params_list = NULL,
+                       params_list = NULL, rescale = FALSE,
                        seed = 1234) {
   if (!is.null(params_list)) {
     as.list(match.call()[-1]) -> set_params_list
@@ -648,6 +649,7 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
       ...,
       vertex.frame.width = 0.5,
       main = main,
+      rescale = rescale,
       vertex.label.font = 1,
       vertex.label.cex = 0.07 * tmp_v$size,
       vertex.label = tmp_v$label,

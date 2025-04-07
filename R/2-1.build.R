@@ -418,7 +418,7 @@ clean_igraph <- function(go, direct = TRUE) {
 #' edge_net <- c_net_set(edge_net, vertex_class = "Phylum", edge_width = "n")
 #' c_net_plot(edge_net)
 c_net_from_edgelist <- function(edgelist, vertex_df = NULL, direct = FALSE, e_type = NULL, e_class = NULL) {
-  if(!is.null(vertex_df)){
+  if (!is.null(vertex_df)) {
     if (!"name" %in% colnames(vertex_df)) {
       vertex_df$name <- rownames(vertex_df)
       message("No 'name' in the colnames(vertex_df), use rownames(vertex_df) as the 'name'.")

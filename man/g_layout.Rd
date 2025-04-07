@@ -13,6 +13,7 @@ g_layout(
   layout2 = in_circle(),
   zoom2 = 3,
   show_big_layout = FALSE,
+  rescale = TRUE,
   ...
 )
 }
@@ -34,6 +35,8 @@ g_layout(
 \item{zoom2}{average sub_network layout size, or numeric vector, or "auto"}
 
 \item{show_big_layout}{show the big layout to help you adjust.}
+
+\item{rescale}{logical, scale the X, Y to (-1,1)}
 
 \item{...}{add}
 }

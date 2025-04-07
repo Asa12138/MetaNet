@@ -12,6 +12,7 @@ c_net_layout(
   order_ls = NULL,
   seed = 1234,
   line_curved = 0.5,
+  rescale = TRUE,
   ...
 )
 }
@@ -31,6 +32,8 @@ c_net_layout(
 \item{seed}{random seed}
 
 \item{line_curved}{consider line curved, only for some layout methods like as_line(), as_polygon().default:0}
+
+\item{rescale}{logical, scale the X, Y to (-1,1)}
 
 \item{...}{add}
 }

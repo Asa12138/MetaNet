@@ -239,15 +239,18 @@ input_gephi <- function(file) {
   }
   coors <- tmp_v[, c("x", "y")]
   coors <- data.frame(name = tmp_v$label, X = coors[, 1], Y = coors[, 2])
-  coors %>% dplyr::mutate(X = pcutils::mmscale(X, -40, 40), Y = pcutils::mmscale(Y, -40, 40)) -> coors
+
+  tmp_fac <- max(diff(range(coors$X)), diff(range(coors$Y)))
+  coors$X <- coors$X * 2 / tmp_fac
+  coors$Y <- coors$Y * 2 / tmp_fac
 
   # transform color
   pcutils::rgb2code(tmp_v[, c("r", "g", "b")]) %>% dplyr::pull(code) -> tmp_v$color
-  if("cor"%in%edge.attributes(gephi)){
-    E(gephi)$color <- ifelse(E(gephi)$cor > 0, "#48A4F0", "#E85D5D")}
-  else {
+  if ("cor" %in% edge.attributes(gephi)) {
+    E(gephi)$color <- ifelse(E(gephi)$cor > 0, "#48A4F0", "#E85D5D")
+  } else {
     E(gephi)$color <- "#48A4F0"
-    }
+  }
   # scale size
   tmp_v$size <- pcutils::mmscale(tmp_v$size, 1, 5)
   E(gephi)$width <- pcutils::mmscale(E(gephi)$width, 0.05, 0.2)
@@ -262,6 +265,26 @@ input_gephi <- function(file) {
   return(list(go = gephi, coors = coors))
 }
 
+
+#' Input a cyjs file exported by Cytoscape
+#'
+#' @param file cyjs file exported by Cytoscape
+#' @family plot
+#' @return list contains the igraph object and coordinates
+#'
+#' @export
+input_cytoscape <- function(file) {
+  c_net_load(file, format = "cyjs") -> cyto
+
+  get_v(cyto) -> tmp_v
+  coors <- tmp_v[, c("x", "y")]
+  coors <- data.frame(name = tmp_v$name, X = coors[, 1], Y = coors[, 2])
+  coors <- structure(list(coors = coors, curved = NULL), class = "coors") %>% rescale_coors(keep_asp = TRUE)
+
+  cyto <- c_net_update(cyto, initialize = TRUE)
+  igraph::graph_attr(cyto, "coors") <- coors$coors
+  return(list(go = cyto, coors = coors$coors))
+}
 
 
 #' plot use networkD3

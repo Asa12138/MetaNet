@@ -47,6 +47,7 @@ c_net_plot(
   pie_legend_title = "Pie part",
   pie_legend_order = NULL,
   params_list = NULL,
+  rescale = FALSE,
   seed = 1234
 )
 }
@@ -133,6 +134,8 @@ c_net_plot(
 
 \item{params_list}{a list of parameters, e.g. list(edge_legend = TRUE, lty_legend = FALSE), when the parameter is duplicated, the format argument will be used rather than the argument in params_list.}
 
+\item{rescale}{Logical constant, whether to rescale the coordinates to the (-1,1).}
+
 \item{seed}{random seed, default:1234, make sure each plot is the same.}
 }
 \value{
@@ -150,6 +153,7 @@ c_net_plot(multi1)
 \seealso{
 Other plot: 
 \code{\link{as.ggig}()},
+\code{\link{input_cytoscape}()},
 \code{\link{input_gephi}()},
 \code{\link{netD3plot}()},
 \code{\link{olympic_rings_net}()},

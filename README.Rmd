@@ -67,7 +67,7 @@ devtools::install_github("Asa12138/MetaNet")
 
 Please cite:
 
-Chen Peng (2023). MetaNet: Network Analysis for Omics Data. _R package_, <https://github.com/Asa12138/MetaNet>.
+Chen Peng (2025). MetaNet: Network Analysis for Omics Data. _R package_, <https://github.com/Asa12138/MetaNet>.
 
 ## Need helps?
 

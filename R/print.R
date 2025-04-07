@@ -76,6 +76,7 @@ summary.corr <- function(object, ...) {
 print.coors <- function(x, ...) {
   cat("Coordinates:\n")
   cat("Table dimensions:", nrow(x$coors), "rows,", ncol(x$coors), "columns\n")
+  if (!is.null(attributes(x)$curved)) cat("With curved information")
 }
 
 

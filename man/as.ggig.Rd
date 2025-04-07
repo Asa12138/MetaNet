@@ -26,6 +26,7 @@ plot(ggig, labels_num = 0.3)
 \seealso{
 Other plot: 
 \code{\link{c_net_plot}()},
+\code{\link{input_cytoscape}()},
 \code{\link{input_gephi}()},
 \code{\link{netD3plot}()},
 \code{\link{olympic_rings_net}()},
