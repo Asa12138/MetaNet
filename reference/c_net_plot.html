@@ -138,6 +138,7 @@
 <span>  pie_legend_title <span class="op">=</span> <span class="st">"Pie part"</span>,</span>
 <span>  pie_legend_order <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  params_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  rescale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">1234</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -310,6 +311,10 @@
 <dd><p>a list of parameters, e.g. list(edge_legend = TRUE, lty_legend = FALSE), when the parameter is duplicated, the format argument will be used rather than the argument in params_list.</p></dd>
 
 
+<dt id="arg-rescale">rescale<a class="anchor" aria-label="anchor" href="#arg-rescale"></a></dt>
+<dd><p>Logical constant, whether to rescale the coordinates to the (-1,1).</p></dd>
+
+
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>random seed, default:1234, make sure each plot is the same.</p></dd>
 
@@ -322,6 +327,7 @@
     <h2>See also</h2>
     <div class="dont-index"><p>Other plot:
 <code><a href="as.ggig.html">as.ggig</a>()</code>,
+<code><a href="input_cytoscape.html">input_cytoscape</a>()</code>,
 <code><a href="input_gephi.html">input_gephi</a>()</code>,
 <code><a href="netD3plot.html">netD3plot</a>()</code>,
 <code><a href="olympic_rings_net.html">olympic_rings_net</a>()</code>,

@@ -57,6 +57,7 @@
 <url><loc>/reference/get_v.html</loc></url>
 <url><loc>/reference/grapes-less-than-greater-than-grapes.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/input_cytoscape.html</loc></url>
 <url><loc>/reference/input_gephi.html</loc></url>
 <url><loc>/reference/is_metanet.html</loc></url>
 <url><loc>/reference/links_stat.html</loc></url>
@@ -99,6 +100,7 @@
 <url><loc>/reference/to_module_net.html</loc></url>
 <url><loc>/reference/transc.html</loc></url>
 <url><loc>/reference/transc_g.html</loc></url>
+<url><loc>/reference/transform_coors.html</loc></url>
 <url><loc>/reference/twocol_edgelist.html</loc></url>
 <url><loc>/reference/venn_net.html</loc></url>
 <url><loc>/reference/vulnerability.html</loc></url>
