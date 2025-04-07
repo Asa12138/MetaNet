@@ -53,7 +53,10 @@ Suggests:
     jsonify,
     ggpubr,
     corrplot,
-    philentropy
+    philentropy,
+    spatstat.random,
+    spatstat.geom,
+    sf
 VignetteBuilder: knitr
 BugReports: https://github.com/Asa12138/MetaNet/issues
 URL: https://github.com/Asa12138/MetaNet

@@ -25,6 +25,8 @@ Other layout:
 \code{\link{as_arc}()},
 \code{\link{as_circle_tree}()},
 \code{\link{as_line}()},
+\code{\link{as_multi_layer}()},
+\code{\link{as_poly_sector}()},
 \code{\link{as_polyarc}()},
 \code{\link{as_polycircle}()},
 \code{\link{c_net_layout}()}

@@ -23,6 +23,8 @@ c_net_plot(co_net, coors = as_line(pi / 2))
 Other layout: 
 \code{\link{as_arc}()},
 \code{\link{as_circle_tree}()},
+\code{\link{as_multi_layer}()},
+\code{\link{as_poly_sector}()},
 \code{\link{as_polyarc}()},
 \code{\link{as_polycircle}()},
 \code{\link{as_polygon}()},

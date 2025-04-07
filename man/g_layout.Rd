@@ -57,6 +57,7 @@ plot(co_net_modu, coors = oridata)
 \seealso{
 Other g_layout: 
 \code{\link{g_layout_nice}()},
+\code{\link{g_layout_poly_sector}()},
 \code{\link{g_layout_polygon}()}
 }
 \concept{g_layout}

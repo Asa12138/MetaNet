@@ -476,6 +476,6 @@ olympic_rings_net <- function() {
   plot(g1,
     coors = g_layout(g1, layout1 = rings_data[, 1:2], zoom1 = 1.2, zoom2 = 0.5),
     rescale = FALSE, legend = FALSE, main = "Olympic Rings", vertex.frame.color = NA,
-    edge.width = 0, vertex.color = setNames(rings_data$color, 1:5), vertex.size = 9
+    edge.width = 0, vertex.color = setNames(rings_data$color, 1:5), vertex.size = 7
   )
 }

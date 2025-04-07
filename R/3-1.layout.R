@@ -69,8 +69,7 @@ c_net_layout <- function(go, method = igraph::nicely(), order_by = NULL, order_l
     }
   }
   coors <- data.frame(coors, row.names = NULL)
-  attributes(coors)$class <- c("coors", class(coors))
-  attributes(coors)$curved <- curved
+  coors <- as_coors(coors, curved)
   if (rescale) {
     coors <- rescale_coors(coors)
   }
@@ -96,6 +95,29 @@ order_tmp_v_name <- function(tmp_v, coors_mat, order_by = NULL, order_ls = NULL)
 is_layout <- \(x){
   any(class(x) %in% c("igraph_layout_spec", "layout"))
 }
+
+
+#' Transfer to a coors object
+#'
+#' @param coors data.frame
+#' @param curved line curved
+#'
+#' @return coors object
+#' @export
+#'
+as_coors <- function(coors, curved = NULL) {
+  if (inherits(coors, "coors")) {
+    if (!is.null(curved)) attributes(coors)$curved <- curved
+    return(coors)
+  }
+  if (!identical(colnames(coors), c("name", "X", "Y"))) {
+    stop("The input should be a data frame with columns: name, X, Y")
+  }
+  attributes(coors)$class <- c("coors", class(coors))
+  attributes(coors)$curved <- curved
+  return(coors)
+}
+
 
 get_coors <- \(coors, go, ...){
   edge_curved <- NULL
@@ -126,8 +148,7 @@ get_coors <- \(coors, go, ...){
   # 5.如果是df了，那就对齐name用于下一步的绘图，
   if (is.data.frame(coors)) {
     coors <- coors[match(V(go)$name, coors$name), ]
-    attributes(coors)$class <- c("coors", class(coors))
-    attributes(coors)$curved <- edge_curved
+    coors <- as_coors(coors, edge_curved)
     return(coors)
   }
   stop("coors wrong!")
@@ -167,8 +188,7 @@ combine_coors <- function(..., list = NULL) {
     if (nrow(curved2) != nrow(curved)) warning("some duplicates in attributes(i)$curved")
     curved <- curved2
   }
-  attributes(coors)$class <- c("coors", class(coors))
-  attributes(coors)$curved <- curved
+  coors <- as_coors(coors, curved)
   return(coors)
 }
 
@@ -320,9 +340,9 @@ as_polyarc <- \(n = 3, space = pi / 3){
 #' @family layout
 #' @examples
 #' as_polycircle()(co_net)
-as_polycircle <- \(n = 2){
+as_polycircle <- \(n = 5){
   fun <- \(go, group2 = NULL, group2_order = NULL){
-    V(go)$poly_group <- rep(paste0("omic", 1:n), len = length(go))
+    V(go)$poly_group <- rep(paste0("omic", 1:n), distribute_points_in_concentric_circles(length(go), n))
     if (n < 2) stop("n should bigger than 1")
     g_layout_polycircle(go, "poly_group", group2 = group2, group2_order = group2_order) -> oridata
     oridata
@@ -330,6 +350,81 @@ as_polycircle <- \(n = 2){
   class(fun) <- c("poly", "layout", "function")
   fun
 }
+
+
+distribute_points_in_concentric_circles <- function(n, k = NULL, mode = c("linear", "perimeter")) {
+  mode <- match.arg(mode)
+
+  if (is.null(k)) {
+    # 自动决定层数：sqrt(n) 是个常用经验
+    k <- ceiling(sqrt(n))
+  }
+
+  layer_weights <- switch(mode,
+    linear = 1:k, # 权重 1, 2, ..., k
+    perimeter = 1:k # 半径与层号成比例，周长也是
+  )
+
+  # 归一化
+  weight_sum <- sum(layer_weights)
+  raw_counts <- n * layer_weights / weight_sum
+
+  # 四舍五入并微调使总和为n
+  counts <- round(raw_counts)
+  diff_n <- n - sum(counts)
+  if (diff_n != 0) {
+    # 按最大余数或最小绝对值误差来调整
+    adjust_order <- order(abs(raw_counts - counts), decreasing = TRUE)
+    for (i in seq_len(abs(diff_n))) {
+      idx <- adjust_order[i]
+      counts[idx] <- counts[idx] + sign(diff_n)
+    }
+  }
+
+  return(counts)
+}
+
+#' Layout as a multi_layer
+#'
+#' @param n how many arcs of this multi_layer
+#' @param layout see method in \code{\link[MetaNet]{c_net_layout}}
+#'
+#' @return A two-column matrix, each row giving the coordinates of a vertex, according to the ids of the vertex ids.
+#' @export
+#' @family layout
+#' @examples
+#' as_multi_layer()(co_net)
+as_multi_layer <- \(n = 3, layout = on_grid()){
+  fun <- \(go, group2 = NULL, group2_order = NULL){
+    V(go)$poly_group <- rep(paste0("omic", 1:n), len = length(go))
+    if (n < 2) stop("n should bigger than 1")
+    g_layout_multi_layer(go, layout = layout, group = "poly_group", group2 = group2, group2_order = group2_order) -> oridata
+    oridata
+  }
+  class(fun) <- c("poly", "layout", "function")
+  fun
+}
+
+#' Layout as a multi_layer
+#'
+#' @param n how many arcs of this multi_layer
+#'
+#' @return A two-column matrix, each row giving the coordinates of a vertex, according to the ids of the vertex ids.
+#' @export
+#' @family layout
+#' @examples
+#' as_poly_sector()(co_net)
+as_poly_sector <- \(n = 3){
+  fun <- \(go, group2 = NULL, group2_order = NULL){
+    V(go)$poly_group <- rep(paste0("omic", 1:n), len = length(go))
+    if (n < 2) stop("n should bigger than 1")
+    g_layout_poly_sector(go, group = "poly_group", group2 = group2, group2_order = group2_order) -> oridata
+    oridata
+  }
+  class(fun) <- c("poly", "layout", "function")
+  fun
+}
+
 
 #' Layout as a circle_tree
 #'
@@ -398,6 +493,8 @@ g_layout <- function(go, group = "module", group_order = NULL, layout1 = in_circ
   get_v(go) %>% dplyr::select(name, !!group) -> nodeGroup
   colnames(nodeGroup) <- c("ID", "group")
   nodeGroup$group <- factor(nodeGroup$group)
+  stopifnot(nlevels(nodeGroup$group) > 1)
+
   if (!is.null(group_order)) nodeGroup$group <- pcutils::change_fac_lev(nodeGroup$group, group_order)
 
   da <- big_layout(zoom1, layout1, nodeGroup)
@@ -552,17 +649,13 @@ g_layout_polyarc <- function(go, group = "v_group", group_order = NULL,
     coors <- rbind(coors, tmp_coor)
     theta1 <- theta1 + arc_r[i] + sep
   }
-  attributes(coors)$class <- c("coors", class(coors))
-  attributes(coors)$curved <- NULL
+  coors <- as_coors(coors)
   coors <- rescale_coors(coors)
   coors
 }
 
 
-#' Layout with group as a polyarc
-#'
-#' @param space the space between each arc, default: pi/4
-#' @param scale_node_num scale with the node number in each group
+#' Layout with group as a polycircle
 #'
 #' @rdname g_layout_polygon
 #' @export
@@ -587,9 +680,8 @@ g_layout_polycircle <- function(go, group = "v_group", group_order = NULL, group
   oridata
 }
 
-#' Layout with group as a polyarc
+#' Layout with group as a multi_layer
 #'
-#' @param scale_node_num scale with the node number in each group
 #' @param layout see method in \code{\link[MetaNet]{c_net_layout}}
 #'
 #' @rdname g_layout_polygon
@@ -660,8 +752,7 @@ g_layout_nice <- function(go, group = "module", mode = "circlepack", ...) {
   data <- ggraph::create_layout(mygraph, layout = mode, ...)
   coors <- data %>% dplyr::select(name, x, y)
   colnames(coors) <- c("name", "X", "Y")
-  attributes(coors)$class <- c("coors", class(coors))
-  attributes(coors)$curved <- NULL
+  coors <- as_coors(coors)
 
   coors <- rescale_coors(coors)
   return(coors)
@@ -689,4 +780,254 @@ g_layout_backbone <- \(go, group = "module", ...){
 #' @export
 g_layout_stress <- \(go, group = "module", ...){
   g_layout_nice(go, group = group, mode = "stress", ...)
+}
+
+
+#' Generate spatial layout using `spatstat`
+#'
+#' @param go igraph or metanet object
+#' @param win A spatstat window object (owin), e.g. disc(), owin(poly=...); Or sf object.
+#' @param type Type of distribution: "random", "regular"
+#' @param mode "surface", "boundary"
+#' @param jitter for surface-regular, defalut 0
+#' @param curved Optional curved attribute for coors
+#' @param order_by order nodes according to a node attribute
+#' @param order_ls manual the discrete variable with a vector, or continuous variable with "desc" to decreasing
+#' @param seed random seed
+#' @param rescale rescale the coordinates to (0,1)
+#'
+#' @return A coors object (data.frame with class "coors" and attribute "curved")
+#' @export
+#'
+#' @examples
+#' \donttest{
+#' if (requireNamespace("spatstat.geom") && requireNamespace("spatstat.random")) {
+#'   poly_x <- c(0, 2, 2, 0)
+#'   poly_y <- c(0, 0, 1, 1)
+#'   win_poly <- spatstat.geom::owin(poly = list(x = poly_x, y = poly_y))
+#'   plot(win_poly)
+#'   coors1 <- spatstat_layout(co_net, win_poly, type = "regular", mode = "surface")
+#'   plot(co_net, coors = coors1)
+#'   coors2 <- spatstat_layout(co_net2, win_poly, type = "random", mode = "boundary")
+#'   plot(co_net2, coors = coors2)
+#'
+#'   if (requireNamespace("sf")) {
+#'     nc <- sf::st_read(system.file("shape/nc.shp", package = "sf"), quiet = TRUE)
+#'     poly <- nc[1, ]
+#'     coors <- spatstat_layout(go = multi1, win = poly, type = "regular", mode = "surface")
+#'     plot(multi1, coors = coors)
+#'   }
+#' }
+#' }
+spatstat_layout <- function(go, win,
+                            type = c("random", "regular"),
+                            mode = c("surface", "boundary"),
+                            jitter = 0,
+                            curved = NULL, order_by = NULL, order_ls = NULL,
+                            seed = 1234, rescale = TRUE) {
+  lib_ps("spatstat.geom", library = FALSE)
+  lib_ps("spatstat.random", library = FALSE)
+
+  type <- match.arg(type)
+  mode <- match.arg(mode)
+
+  if (inherits(win, "sf")) {
+    win <- sf_to_owin(win)
+  }
+  if (!inherits(win, "owin")) stop("Input 'win' must be a spatstat 'owin' object.")
+
+  n_nodes <- length(go)
+  set.seed(seed)
+  pts <- switch(mode,
+    surface = switch(type,
+      random = generate_random_points(n_nodes, win),
+      regular = generate_regular_points(n_nodes, win, jitter = jitter)
+    ),
+    boundary = switch(type,
+      random = generate_boundary_points_random(n_nodes, win),
+      regular = generate_boundary_points_regular(n_nodes, win)
+    )
+  )
+
+  coors <- data.frame(X = pts$x, Y = pts$y) %>%
+    dplyr::arrange_all() %>%
+    as.matrix()
+  # order
+  get_v(go) -> tmp_v
+  coors <- order_tmp_v_name(tmp_v, coors, order_by = order_by, order_ls = order_ls)
+
+  coors <- as_coors(coors, curved = curved)
+  if (rescale) coors <- rescale_coors(coors)
+  coors
+}
+
+generate_regular_points <- function(n_nodes, win, max_iter = 20, jitter = 0) {
+  xlen <- diff(win$xrange)
+  ylen <- diff(win$yrange)
+  ratio <- xlen / ylen
+
+  for (factor in seq(1.1, 5, length.out = max_iter)) {
+    ny <- ceiling(sqrt(n_nodes / ratio) * factor)
+    nx <- ceiling(ny * ratio)
+
+    gx <- seq(win$xrange[1], win$xrange[2], length.out = nx)
+    gy <- seq(win$yrange[1], win$yrange[2], length.out = ny)
+    grid <- expand.grid(x = gx, y = gy)
+
+    if (jitter > 0) {
+      gx_step <- mean(diff(gx))
+      gy_step <- mean(diff(gy))
+      grid$x <- grid$x + runif(nrow(grid), -jitter * gx_step, jitter * gx_step)
+      grid$y <- grid$y + runif(nrow(grid), -jitter * gy_step, jitter * gy_step)
+    }
+
+    inside <- spatstat.geom::inside.owin(grid$x, grid$y, win)
+    valid_pts <- grid[inside, ]
+    if (nrow(valid_pts) >= n_nodes) {
+      selected <- valid_pts[sample(nrow(valid_pts), n_nodes), ]
+      return(spatstat.geom::ppp(selected$x, selected$y, window = win))
+    }
+  }
+  stop("Failed to generate enough regularly spaced points inside window after multiple attempts.")
+}
+
+
+generate_random_points <- function(n_nodes, win) {
+  spatstat.random::runifpoint(n_nodes, win = win)
+}
+
+generate_boundary_points_random <- function(n_nodes, win) {
+  bnd <- spatstat.geom::edges(win_poly)
+  pts <- spatstat.random::runifpointOnLines(n_nodes, bnd)
+  spatstat.geom::ppp(pts$x, pts$y, window = win)
+}
+
+generate_boundary_points_regular <- function(n_nodes, win) {
+  bnd <- spatstat.geom::edges(win)
+  len <- spatstat.geom::lengths_psp(bnd)
+  total_len <- sum(len)
+  t_seq <- seq(0, total_len, length.out = n_nodes + 1)[-1]
+
+  pts_x <- numeric(n_nodes)
+  pts_y <- numeric(n_nodes)
+  cum_len <- cumsum(len)
+
+  for (i in seq_along(t_seq)) {
+    t <- t_seq[i]
+    seg_idx <- which(t <= cum_len)[1]
+    t0 <- if (seg_idx == 1) 0 else cum_len[seg_idx - 1]
+    frac <- (t - t0) / len[seg_idx]
+    seg <- bnd[seg_idx]
+    pts_x[i] <- seg$ends$x0 + frac * (seg$ends$x1 - seg$ends$x0)
+    pts_y[i] <- seg$ends$y0 + frac * (seg$ends$y1 - seg$ends$y0)
+  }
+
+  spatstat.geom::ppp(pts_x, pts_y, window = win)
+}
+
+sf_to_owin <- function(sf_obj) {
+  lib_ps("sf", library = FALSE)
+  lib_ps("spatstat.geom", library = FALSE)
+
+  # 确保输入是 sf 对象
+  if (!inherits(sf_obj, "sf")) stop("Input must be an 'sf' object.")
+  if (!sf::st_is(sf_obj, "POLYGON") && !sf::st_is(sf_obj, "MULTIPOLYGON")) {
+    stop("sf object must be a POLYGON or MULTIPOLYGON")
+  }
+
+  # 修复方向问题
+  sf_obj <- sf::st_make_valid(sf_obj) # 处理无效几何问题
+  # 强制外环为逆时针，内环为顺时针
+  sf_obj <- sf::st_set_geometry(sf_obj, sf::st_geometry(sf_obj))
+  sf_obj <- sf::st_simplify(sf_obj) # 简化几何
+
+  # 将 sf 对象转为 polylist 坐标
+  poly_coords <- sf::st_coordinates(sf_obj)[, 1:2]
+  polylist <- list(x = poly_coords[, 1], y = poly_coords[, 2])
+
+  # 创建 spatstat 的 owin 对象
+  win <- spatstat.geom::owin(poly = list(polylist))
+  return(win)
+}
+
+
+create_sector_window <- function(r0 = 0, r1 = 1, theta_start = 0, theta_end = pi) {
+  # theta in radians
+  n <- 100
+  angles <- seq(theta_start, theta_end, length.out = n)
+  x_outer <- r1 * cos(angles)
+  y_outer <- r1 * sin(angles)
+  x_inner <- r0 * cos(rev(angles))
+  y_inner <- r0 * sin(rev(angles))
+  x <- c(x_outer, x_inner)
+  y <- c(y_outer, y_inner)
+  spatstat.geom::owin(poly = list(x = x, y = y))
+}
+
+
+
+#' Layout with group
+#'
+#' @param go igraph
+#' @param group group name (default:v_group)
+#' @param group2 group2 name, will order nodes in each group according to group2_order
+#' @param group2_order group2_order
+#' @param group_order group_order
+#' @param space the space between each arc, default: pi/4
+#' @param scale_node_num scale with the node number in each group
+#' @param type Type of distribution: "random", "regular"
+#' @param mode "surface", "boundary"
+#' @param jitter for surface-regular, defalut 0
+#' @param curved Optional curved attribute for coors
+#'
+#' @return coors
+#' @export
+#' @family g_layout
+g_layout_poly_sector <- function(go,
+                                 group = "v_group", group_order = NULL,
+                                 group2 = NULL, group2_order = NULL,
+                                 space = pi / 4, jitter = 0,
+                                 scale_node_num = TRUE,
+                                 type = c("regular", "random"),
+                                 mode = c("surface", "boundary"),
+                                 curved = NULL) {
+  type <- match.arg(type)
+  mode <- match.arg(mode)
+
+  get_v(go) -> tmp_v
+  group1 <- as.factor(tmp_v[[group]])
+  if (!is.null(group_order)) group1 <- pcutils::change_fac_lev(group1, group_order)
+
+  n <- nlevels(group1)
+  if (n < 2) stop("n should be greater than 1")
+
+  g_num <- table(group1)
+  sep <- space / n
+
+  # 分配每组所占的弧度
+  if (scale_node_num) {
+    arc_r <- (2 * pi - space) * as.numeric(g_num) / sum(g_num)
+  } else {
+    arc_r <- rep((2 * pi - space) / n, n)
+  }
+  names(arc_r) <- levels(group1)
+
+  coors_all <- list()
+  theta1 <- 0
+  for (i in names(arc_r)) {
+    tmp_nodes <- tmp_v[tmp_v[[group]] == i, ]
+    sub_go <- igraph::make_empty_graph(n = nrow(tmp_nodes)) %>%
+      igraph::set_vertex_attr("name", value = tmp_nodes$name)
+
+    win <- create_sector_window(r0 = 0, r1 = 1, theta_start = theta1, theta_end = theta1 + arc_r[i])
+    tmp_layout <- spatstat_layout(sub_go, win = win, type = type, mode = mode, curved = curved, rescale = FALSE, jitter = jitter)
+
+    tmp_layout <- order_tmp_v_name(tmp_nodes, tmp_layout[, c("X", "Y")], group2, group2_order)
+    coors_all[[i]] <- tmp_layout
+    theta1 <- theta1 + arc_r[i] + sep
+  }
+
+  # 合并所有 layout
+  coors_df <- do.call(rbind, coors_all)
+  as_coors(coors_df, curved = curved) %>% rescale_coors()
 }

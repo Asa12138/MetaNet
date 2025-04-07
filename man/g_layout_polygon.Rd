@@ -71,9 +71,9 @@ Layout with group as a polygon
 
 Layout with group as a polyarc
 
-Layout with group as a polyarc
+Layout with group as a polycircle
 
-Layout with group as a polyarc
+Layout with group as a multi_layer
 }
 \examples{
 g_layout_polygon(multi1) -> oridata
@@ -88,6 +88,7 @@ c_net_plot(co_net2, oridata)
 \seealso{
 Other g_layout: 
 \code{\link{g_layout_nice}()},
+\code{\link{g_layout_poly_sector}()},
 \code{\link{g_layout}()}
 }
 \concept{g_layout}
