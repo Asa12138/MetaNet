@@ -15,7 +15,10 @@
 <url><loc>/reference/as.ggig.html</loc></url>
 <url><loc>/reference/as_arc.html</loc></url>
 <url><loc>/reference/as_circle_tree.html</loc></url>
+<url><loc>/reference/as_coors.html</loc></url>
 <url><loc>/reference/as_line.html</loc></url>
+<url><loc>/reference/as_multi_layer.html</loc></url>
+<url><loc>/reference/as_poly_sector.html</loc></url>
 <url><loc>/reference/as_polyarc.html</loc></url>
 <url><loc>/reference/as_polycircle.html</loc></url>
 <url><loc>/reference/as_polygon.html</loc></url>
@@ -47,6 +50,7 @@
 <url><loc>/reference/fit_power.html</loc></url>
 <url><loc>/reference/g_layout.html</loc></url>
 <url><loc>/reference/g_layout_nice.html</loc></url>
+<url><loc>/reference/g_layout_poly_sector.html</loc></url>
 <url><loc>/reference/g_layout_polygon.html</loc></url>
 <url><loc>/reference/get_community.html</loc></url>
 <url><loc>/reference/get_e.html</loc></url>
@@ -94,6 +98,7 @@
 <url><loc>/reference/save_corr.html</loc></url>
 <url><loc>/reference/show_MetaNet_logo.html</loc></url>
 <url><loc>/reference/smallworldness.html</loc></url>
+<url><loc>/reference/spatstat_layout.html</loc></url>
 <url><loc>/reference/summ_2col.html</loc></url>
 <url><loc>/reference/summary.corr.html</loc></url>
 <url><loc>/reference/summary_module.html</loc></url>
