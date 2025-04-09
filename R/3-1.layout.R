@@ -412,8 +412,6 @@ as_multi_layer <- \(n = 3, layout = on_grid()){
 #' @return A two-column matrix, each row giving the coordinates of a vertex, according to the ids of the vertex ids.
 #' @export
 #' @family layout
-#' @examples
-#' as_poly_sector()(co_net)
 as_poly_sector <- \(n = 3){
   fun <- \(go, group2 = NULL, group2_order = NULL){
     V(go)$poly_group <- rep(paste0("omic", 1:n), len = length(go))
@@ -952,6 +950,7 @@ sf_to_owin <- function(sf_obj) {
 
 
 create_sector_window <- function(r0 = 0, r1 = 1, theta_start = 0, theta_end = pi) {
+  lib_ps("spatstat.geom", library = FALSE)
   # theta in radians
   n <- 100
   angles <- seq(theta_start, theta_end, length.out = n)

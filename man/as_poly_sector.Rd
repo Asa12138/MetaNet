@@ -15,9 +15,6 @@ A two-column matrix, each row giving the coordinates of a vertex, according to t
 \description{
 Layout as a multi_layer
 }
-\examples{
-as_poly_sector()(co_net)
-}
 \seealso{
 Other layout: 
 \code{\link{as_arc}()},

@@ -10,7 +10,7 @@
 [![](http://cranlogs.r-pkg.org/badges/grand-total/MetaNet)](https://cran.r-project.org/package=MetaNet)
 [![](http://cranlogs.r-pkg.org/badges/last-month/MetaNet)](https://cran.r-project.org/package=MetaNet)
 [![](https://www.r-pkg.org/badges/version/MetaNet?color=green)](https://cran.r-project.org/package=MetaNet)
-[![](https://img.shields.io/badge/devel%20version-0.2.2-green.svg)](https://github.com/Asa12138/MetaNet)
+[![](https://img.shields.io/badge/devel%20version-0.2.5-green.svg)](https://github.com/Asa12138/MetaNet)
 <!-- badges: end -->
 
 MetaNet: Network analysis for multi-omics
@@ -18,8 +18,10 @@ MetaNet: Network analysis for multi-omics
 The HTML documentation of the latest version is available at [Github
 page](https://asa12138.github.io/MetaNet/).
 
-Please go to <https://bookdown.org/Asa12138/metanet_book/> for the full
-vignette.
+## Tutorial📖
+
+Please go to **<https://bookdown.org/Asa12138/metanet_book/>** for the
+full vignette.
 
 ## Installation
 
