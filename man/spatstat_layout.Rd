@@ -13,6 +13,7 @@ spatstat_layout(
   curved = NULL,
   order_by = NULL,
   order_ls = NULL,
+  order_circle = FALSE,
   seed = 1234,
   rescale = TRUE
 )
@@ -33,6 +34,8 @@ spatstat_layout(
 \item{order_by}{order nodes according to a node attribute}
 
 \item{order_ls}{manual the discrete variable with a vector, or continuous variable with "desc" to decreasing}
+
+\item{order_circle}{order nodes from the center of a circle}
 
 \item{seed}{random seed}
 

@@ -310,25 +310,7 @@ fit_power <- function(go, p.value = FALSE) {
 }
 
 
-#' Degree distribution comparison with random network
-#'
-#' @param go igraph object
-#' @param plot plot or not
-#'
-#' @return ggplot
-#' @export
-#' @family topological
-#' @examples
-#' rand_net(co_net)
-rand_net <- function(go = go, plot = TRUE) {
-  freq <- net <- NULL
-  # generate a random network
-  rand.g <- igraph::erdos.renyi.game(length(V(go)), length(E(go)), type = "gnm")
-
-  if (!plot) {
-    return(rand.g)
-  }
-
+plot_net_degree <- function(go, rand.g) {
   data1 <- data.frame(
     freq = igraph::degree_distribution(go), net = "Network",
     degree = 0:(length(degree_distribution(go)) - 1)
@@ -351,9 +333,32 @@ rand_net <- function(go = go, plot = TRUE) {
     scale_fill_manual(values = c("#F58B8B", "#7AADF0")) +
     MetaNet_theme +
     theme(legend.position = c(0.8, 0.9), legend.title = element_blank())
+  p1
+}
+
+#' Degree distribution comparison with random network
+#'
+#' @param go igraph object
+#' @param plot plot or not
+#'
+#' @return ggplot
+#' @export
+#' @family topological
+#' @examples
+#' rand_net(co_net)
+rand_net <- function(go = go, plot = TRUE) {
+  freq <- net <- NULL
+  # generate a random network
+  rand.g <- igraph::erdos.renyi.game(length(V(go)), length(E(go)), type = "gnm")
+
+  if (!plot) {
+    return(rand.g)
+  }
+  plot_net_degree(go, rand.g) -> p1
   print(p1)
   return(rand.g)
 }
+
 
 #' Net_pars of many random network
 #'

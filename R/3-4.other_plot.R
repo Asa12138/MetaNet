@@ -175,7 +175,7 @@ plot.ggig <- function(x, coors = NULL, ..., labels_num = NULL,
       label = lty_text, guide = ifelse(lty_legend, "legend", "none")
     ) + # edge linetype
     scale_linewidth(
-      name = width_legend_title, breaks = c(min(tmp_e$width), max(tmp_e$width)), range = c(0.5, 1),
+      name = width_legend_title, breaks = c(min(tmp_e$width), max(tmp_e$width)), range = edge_width_range,
       labels = edge_width_text, guide = ifelse(width_legend, "legend", "none")
     )
 
@@ -189,12 +189,13 @@ plot.ggig <- function(x, coors = NULL, ..., labels_num = NULL,
     ) + # node color
     scale_size(
       name = size_legend_title, breaks = c(min(tmp_v$size), max(tmp_v$size)),
-      labels = node_size_text, guide = ifelse(size_legend, "legend", "none")
+      labels = node_size_text, guide = ifelse(size_legend, "legend", "none"),
+      range = range(unlist(vertex_size_range))
     ) + # node size
 
     ggnewscale::new_scale("size") +
     geom_text(aes(X, Y, size = size, label = label), col = "black", data = tmp_v, show.legend = FALSE) +
-    scale_size(range = c(1, 3), guide = "none") +
+    scale_size(range = range(unlist(vertex_size_range)), guide = "none") +
     guides(
       fill = guide_legend(override.aes = list(shape = node_shapes[vclass])),
       shape = "none"
@@ -238,7 +239,7 @@ input_gephi <- function(file) {
   }
   coors <- tmp_v[, c("x", "y")]
   coors <- data.frame(name = tmp_v$label, X = coors[, 1], Y = coors[, 2])
-  class(coors) <- "coors"
+  attributes(coors)$class <- c("coors", class(coors))
   coors <- rescale_coors(coors)
 
   # transform color
@@ -275,9 +276,9 @@ input_cytoscape <- function(file) {
 
   get_v(cyto) -> tmp_v
   coors <- tmp_v[, c("x", "y")]
-  coors <- data.frame(name = tmp_v$name, X = coors[, 1], Y = coors[, 2])
+  coors <- data.frame(name = tmp_v$label, X = coors[, 1], Y = coors[, 2])
 
-  class(coors) <- "coors"
+  attributes(coors)$class <- c("coors", class(coors))
   coors <- rescale_coors(coors)
 
   cyto <- c_net_update(cyto, initialize = TRUE)

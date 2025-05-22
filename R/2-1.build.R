@@ -269,6 +269,7 @@ c_net_update <- function(go, node_break = 5, edge_break = 5, initialize = FALSE,
     message("Empty graph, return empty metanet object.")
     return(go)
   }
+  v_class <- NULL
   # name
   if (!"name" %in% igraph::vertex_attr_names(go)) V(go)$name <- as.character(seq_len(length(go)))
   if (!"label" %in% igraph::vertex_attr_names(go)) V(go)$label <- V(go)$name
@@ -391,8 +392,9 @@ c_net_update <- function(go, node_break = 5, edge_break = 5, initialize = FALSE,
 #'
 #' @return a igraph object
 #' @export
-clean_igraph <- function(go, direct = TRUE) {
+clean_igraph <- function(go, direct = NULL) {
   stopifnot(inherits(go, "igraph"))
+  if (is.null(direct)) direct <- is.directed(go)
   go <- igraph::graph_from_data_frame(
     d = get_e(go)[, c("from", "to")],
     directed = direct,
@@ -439,6 +441,7 @@ c_net_from_edgelist <- function(edgelist, vertex_df = NULL, direct = FALSE, e_ty
 }
 
 update_c_net_rda <- function() {
+  otutab <- metadata <- taxonomy <- NULL
   data("otutab", package = "pcutils", envir = environment())
   t(otutab) -> totu
   metadata[, 3:10] -> env

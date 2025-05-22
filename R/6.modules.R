@@ -385,7 +385,7 @@ module_expression <- function(go_m, totu, group = NULL, r_threshold = 0.6,
     # facet_wrap(facets = ~module,nrow = nrow,scales = "free_y")+
     scale_alpha_continuous(range = c(0, 0.6)) +
     scale_x_discrete(expand = c(0, 0)) +
-    scale_color_manual(values = get_cols(nlevels(pdat_m$module)))
+    scale_color_manual(values = get_cols(nlevels(pdat_m$module), default_v_color))
 
   if (plot_eigen) p1 <- p1 + geom_line(data = module_eigen, aes(x = rowname, y = value, col = module, group = module), size = 2, alpha = 1)
 

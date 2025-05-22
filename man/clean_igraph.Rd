@@ -4,7 +4,7 @@
 \alias{clean_igraph}
 \title{Clean a igraph object}
 \usage{
-clean_igraph(go, direct = TRUE)
+clean_igraph(go, direct = NULL)
 }
 \arguments{
 \item{go}{igraph, metanet objects}

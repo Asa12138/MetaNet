@@ -6,10 +6,10 @@
 #' @import igraph
 #' @importFrom dplyr select filter left_join arrange count mutate group_by summarise pull rename
 #' @importFrom igraph V E
-#' @importFrom utils data combn head tail write.csv packageName
+#' @importFrom utils data combn head tail read.csv write.csv packageName
 #' @importFrom stats aggregate median var sd setNames runif relevel coef fitted cor coefficients formula lm pt
 #' @importFrom stats time na.omit kmeans p.adjust density approx ks.test smooth.spline
-#' @importFrom pcutils lib_ps mmscale get_cols trans guolv hebing update_param tidai change_fac_lev
+#' @importFrom pcutils lib_ps mmscale get_cols trans guolv hebing update_param tidai change_fac_lev list_to_dataframe
 #' @importFrom graphics legend hist par text symbols
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom reshape2 acast melt

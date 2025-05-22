@@ -130,5 +130,11 @@ deprecated("c_net_module", module_detect)
 #' @export c_net_lay
 deprecated("c_net_lay", c_net_layout)
 
+#' @export c_net_neighbors
+deprecated("c_net_neighbors", c_net_ego)
+
 #' @export as.metanet
 deprecated("as.metanet", c_net_update)
+
+#' @export c_net_skeleton
+deprecated("c_net_skeleton", get_group_skeleton)

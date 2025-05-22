@@ -1,3 +1,11 @@
+# MetaNet v0.2.6 Notes
+
+## Added
+
+- added `plot_e_type_bar`, `plot_multi_nets` functions <2025-05-22, Thu>
+- added `c_net_ego`, `c_net_intersect`, `c_net_difference`, `c_net_highlight` functions <2025-04-28, Mon>
+- added "star","pentagon","hexagon" shapes for node <2025-04-27, Sun>
+
 # MetaNet v0.2.5 Notes
 
 ## Others

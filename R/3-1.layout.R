@@ -76,6 +76,18 @@ c_net_layout <- function(go, method = igraph::nicely(), order_by = NULL, order_l
   return(coors)
 }
 
+order_circle_func <- function(coors_mat) {
+  dis <- X <- Y <- NULL
+  mid_x <- mean(coors_mat[, 1])
+  mid_y <- mean(coors_mat[, 2])
+  coors_mat <- data.frame(X = coors_mat[, 1], Y = coors_mat[, 2]) %>%
+    dplyr::mutate(dis = sqrt((X - mid_x)^2 + (Y - mid_y)^2)) %>%
+    dplyr::arrange(dis) %>%
+    dplyr::select_at(1:2) %>%
+    as.matrix()
+  coors_mat
+}
+
 order_tmp_v_name <- function(tmp_v, coors_mat, order_by = NULL, order_ls = NULL) {
   if (is.null(order_by)) {
     coors <- data.frame(name = tmp_v$name, X = coors_mat[, 1], Y = coors_mat[, 2], row.names = NULL)
@@ -580,7 +592,7 @@ g_layout_polygon <- function(go, group = "v_group", group_order = NULL, group2 =
   n <- length(unique(igraph::vertex.attributes(go)[[group]]))
 
   if (n < 2) stop("n should bigger than 1")
-
+  `_internal_group` <- NULL
   get_v(go) %>% dplyr::pull(!!group) -> group1
   group1_level <- table(group1)
   V(go)$`_internal_group` <- group1
@@ -689,22 +701,53 @@ g_layout_multi_layer <- function(go, layout = igraph::in_circle(), group = "v_gr
   n <- length(unique(igraph::vertex.attributes(go)[[group]]))
   if (n < 2) stop("n should bigger than 1")
 
-  get_v(go) %>% dplyr::pull(!!group) -> group1
+  get_v(go) %>%
+    dplyr::pull(!!group) %>%
+    as.factor() -> group1
+  if (!is.null(group_order)) group1 <- pcutils::change_fac_lev(group1, group_order)
   group1_level <- table(group1)
-
+  `_internal_group` <- NULL
   V(go)$`_internal_group` <- group1
+
+  # layout of vertexes in one group
+  {
+    layoutls <- list()
+    if (is_layout(layout)) {
+      layoutls <- rep(list(layout), nlevels(group1))
+    } else if (all(class(layout) == "list")) {
+      if (is.null(names(layout))) {
+        layoutls <- rep(layout, len = nlevels(group1))
+      } else {
+        for (i in levels(group1)) {
+          if (i %in% names(layout)) {
+            layoutls[[i]] <- layout[[i]]
+          } else {
+            layoutls[[i]] <- igraph::in_circle()
+            warning("layout of ", i, " not set, use in_circle()")
+          }
+        }
+      }
+    }
+    if (is.null(names(layoutls))) names(layoutls) <- levels(group1)
+  }
 
   layout2_ls <- list()
   for (i in names(group1_level)) {
     c_net_filter(go, `_internal_group` == i) %>%
-      c_net_layout(method = layout, order_by = group2, order_ls = group2_order) %>%
+      c_net_layout(method = layoutls[[i]], order_by = group2, order_ls = group2_order) %>%
       transform_coors(shear_x = 3, aspect_ratio = 0.2) -> layout2_ls[[i]]
+  }
+
+  if (scale_node_num) {
+    zoom2 <- group1_level / mean(group1_level)
+  } else {
+    zoom2 <- rep(1, nlevels(group1))
   }
 
   g_layout(go,
     group_order = group_order,
     group = group, layout1 = data.frame(X = 0, Y = seq(-1, 1, length = length(group1_level))),
-    zoom1 = 1, zoom2 = group1_level / mean(group1_level),
+    zoom1 = 1, zoom2 = zoom2,
     layout2 = layout2_ls
   ) -> oridata
   oridata
@@ -793,6 +836,7 @@ g_layout_stress <- \(go, group = "module", ...){
 #' @param order_ls manual the discrete variable with a vector, or continuous variable with "desc" to decreasing
 #' @param seed random seed
 #' @param rescale rescale the coordinates to (0,1)
+#' @param order_circle order nodes from the center of a circle
 #'
 #' @return A coors object (data.frame with class "coors" and attribute "curved")
 #' @export
@@ -821,7 +865,8 @@ spatstat_layout <- function(go, win,
                             type = c("random", "regular"),
                             mode = c("surface", "boundary"),
                             jitter = 0,
-                            curved = NULL, order_by = NULL, order_ls = NULL,
+                            curved = NULL,
+                            order_by = NULL, order_ls = NULL, order_circle = FALSE,
                             seed = 1234, rescale = TRUE) {
   lib_ps("spatstat.geom", library = FALSE)
   lib_ps("spatstat.random", library = FALSE)
@@ -846,10 +891,19 @@ spatstat_layout <- function(go, win,
       regular = generate_boundary_points_regular(n_nodes, win)
     )
   )
+  if (!is.null(attributes(pts)$rejects)) {
+    pts$x <- c(pts$x, attributes(pts)$rejects$x)
+    pts$y <- c(pts$y, attributes(pts)$rejects$y)
+  }
 
-  coors <- data.frame(X = pts$x, Y = pts$y) %>%
-    dplyr::arrange_all() %>%
-    as.matrix()
+  if (!order_circle) {
+    coors <- data.frame(X = pts$x, Y = pts$y) %>%
+      dplyr::arrange_all() %>%
+      as.matrix()
+  } else {
+    coors <- order_circle_func(as.matrix(data.frame(X = pts$x, Y = pts$y)))
+  }
+
   # order
   get_v(go) -> tmp_v
   coors <- order_tmp_v_name(tmp_v, coors, order_by = order_by, order_ls = order_ls)
@@ -895,7 +949,7 @@ generate_random_points <- function(n_nodes, win) {
 }
 
 generate_boundary_points_random <- function(n_nodes, win) {
-  bnd <- spatstat.geom::edges(win_poly)
+  bnd <- spatstat.geom::edges(win)
   pts <- spatstat.random::runifpointOnLines(n_nodes, bnd)
   spatstat.geom::ppp(pts$x, pts$y, window = win)
 }

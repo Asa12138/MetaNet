@@ -4,12 +4,14 @@
 \alias{c_net_union}
 \title{Union two networks}
 \usage{
-c_net_union(go1, go2)
+c_net_union(go1, go2, ...)
 }
 \arguments{
 \item{go1}{metanet object}
 
 \item{go2}{metanet object}
+
+\item{...}{add}
 }
 \value{
 metanet
@@ -18,9 +20,12 @@ metanet
 Union two networks
 }
 \examples{
-data("c_net")
-co_net_union <- c_net_union(co_net, co_net2)
-c_net_plot(co_net_union)
+g1 <- make_graph(edges = c("1", 2, 2, 3, 3, 4, 4, 5, 5, 1), directed = FALSE) \%>\% as.metanet()
+g2 <- make_graph(edges = c("4", 5, 5, 6, 6, 7, 7, 8, 8, 4), directed = FALSE) \%>\% as.metanet()
+par(mfrow = c(1, 3))
+plot(c_net_union(g1, g2))
+plot(c_net_intersect(g1, g2))
+plot(c_net_difference(g1, g2))
 }
 \seealso{
 Other manipulate: 

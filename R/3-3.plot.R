@@ -128,6 +128,8 @@ scale_size_width <- function(tmp_v, tmp_e, vertex_size_range, edge_width_range) 
   envir <- parent.frame()
   assign("node_size_text", node_size_text, envir)
   assign("edge_width_text", edge_width_text, envir)
+  assign("vertex_size_range", vertex_size_range, envir)
+  assign("edge_width_range", edge_width_range, envir)
   assign("tmp_e", tmp_e, envir)
   assign("tmp_v", tmp_v, envir)
 }
@@ -231,8 +233,12 @@ get_show_labels <- function(tmp_v, labels_num) {
     }
   }
   {
-    if (labels_num == "all") {
-      tmp_v %>% dplyr::pull(name) -> toplabel
+    if (is.character(labels_num)) {
+      if (identical(labels_num, "all")) {
+        tmp_v %>% dplyr::pull(name) -> toplabel
+      } else {
+        intersect(tmp_v %>% dplyr::pull(name), labels_num) -> toplabel
+      }
     } else {
       if (labels_num >= 1) {
         tmp_v %>%
@@ -304,6 +310,7 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
                                   pie_legend, pie_legend_title, pie_legend_order, pie_color,
                                   ...) {
   color <- e_type <- lty <- e_class <- v_class <- shape <- left_leg_x <- right_leg_x <- NULL
+  v_highlight <- v_highlight_from <- v_highlight_to <- NULL
 
   legend_position_default <- c(left_leg_x = -2, left_leg_y = 1, right_leg_x = 1.2, right_leg_y = 1)
 
@@ -337,6 +344,9 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
       )
     }
 
+    if ("v_highlight" %in% colnames(tmp_v)) {
+      tmp_v <- dplyr::arrange(tmp_v, -v_highlight)
+    }
     for (g_i in vgroups) {
       if ("count" %in% names(tmp_v)) {
         tmp_v1 <- tmp_v[tmp_v$v_group == g_i, c("v_class", "color", "shape", "count")]
@@ -358,7 +368,7 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
         eee <- table(tmp_v1$v_class)
         if (!is.null(attributes(tmp_v)$skeleton)) {
           eee <- setNames(tmp_v1$count, tmp_v1$v_class)
-          legend_number <- FALSE
+          # legend_number <- FALSE
         }
         le_text <- paste(vclass, eee[vclass], sep = ": ")
       } else {
@@ -429,6 +439,10 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
   }
 
   if (edge_legend) {
+    if ("v_highlight_from" %in% colnames(tmp_e)) {
+      tmp_e <- dplyr::arrange(tmp_e, -v_highlight_from, -v_highlight_to)
+    }
+
     tmp_e$e_type <- factor(tmp_e$e_type, levels = custom_sort(unique(tmp_e$e_type)))
     edges <- pcutils::change_fac_lev(tmp_e$e_type, edge_legend_order)
     edges <- levels(edges)
@@ -610,6 +624,7 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
   some_custom_paras(tmp_v, tmp_e, ...)
 
   # set pie
+  pie_value_list <- NULL
   pie_set_for_plot(tmp_v, pie_value, pie_color)
   if (is.null(pie_value) || !"pie" %in% tmp_v$shape) pie_legend <- FALSE
   if (is.null(pie_color)) {
@@ -652,8 +667,8 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
       vertex.label.font = 1,
       vertex.label.cex = 0.07 * tmp_v$size,
       vertex.label = tmp_v$label,
-      edge.arrow.size = 0.3 * tmp_e$width * 3,
-      edge.arrow.width = 0.6 * tmp_e$width * 3,
+      edge.arrow.size = 0.5 * tmp_e$width,
+      edge.arrow.width = 0.6 * tmp_e$width,
       edge.curved = edge_curved,
       margin = c(0, 0, 0, 0)
     )

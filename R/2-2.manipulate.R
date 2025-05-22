@@ -142,6 +142,7 @@ is_metanet <- function(go) {
 #' @return data.frame
 #' @export
 get_v <- function(go, index = NULL) {
+  name <- NULL
   # 规定name只能为字符
   if (is.null(V(go)$name)) V(go)$name <- as.character(V(go))
   # df <- as.data.frame(igraph::vertex.attributes(go))
@@ -272,15 +273,43 @@ filter_e <- function(go, ...) {
 #'
 #' @param go1 metanet object
 #' @param go2 metanet object
+#' @param ... add
 #'
 #' @return metanet
 #' @export
 #' @family manipulate
 #' @examples
-#' data("c_net")
-#' co_net_union <- c_net_union(co_net, co_net2)
-#' c_net_plot(co_net_union)
-c_net_union <- function(go1, go2) {
+#' g1 <- make_graph(edges = c("1", 2, 2, 3, 3, 4, 4, 5, 5, 1), directed = FALSE) %>% as.metanet()
+#' g2 <- make_graph(edges = c("4", 5, 5, 6, 6, 7, 7, 8, 8, 4), directed = FALSE) %>% as.metanet()
+#' par(mfrow = c(1, 3))
+#' plot(c_net_union(g1, g2))
+#' plot(c_net_intersect(g1, g2))
+#' plot(c_net_difference(g1, g2))
+c_net_union <- function(go1, go2, ...) {
+  c_net_two_do(go1, go2, func = igraph::union, ...)
+}
+
+#' Intersect two networks
+#'
+#' @inheritParams c_net_union
+#' @return metanet
+#' @export
+c_net_intersect <- function(go1, go2, ...) {
+  c_net_two_do(go1, go2, func = igraph::intersection, keep.all.vertices = FALSE, ...)
+  # common_nodes <- intersect(V(go1)$name, V(go2)$name)
+  # c_net_filter(go1, name%in%common_nodes)
+}
+
+#' Difference two networks
+#'
+#' @inheritParams c_net_union
+#' @return metanet
+#' @export
+c_net_difference <- function(go1, go2, ...) {
+  c_net_two_do(go1, go2, func = igraph::difference, ...)
+}
+
+c_net_two_do <- function(go1, go2, func = igraph::union, ...) {
   tmp_v1 <- get_v(go1)
   tmp_v2 <- get_v(go2)
   cols <- c("name", "label", "size", "v_group", "shape", "v_class", "color")
@@ -294,11 +323,16 @@ c_net_union <- function(go1, go2) {
   tmp_e <- rbind(tmp_e1[cols], tmp_e2[cols])
   message("Duplicated edges: ", sum(duplicated(tmp_e[, c("from", "to")])), "\nUse the attributes of the first network.")
   tmp_e <- tmp_e[!duplicated(tmp_e[, c("from", "to")]), ]
+  # 无方向性
+  tmp_e2 <- tmp_e
+  tmp_e2$from <- tmp_e$to
+  tmp_e2$to <- tmp_e$from
 
-  go <- igraph::union(go1, go2)
+  go <- func(go1, go2, ...)
+
   go <- clean_igraph(go, direct = FALSE)
   go <- c_net_annotate(go, tmp_v, mode = "v")
-  go <- c_net_annotate(go, tmp_e, mode = "e")
+  go <- c_net_annotate(go, rbind(tmp_e, tmp_e2), mode = "e")
   go <- c_net_annotate(go, list(n_type = "combine_net"), mode = "n")
   go <- c_net_update(go, initialize = TRUE)
   go
@@ -551,6 +585,49 @@ summ_2col <- function(df, from = 1, to = 2, count = 3, direct = FALSE) {
 }
 
 
+#' Plot e_type bar
+#'
+#' @param go metanet object
+#' @param mode "left" or "right"
+#' @param degree_threshold degree threshold
+#'
+#' @returns ggplot
+#' @export
+#'
+#' @examples
+#' data("c_net")
+#' plot_e_type_bar(co_net, degree_threshold = 10)
+plot_e_type_bar <- function(go, mode = c("left", "right")[1], degree_threshold = 0) {
+  get_e(go) -> tmp_e2
+  count(tmp_e2, from, e_type) -> plotdat
+  count(tmp_e2, from) -> plotdat2
+  filter(plotdat2, n > degree_threshold) -> plotdat2
+  plotdat <- filter(plotdat, from %in% plotdat2$from)
+  plotdat2$label <- plotdat2$from
+
+  plotdat$from <- factor(plotdat$from, levels = dplyr::arrange(plotdat2, n) %>% dplyr::pull(from))
+  if (mode == "left") {
+    p <- ggplot(plotdat, aes(x = -n, y = from)) +
+      geom_col(aes(fill = e_type), width = 0.9, color = "black", linewidth = 0.2) +
+      geom_text(aes(x = -0.3, y = from, label = label), data = plotdat2, hjust = 1, size = 3) +
+      scale_x_continuous(labels = \(x) -x, expand = c(0.1, 0.1, 0, 0))
+  } else {
+    p <- ggplot(plotdat, aes(x = n, y = from)) +
+      geom_col(aes(fill = e_type), width = 0.9, color = "black", linewidth = 0.2) +
+      geom_text(aes(x = 0.3, y = from, label = label), data = plotdat2, hjust = 0, size = 3) +
+      scale_x_continuous(labels = \(x) x, expand = c(0, 0, 0.1, 0.1))
+  }
+  p +
+    theme_test() +
+    scale_fill_manual(values = setNames(unique(tmp_e2$color), unique(tmp_e2$e_type))) +
+    theme(
+      axis.ticks.y = element_blank(),
+      axis.text.y = element_blank(),
+      axis.title.y = element_blank()
+    ) +
+    xlab("Number of e_type")
+}
+
 #' Get skeleton network according to a group
 #'
 #' @param go network
@@ -561,6 +638,8 @@ summ_2col <- function(df, from = 1, to = 2, count = 3, direct = FALSE) {
 #' @return skeleton network
 #' @export
 #' @family topological
+#' @aliases c_net_skeleton
+#'
 #' @examples
 #' get_group_skeleton(co_net) -> ske_net
 #' skeleton_plot(ske_net)

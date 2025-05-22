@@ -2,6 +2,7 @@
 % Please edit documentation in R/2-2.manipulate.R
 \name{get_group_skeleton}
 \alias{get_group_skeleton}
+\alias{c_net_skeleton}
 \alias{skeleton_plot}
 \title{Get skeleton network according to a group}
 \usage{
