@@ -25,8 +25,12 @@
 <url><loc>/reference/c_net_annotate.html</loc></url>
 <url><loc>/reference/c_net_build.html</loc></url>
 <url><loc>/reference/c_net_calculate.html</loc></url>
+<url><loc>/reference/c_net_difference.html</loc></url>
+<url><loc>/reference/c_net_ego.html</loc></url>
 <url><loc>/reference/c_net_filter.html</loc></url>
 <url><loc>/reference/c_net_from_edgelist.html</loc></url>
+<url><loc>/reference/c_net_highlight.html</loc></url>
+<url><loc>/reference/c_net_intersect.html</loc></url>
 <url><loc>/reference/c_net_layout.html</loc></url>
 <url><loc>/reference/c_net_load.html</loc></url>
 <url><loc>/reference/c_net_plot.html</loc></url>
@@ -83,6 +87,8 @@
 <url><loc>/reference/plot.ggig.html</loc></url>
 <url><loc>/reference/plot.metanet.html</loc></url>
 <url><loc>/reference/plot.rmt_res.html</loc></url>
+<url><loc>/reference/plot_e_type_bar.html</loc></url>
+<url><loc>/reference/plot_multi_nets.html</loc></url>
 <url><loc>/reference/print.cohesion.html</loc></url>
 <url><loc>/reference/print.coors.html</loc></url>
 <url><loc>/reference/print.corr.html</loc></url>

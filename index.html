@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Network Analysis for Omics Data • MetaNet</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png">
+<link rel="icon" type="”image/svg+xml”" href="favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" sizes="any" href="favicon.ico">
+<link rel="manifest" href="site.webmanifest">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -41,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">MetaNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
       </span>
     </div>
 
@@ -129,6 +128,7 @@
 <h2 id="tutorial">Tutorial📖<a class="anchor" aria-label="anchor" href="#tutorial"></a>
 </h2>
 <p>Please go to <strong><a href="https://bookdown.org/Asa12138/metanet_book/" class="external-link uri">https://bookdown.org/Asa12138/metanet_book/</a></strong> for the full vignette.</p>
+<p><img src="reference/figures/cover1.jpeg" style="width:40.0%"></p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -142,16 +142,25 @@
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"Asa12138/MetaNet"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="workflow-overview">Workflow overview<a class="anchor" aria-label="anchor" href="#workflow-overview"></a>
+</h2>
+<p><img src="reference/figures/fig1.jpeg"></p>
+<p>Figure 1. Overview of the MetaNet workflow and its high-efficiency computation. (A) Functional modules of MetaNet, visualized using MetaNet itself. (B) Detailed workflow of MetaNet. Green boxes indicate data objects, red boxes represent MetaNet-specific objects, and gray boxes denote core functions. (C) MetaNet logo and its available code repositories and platforms. (D) Line plots comparing memory usage and runtime for correlation-based network construction across different R packages. Error bars represent standard deviation (SD). (E) Line plots showing MetaNet’s performance on increasingly larger datasets in terms of memory usage and runtime. Error bars represent SD.</p>
+<p><img src="reference/figures/fig2.jpeg"></p>
+<p>Figure 2. MetaNet supports flexible and intuitive network manipulation. (A) Initial multi-omics network constructed without annotations. (B) Annotated multi-omics network using the “c_net_set” function. Node shape indicates omics type, color represents omics subtypes, size denotes average abundance, edge color indicates positive or negative correlation, edge type distinguishes intra- and inter-omics connections, and edge width reflects the absolute value of the correlation coefficient. (C) Subnetwork filtered from intra-omics interactions between the Microbiome and Metabolome layers using “c_net_filter”. (D) Highlighted nodes centered on “s__Dongia_mobilis” and its neighbors using “c_net_highlight”. (E) Community detection and modular visualization using “c_net_module”. (F) Chord diagram displaying the proportion of edges between modules. (G) Skeleton network across omics subtypes at a grouped level using “c_net_skeleton”. (H) Operations among networks: “c_net_union” merges net1 and net2, “c_net_intersect” extracts shared nodes and edges, and “c_net_difference” isolates net1-specific nodes and edges. All networks shown are based on simulated data and are for illustrative purposes only.</p>
+<p><img src="reference/figures/fig3.jpeg"></p>
+<p>Figure 3. MetaNet enables diverse and powerful network layout strategies. (A) Application of 24 out of more than 40 built-in layout algorithms from “c_net_layout” on the Zachary Karate Club network. (B) Layout generated within a star using “spatstat_layout”. (C) Layout applied within the map of Australia using “spatstat_layout”. (D) Grouped network layout consisting of four subgroups arranged with “with_fr()”, “on_grid()”, “as_polycircle(3)”, and “as_polygon(3)” within a human-body schematic. All visualization elements were rendered entirely in MetaNet without manual adjustment. (E) Modular network visualized using “g_layout_circlepack”. (F) Three-layer modular structure visualized using “g_layout_multi_layer”. All networks shown are based on simulated data and carry no biological interpretation.</p>
+</div>
+<div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
 <p>Please cite:</p>
-<p>Chen Peng (2025). MetaNet: Network Analysis for Omics Data. <em>R package</em>, <a href="https://github.com/Asa12138/MetaNet" class="external-link uri">https://github.com/Asa12138/MetaNet</a>.</p>
+<p>Chen Peng (2025). MetaNet: A Comprehensive R Package for Network Analysis of Omics Data. <em>R package</em>, <a href="https://github.com/Asa12138/MetaNet" class="external-link uri">https://github.com/Asa12138/MetaNet</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="need-helps">Need helps?<a class="anchor" aria-label="anchor" href="#need-helps"></a>
 </h2>
-<p>If you have questions/issues, please visit <a href="https://github.com/Asa12138/MetaNet" class="external-link">MetaNet homepage</a> first. Your problems are mostly documented.</p>
-<p>If you think you found a bug, please post on <a href="https://github.com/Asa12138/MetaNet/issues" class="external-link">github issue</a>.</p>
+<p>If you have questions/issues, please visit <a href="https://github.com/Asa12138/MetaNet" class="external-link">MetaNet homepage</a> first. Your problems are mostly documented. If you think you found a bug, please post on <a href="https://github.com/Asa12138/MetaNet/issues" class="external-link">github issue</a>.</p>
 </div>
 </div>
   </div>
@@ -184,7 +193,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Chen Peng <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-9449-7606" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Chen Peng <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-9449-7606" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 
@@ -196,7 +205,7 @@
 <li><a href="https://cran.r-project.org/package=MetaNet" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/grand-total/MetaNet"></a></li>
 <li><a href="https://cran.r-project.org/package=MetaNet" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/last-month/MetaNet"></a></li>
 <li><a href="https://cran.r-project.org/package=MetaNet" class="external-link"><img src="https://www.r-pkg.org/badges/version/MetaNet?color=green"></a></li>
-<li><a href="https://github.com/Asa12138/MetaNet" class="external-link"><img src="https://img.shields.io/badge/devel%20version-0.2.5-green.svg"></a></li>
+<li><a href="https://github.com/Asa12138/MetaNet" class="external-link"><img src="https://img.shields.io/badge/devel%20version-0.2.6-green.svg"></a></li>
 </ul>
 </div>
 
@@ -211,7 +220,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
       </footer>
