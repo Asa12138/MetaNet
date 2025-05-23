@@ -159,6 +159,19 @@ get_coors <- \(coors, go, ...){
   if (is.matrix(coors)) coors <- data.frame(name = V(go)$name, X = coors[, 1], Y = coors[, 2], row.names = NULL)
   # 5.如果是df了，那就对齐name用于下一步的绘图，
   if (is.data.frame(coors)) {
+    coors <- data.frame(coors, check.names = FALSE)
+    setdiff(V(go)$name, coors$name) -> tmp_name
+    if (length(setdiff(V(go)$name, coors$name)) > 0) {
+      warning("Some nodes are not in coors, will be randomly assigned")
+      coors <- rbind(
+        coors,
+        data.frame(
+          name = tmp_name,
+          X = runif(length(tmp_name), range(coors$X)[1], range(coors$X)[2]),
+          Y = runif(length(tmp_name), range(coors$Y)[1], range(coors$Y)[2])
+        )
+      )
+    }
     coors <- coors[match(V(go)$name, coors$name), ]
     coors <- as_coors(coors, edge_curved)
     return(coors)
@@ -464,17 +477,17 @@ as_circle_tree <- \(){
 }
 
 big_layout <- \(zoom1, layout1, nodeGroup){
-  c_net_update(igraph::make_ring(nlevels(nodeGroup$group))) -> tmp_da_net
+  tmp_g <- igraph::make_ring(nlevels(nodeGroup$group))
+  V(tmp_g)$name <- levels(nodeGroup$group)
+  c_net_update(tmp_g) -> tmp_da_net
   da <- get_coors(layout1, tmp_da_net)
-  da$name <- NULL
-
-  if (!all(levels(nodeGroup$group) %in% rownames(da))) rownames(da) <- levels(nodeGroup$group)
+  rownames(da) <- da$name
+  da <- da[, c("X", "Y")]
 
   # center of each group
   scale_f <- (ceiling(max(da) - min(da)))
   scale_f <- ifelse(scale_f == 0, 1, scale_f / 2)
   da <- da / scale_f * zoom1
-  colnames(da) <- c("X", "Y")
   return(da)
 }
 
@@ -555,11 +568,15 @@ g_layout <- function(go, group = "module", group_order = NULL, layout1 = in_circ
   # get coors
   all_coors <- setNames(vector("list", nlevels(nodeGroup$group)), levels(nodeGroup$group))
   for (i in levels(nodeGroup$group)) {
+    # print(i)
     nodeGroup[nodeGroup[, "group"] == i, "ID"] -> tmpid
     igraph::subgraph(go, tmpid) -> tmp_net
 
     get_coors(layoutls[[i]], tmp_net, ...) -> coors
     data <- coors
+    if (nrow(data) == 1) {
+      data <- data.frame(name = data$name, X = 0, Y = 0) %>% as_coors()
+    }
     if ("igraph_layout_spec" %in% class(layoutls[[i]])) {
       data[, c("X", "Y")] <- igraph::norm_coords(as.matrix(data[, c("X", "Y")]))
     }
@@ -812,6 +829,16 @@ g_layout_nice <- function(go, group = "module", mode = "circlepack", group_zoom 
 
   coors <- rescale_coors(coors)
   return(coors)
+}
+
+#' @rdname g_layout_nice
+#' @export
+get_big_lay_nice <- function(go, group = "module", mode = "circlepack", ...) {
+  coors <- g_layout_nice(go, group, mode, ...)
+  # 提取circlepack的分组坐标
+  big_lay <- coors[grepl("group_", coors$name), ]
+  big_lay$name <- gsub("group_", "", big_lay$name)
+  return(big_lay)
 }
 
 #' @rdname g_layout_nice

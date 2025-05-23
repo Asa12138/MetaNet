@@ -310,27 +310,35 @@ fit_power <- function(go, p.value = FALSE) {
 }
 
 
-plot_net_degree <- function(go, rand.g) {
-  data1 <- data.frame(
-    freq = igraph::degree_distribution(go), net = "Network",
-    degree = 0:(length(degree_distribution(go)) - 1)
-  )
-
-  data2 <- data.frame(
-    freq = igraph::degree_distribution(rand.g), net = "Random E-R",
-    degree = 0:(length(degree_distribution(rand.g)) - 1)
-  )
+#' Plot degree distribution of networks
+#'
+#' @param gols list of metanet
+#' @param net_names names of networks
+#'
+#' @returns ggplot
+#' @export
+plot_net_degree <- function(gols, net_names = NULL) {
+  if (is.null(names(gols))) {
+    names(gols) <- paste0("Network", seq_along(gols))
+  }
+  if (!is.null(net_names)) {
+    names(gols) <- net_names
+  }
+  lapply(seq_along(gols), \(i){
+    data.frame(
+      freq = igraph::degree_distribution(gols[[i]]), net = names(gols)[[i]],
+      degree = 0:(length(degree_distribution(gols[[i]])) - 1)
+    )
+  }) -> data_list
+  data <- do.call(rbind, data_list)
 
   # if data1[1,1]=0, it'is delete single vertex
-  if (data1[1, 1] == 0) data1 <- data1[-1, ]
+  if (data[1, 1] == 0) data <- data[-1, ]
 
-  data <- rbind(data1, data2)
   p1 <- ggplot(data) +
     geom_point(aes(x = degree, y = freq, group = net, fill = net), pch = 21, size = 2) +
     geom_smooth(aes(x = degree, y = freq, group = net, color = net), se = FALSE, method = "loess", formula = "y ~ x") +
     labs(x = "Degree", y = "Proportion") +
-    scale_color_manual(values = c("#F58B8B", "#7AADF0")) +
-    scale_fill_manual(values = c("#F58B8B", "#7AADF0")) +
     MetaNet_theme +
     theme(legend.position = c(0.8, 0.9), legend.title = element_blank())
   p1
@@ -354,8 +362,9 @@ rand_net <- function(go = go, plot = TRUE) {
   if (!plot) {
     return(rand.g)
   }
-  plot_net_degree(go, rand.g) -> p1
-  print(p1)
+  plot_net_degree(list(go, rand.g), net_names = c("Network", "Random E-R")) -> p1
+  print(p1 + scale_color_manual(values = c("#F58B8B", "#7AADF0")) +
+    scale_fill_manual(values = c("#F58B8B", "#7AADF0")))
   return(rand.g)
 }
 

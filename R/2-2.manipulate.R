@@ -312,14 +312,14 @@ c_net_difference <- function(go1, go2, ...) {
 c_net_two_do <- function(go1, go2, func = igraph::union, ...) {
   tmp_v1 <- get_v(go1)
   tmp_v2 <- get_v(go2)
-  cols <- c("name", "label", "size", "v_group", "shape", "v_class", "color")
+  cols <- intersect(colnames(tmp_v1), colnames(tmp_v2))
   tmp_v <- rbind(tmp_v1[cols], tmp_v2[cols])
   message("Duplicated vertexes: ", sum(duplicated(tmp_v$name)), "\nUse the attributes of the first network.")
   tmp_v <- tmp_v[!duplicated(tmp_v$name), ]
 
   tmp_e1 <- get_e(go1)
   tmp_e2 <- get_e(go2)
-  cols <- c("from", "to", "e_type", "color", "e_class", "lty", "width")
+  cols <- intersect(colnames(tmp_e1), colnames(tmp_e2))
   tmp_e <- rbind(tmp_e1[cols], tmp_e2[cols])
   message("Duplicated edges: ", sum(duplicated(tmp_e[, c("from", "to")])), "\nUse the attributes of the first network.")
   tmp_e <- tmp_e[!duplicated(tmp_e[, c("from", "to")]), ]

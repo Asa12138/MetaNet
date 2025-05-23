@@ -2,6 +2,7 @@
 % Please edit documentation in R/3-1.layout.R
 \name{g_layout_nice}
 \alias{g_layout_nice}
+\alias{get_big_lay_nice}
 \alias{g_layout_circlepack}
 \alias{g_layout_treemap}
 \alias{g_layout_backbone}
@@ -9,6 +10,8 @@
 \title{Layout with group nicely}
 \usage{
 g_layout_nice(go, group = "module", mode = "circlepack", group_zoom = 1, ...)
+
+get_big_lay_nice(go, group = "module", mode = "circlepack", ...)
 
 g_layout_circlepack(go, group = "module", ...)
 

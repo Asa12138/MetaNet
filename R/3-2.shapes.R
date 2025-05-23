@@ -145,6 +145,7 @@ add_metanet_shape_star <- function() {
       vertex.size <- vertex.size[v]
     }
     norays <- params("vertex", "norays")
+    if (is.null(norays)) norays <- 5
     if (length(norays) != 1 && !is.null(v)) {
       norays <- norays[v]
     }
@@ -203,6 +204,7 @@ add_metanet_shape_polygon <- function() {
       vertex.size <- vertex.size[v]
     }
     norays <- params("vertex", "norays")
+    if (is.null(norays)) norays <- 5
     if (length(norays) != 1 && !is.null(v)) {
       norays <- norays[v]
     }
