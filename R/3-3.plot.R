@@ -58,7 +58,7 @@ plot.metanet <- function(x, ...) {
 }
 
 get_net_main <- function(n_index) {
-  main <- "Network"
+  main <- ""
   if (!is.null(n_index$n_type)) {
     switch(n_index$n_type,
       "single" = {
@@ -80,7 +80,7 @@ get_net_main <- function(n_index) {
         main <- "Venn network"
       },
       default = {
-        main <- "Network"
+        main <- ""
       }
     )
   }

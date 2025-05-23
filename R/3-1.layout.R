@@ -228,6 +228,12 @@ transform_coors <- function(coors, scale = 1, aspect_ratio = 1,
   # 复制原始数据
   new_coor <- coors
 
+  mid_x <- mean(new_coor$X)
+  mid_y <- mean(new_coor$Y)
+
+  new_coor$X <- new_coor$X - mid_x
+  new_coor$Y <- new_coor$Y - mid_y
+
   # 放大/缩小
   new_coor$X <- new_coor$X * scale
   new_coor$Y <- new_coor$Y * scale * aspect_ratio
@@ -246,6 +252,9 @@ transform_coors <- function(coors, scale = 1, aspect_ratio = 1,
   # 镜像变换
   if (mirror_x) new_coor$X <- -new_coor$X
   if (mirror_y) new_coor$Y <- -new_coor$Y
+  # 还原到原始位置
+  new_coor$X <- new_coor$X + mid_x
+  new_coor$Y <- new_coor$Y + mid_y
 
   coors <- new_coor
   return(coors)
@@ -759,6 +768,7 @@ g_layout_multi_layer <- function(go, layout = igraph::in_circle(), group = "v_gr
 #' @param group group name (default: module)
 #' @param mode circlepack, treemap, backbone, stress
 #' @param ... add
+#' @param group_zoom zoom for each group
 #'
 #' @export
 #' @return coors
@@ -772,7 +782,7 @@ g_layout_multi_layer <- function(go, layout = igraph::in_circle(), group = "v_gr
 #'   plot(co_net_modu, coors = g_layout_nice(co_net_modu, group = "module", mode = "treemap"))
 #' }
 #' }
-g_layout_nice <- function(go, group = "module", mode = "circlepack", ...) {
+g_layout_nice <- function(go, group = "module", mode = "circlepack", group_zoom = 1, ...) {
   name <- x <- y <- NULL
   lib_ps("ggraph", library = FALSE)
   stopifnot(is_igraph(go))
@@ -794,6 +804,11 @@ g_layout_nice <- function(go, group = "module", mode = "circlepack", ...) {
   coors <- data %>% dplyr::select(name, x, y)
   colnames(coors) <- c("name", "X", "Y")
   coors <- as_coors(coors)
+
+  for (i in unique(nodeGroup$group)) {
+    tmp_id <- nodeGroup[nodeGroup[, "group"] == i, "ID"]
+    transform_coors(coors[coors$name %in% tmp_id, ], scale = group_zoom) -> coors[coors$name %in% tmp_id, ]
+  }
 
   coors <- rescale_coors(coors)
   return(coors)

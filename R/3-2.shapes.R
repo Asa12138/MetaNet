@@ -144,35 +144,48 @@ add_metanet_shape_star <- function() {
     if (length(vertex.size) != 1 && !is.null(v)) {
       vertex.size <- vertex.size[v]
     }
-
-    # 五角星坐标计算
-    star_coords <- function(x, y, size) {
-      theta <- seq(0, 2 * pi, length.out = 6)[-6]
-      outer_x <- x + size * cos(theta)
-      outer_y <- y + size * sin(theta)
-      inner_x <- x + size / 2 * cos(theta + pi / 5)
-      inner_y <- y + size / 2 * sin(theta + pi / 5)
-      list(x = c(rbind(outer_x, inner_x)), y = c(rbind(outer_y, inner_y)))
+    norays <- params("vertex", "norays")
+    if (length(norays) != 1 && !is.null(v)) {
+      norays <- norays[v]
     }
+
+    # # 五角星坐标计算
+    # star_coords <- function(x, y, size) {
+    #   theta <- seq(0, 2 * pi, length.out = 6)[-6]
+    #   outer_x <- x + size * cos(theta)
+    #   outer_y <- y + size * sin(theta)
+    #   inner_x <- x + size / 2 * cos(theta + pi / 5)
+    #   inner_y <- y + size / 2 * sin(theta + pi / 5)
+    #   list(x = c(rbind(outer_x, inner_x)), y = c(rbind(outer_y, inner_y)))
+    # }
 
     # 处理边框宽度和颜色
     vertex.frame.color[vertex.frame.width <= 0] <- NA
     vertex.frame.width[vertex.frame.width <= 0] <- 1 # 避免宽度为0
 
     # 绘制五角星
+    # mapply(coords[, 1], coords[, 2], vertex.color, vertex.frame.color,
+    #   vertex.size, vertex.frame.width,
+    #   FUN = function(x, y, bg, fg, size, lwd) {
+    #     coords <- star_coords(x, y, size)
+    #     polygon(coords$x, coords$y, col = bg, border = fg, lwd = lwd)
+    #   }
+    # )
     mapply(coords[, 1], coords[, 2], vertex.color, vertex.frame.color,
-      vertex.size, vertex.frame.width,
-      FUN = function(x, y, bg, fg, size, lwd) {
-        coords <- star_coords(x, y, size)
-        polygon(coords$x, coords$y, col = bg, border = fg, lwd = lwd)
+      vertex.size, vertex.frame.width, norays,
+      FUN = function(x, y, bg, fg, size, lwd, nor) {
+        symbols(
+          x = x, y = y, bg = bg, fg = fg, lwd = lwd,
+          stars = matrix(c(size, size / 2), nrow = 1, ncol = nor * 2), add = TRUE, inches = FALSE
+        )
       }
     )
   }
   igraph::add_shape("star", clip = igraph::shape_noclip, plot = mystar)
 }
 
-add_metanet_shape_hexagon <- function() {
-  myhexagon <- function(coords, v = NULL, params) {
+add_metanet_shape_polygon <- function() {
+  mypolygon <- function(coords, v = NULL, params) {
     vertex.color <- params("vertex", "color")
     if (length(vertex.color) != 1 && !is.null(v)) {
       vertex.color <- vertex.color[v]
@@ -189,77 +202,48 @@ add_metanet_shape_hexagon <- function() {
     if (length(vertex.size) != 1 && !is.null(v)) {
       vertex.size <- vertex.size[v]
     }
-
-    hexagon_coords <- function(x, y, size) {
-      theta <- seq(0, 2 * pi, length.out = 7)[-7] # 6个顶点
-      x_coords <- x + size * cos(theta)
-      y_coords <- y + size * sin(theta)
-      list(x = x_coords, y = y_coords)
+    norays <- params("vertex", "norays")
+    if (length(norays) != 1 && !is.null(v)) {
+      norays <- norays[v]
     }
+
+    # hexagon_coords <- function(x, y, size) {
+    #   theta <- seq(0, 2 * pi, length.out = 7)[-7] # 6个顶点
+    #   x_coords <- x + size * cos(theta)
+    #   y_coords <- y + size * sin(theta)
+    #   list(x = x_coords, y = y_coords)
+    # }
 
     # 处理边框宽度和颜色
     vertex.frame.color[vertex.frame.width <= 0] <- NA
     vertex.frame.width[vertex.frame.width <= 0] <- 1
 
     # 批量绘制六边形
+    # mapply(coords[, 1], coords[, 2], vertex.color, vertex.frame.color,
+    #   vertex.size, vertex.frame.width,
+    #   FUN = function(x, y, bg, fg, size, lwd) {
+    #     coords <- hexagon_coords(x, y, size)
+    #     polygon(coords$x, coords$y, col = bg, border = fg, lwd = lwd)
+    #   }
+    # )
     mapply(coords[, 1], coords[, 2], vertex.color, vertex.frame.color,
-      vertex.size, vertex.frame.width,
-      FUN = function(x, y, bg, fg, size, lwd) {
-        coords <- hexagon_coords(x, y, size)
-        polygon(coords$x, coords$y, col = bg, border = fg, lwd = lwd)
+      vertex.size, vertex.frame.width, norays,
+      FUN = function(x, y, bg, fg, size, lwd, nor) {
+        symbols(
+          x = x, y = y, bg = bg, fg = fg, lwd = lwd,
+          stars = matrix(size, nrow = 1, ncol = nor), add = TRUE, inches = FALSE
+        )
       }
     )
   }
-  igraph::add_shape("hexagon", clip = igraph::shape_noclip, plot = myhexagon)
-}
-
-add_metanet_shape_pentagon <- function() {
-  mypentagon <- function(coords, v = NULL, params) {
-    vertex.color <- params("vertex", "color")
-    if (length(vertex.color) != 1 && !is.null(v)) {
-      vertex.color <- vertex.color[v]
-    }
-    vertex.frame.color <- params("vertex", "frame.color")
-    if (length(vertex.frame.color) != 1 && !is.null(v)) {
-      vertex.frame.color <- vertex.frame.color[v]
-    }
-    vertex.frame.width <- params("vertex", "frame.width")
-    if (length(vertex.frame.width) != 1 && !is.null(v)) {
-      vertex.frame.width <- vertex.frame.width[v]
-    }
-    vertex.size <- 1 / 200 * params("vertex", "size")
-    if (length(vertex.size) != 1 && !is.null(v)) {
-      vertex.size <- vertex.size[v]
-    }
-
-    pentagon_coords <- function(x, y, size) {
-      theta <- seq(0, 2 * pi, length.out = 6)[-6] # 5个顶点
-      x_coords <- x + size * cos(theta)
-      y_coords <- y + size * sin(theta)
-      list(x = x_coords, y = y_coords)
-    }
-
-    # 处理边框宽度和颜色
-    vertex.frame.color[vertex.frame.width <= 0] <- NA
-    vertex.frame.width[vertex.frame.width <= 0] <- 1
-
-    # 批量绘制六边形
-    mapply(coords[, 1], coords[, 2], vertex.color, vertex.frame.color,
-      vertex.size, vertex.frame.width,
-      FUN = function(x, y, bg, fg, size, lwd) {
-        coords <- pentagon_coords(x, y, size)
-        polygon(coords$x, coords$y, col = bg, border = fg, lwd = lwd)
-      }
-    )
-  }
-  igraph::add_shape("pentagon", clip = igraph::shape_noclip, plot = mypentagon)
+  igraph::add_shape("polygon", clip = igraph::shape_noclip, plot = mypolygon)
 }
 
 # 因为igraph默认只有circle和square适合展示，所以这里添加了更多的形状
 
 add_metanet_shapes <- function() {
   # ！！！考虑添加更多的形状，至少是21:25，形状为pie时添加额外legend
-  for (i in c(names(default_v_shape)[3:5], "star", "pentagon", "hexagon")) {
+  for (i in c(names(default_v_shape)[3:5], "star", "polygon")) {
     paste0("add_metanet_shape_", i) -> fun_name
     do.call(fun_name, list())
   }

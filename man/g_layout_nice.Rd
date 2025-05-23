@@ -8,7 +8,7 @@
 \alias{g_layout_stress}
 \title{Layout with group nicely}
 \usage{
-g_layout_nice(go, group = "module", mode = "circlepack", ...)
+g_layout_nice(go, group = "module", mode = "circlepack", group_zoom = 1, ...)
 
 g_layout_circlepack(go, group = "module", ...)
 
@@ -24,6 +24,8 @@ g_layout_stress(go, group = "module", ...)
 \item{group}{group name (default: module)}
 
 \item{mode}{circlepack, treemap, backbone, stress}
+
+\item{group_zoom}{zoom for each group}
 
 \item{...}{add}
 }
