@@ -293,21 +293,28 @@ c_net_compare <- function(g1, g2) {
 #'
 #' @param x metanet_compare object
 #' @param ... add
+#' @param coors_com coors object
+#' @param mains a vector of two strings for the main titles of the two networks
 #'
 #' @return plot
 #' @exportS3Method
 #' @method plot metanet_compare
-plot.metanet_compare <- function(x, ...) {
+plot.metanet_compare <- function(x, coors_com = NULL, mains = NULL, ...) {
   c_net_comp <- x
-  coors_com <- c_net_layout(c_net_comp$g_union)
+  if (is.null(coors_com)) {
+    coors_com <- c_net_layout(c_net_comp$g_union)
+  }
+  if (is.null(mains)) {
+    mains <- c("g1", "g2")
+  }
 
   c_net_highlight(c_net_comp$g1, V(c_net_comp$g_inter)$name) -> c_net_comp_g1
   c_net_highlight(c_net_comp$g2, V(c_net_comp$g_inter)$name) -> c_net_comp_g2
   plot_multi_nets(list(c_net_comp_g1, c_net_comp_g2),
     nrow = 1, ncol = 2,
     multi_params_list = list(
-      list(coors = coors_com, main = "g1", legend = FALSE),
-      list(coors = coors_com, main = "g2", legend = FALSE)
+      list(coors = coors_com, main = mains[1], legend = FALSE),
+      list(coors = coors_com, main = mains[2], legend = FALSE)
     )
   )
 }

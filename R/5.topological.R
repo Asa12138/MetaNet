@@ -85,6 +85,9 @@ extract_sample_net <- function(whole_net, otutab, threads = 1, save_net = FALSE,
 #' @examples
 #' igraph::make_ring(10) %>% nc()
 nc <- function(p) {
+  if (length(p) == 0) {
+    return(NaN)
+  }
   adj_matrix <- as.matrix(igraph::as_adj(p, sparse = FALSE))
   adj_matrix[abs(adj_matrix) != 0] <- 1
 

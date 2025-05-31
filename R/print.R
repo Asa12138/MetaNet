@@ -105,6 +105,19 @@ print.ggig <- function(x, ...) {
   pcutils::dabiao("use `plot()` to visualize ggig object.", char = " ", print = TRUE)
 }
 
+
+#' Print method for 'metanet_compare' objects
+#' @param x 'metanet_compare' object
+#' @param ... Additional arguments
+#' @return No value
+#' @exportS3Method
+#' @method print metanet_compare
+print.metanet_compare <- function(x, ...) {
+  pcutils::dabiao("Comparsion result ", print = TRUE)
+  print(x$net_similarity)
+  pcutils::dabiao("\n\nuse `plot()` to visualize metanet_compare object.", char = " ", print = TRUE)
+}
+
 #' Print method for 'robust' objects
 #' @param x 'robust' object
 #' @param ... Additional arguments

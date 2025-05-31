@@ -420,23 +420,35 @@ clean_igraph <- function(go, direct = NULL) {
 #' edge_net <- c_net_set(edge_net, vertex_class = "Phylum", edge_width = "n")
 #' c_net_plot(edge_net)
 c_net_from_edgelist <- function(edgelist, vertex_df = NULL, direct = FALSE, e_type = NULL, e_class = NULL) {
+  node_type <- c("from", "to")
+  if (!all(c("from", "to") %in% colnames(edgelist))) {
+    message("No 'from' and 'to' in the colnames(edgelist), use the first two columns as the 'from' and 'to'.")
+    node_type <- colnames(edgelist)[1:2]
+    colnames(edgelist)[1:2] <- c("from", "to")
+  }
+  edgelist <- data.frame(edgelist[, c("from", "to"), drop = FALSE], edgelist[, setdiff(colnames(edgelist), c("from", "to")), drop = FALSE])
+  name <- NULL
+  vertices <- data.frame(
+    name = c(unique(edgelist$from), unique(edgelist$to)),
+    `_type` = c(rep(node_type[1], length(unique(edgelist$from))), rep(node_type[2], length(unique(edgelist$to)))),
+    check.names = FALSE, stringsAsFactors = FALSE
+  )
+  vertices <- dplyr::distinct(vertices, name, .keep_all = TRUE)
   if (!is.null(vertex_df)) {
     if (!"name" %in% colnames(vertex_df)) {
       vertex_df$name <- rownames(vertex_df)
       message("No 'name' in the colnames(vertex_df), use rownames(vertex_df) as the 'name'.")
     }
     vertex_df <- data.frame(vertex_df[, "name", drop = FALSE], vertex_df[, setdiff(colnames(vertex_df), "name"), drop = FALSE])
+    vertices <- dplyr::left_join(vertices, vertex_df)
   }
 
-  if (!all(c("from", "to") %in% colnames(edgelist))) {
-    message("No 'from' and 'to' in the colnames(edgelist), use the first two columns as the 'from' and 'to'.")
-    colnames(edgelist)[1:2] <- c("from", "to")
-  }
-  edgelist <- data.frame(edgelist[, c("from", "to"), drop = FALSE], edgelist[, setdiff(colnames(edgelist), c("from", "to")), drop = FALSE])
-  go <- igraph::graph_from_data_frame(edgelist, directed = direct, vertices = vertex_df)
+  go <- igraph::graph_from_data_frame(edgelist, directed = direct, vertices = vertices)
   if (!is.null(e_type)) E(go)$e_type <- edgelist[, e_type]
   if (!is.null(e_class)) E(go)$e_class <- edgelist[, e_class]
   go <- c_net_update(go, initialize = TRUE)
+  if (!"v_group" %in% colnames(vertices)) go <- c_net_set(go, vertex_group = "_type")
+  if (!"v_class" %in% colnames(vertices)) go <- c_net_set(go, vertex_class = "_type")
   go
 }
 

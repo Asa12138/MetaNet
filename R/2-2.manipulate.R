@@ -310,6 +310,8 @@ c_net_difference <- function(go1, go2, ...) {
 }
 
 c_net_two_do <- function(go1, go2, func = igraph::union, ...) {
+  stopifnot(is_directed(go1) == is_directed(go2))
+
   tmp_v1 <- get_v(go1)
   tmp_v2 <- get_v(go2)
   cols <- intersect(colnames(tmp_v1), colnames(tmp_v2))
@@ -321,18 +323,21 @@ c_net_two_do <- function(go1, go2, func = igraph::union, ...) {
   tmp_e2 <- get_e(go2)
   cols <- intersect(colnames(tmp_e1), colnames(tmp_e2))
   tmp_e <- rbind(tmp_e1[cols], tmp_e2[cols])
+  if (!is_directed(go1)) {
+    # 无方向性
+    tmp_e2 <- tmp_e
+    tmp_e2$from <- tmp_e$to
+    tmp_e2$to <- tmp_e$from
+    tmp_e <- rbind(tmp_e, tmp_e2)
+  }
   message("Duplicated edges: ", sum(duplicated(tmp_e[, c("from", "to")])), "\nUse the attributes of the first network.")
   tmp_e <- tmp_e[!duplicated(tmp_e[, c("from", "to")]), ]
-  # 无方向性
-  tmp_e2 <- tmp_e
-  tmp_e2$from <- tmp_e$to
-  tmp_e2$to <- tmp_e$from
 
   go <- func(go1, go2, ...)
 
-  go <- clean_igraph(go, direct = FALSE)
+  go <- clean_igraph(go)
   go <- c_net_annotate(go, tmp_v, mode = "v")
-  go <- c_net_annotate(go, rbind(tmp_e, tmp_e2), mode = "e")
+  go <- c_net_annotate(go, tmp_e, mode = "e")
   go <- c_net_annotate(go, list(n_type = "combine_net"), mode = "n")
   go <- c_net_update(go, initialize = TRUE)
   go
@@ -430,7 +435,11 @@ anno_edge <- function(go, anno_tab, verbose = TRUE) {
   }
   get_e(go) -> e_atr
   if (all(c("from", "to") %in% colnames(anno_tab))) {
-    e_atr <- dplyr::left_join(e_atr, anno_tab, by = c("from", "to"), suffix = c(".x", ""))
+    if (anyDuplicated(anno_tab[, c("from", "to")])) {
+      message("Duplicated edges in annotation tables: ")
+    }
+    if ("id" %in% colnames(anno_tab)) anno_tab$id <- NULL
+    e_atr <- dplyr::left_join(e_atr, anno_tab, by = c("from", "to"), suffix = c(".x", ""), multiple = "first")
     grep(".x", colnames(e_atr), value = TRUE) %>% gsub(".x", "", .) -> du
     if (length(du) > 0) {
       if (verbose) message(length(du), (" attributes will be overwrited:\n"), paste0(du, collapse = ","), "\n")
@@ -440,6 +449,12 @@ anno_edge <- function(go, anno_tab, verbose = TRUE) {
     if (verbose) message("No 'from' and 'to' columns in annotation table, will use 'name_from' and 'name_to' instead.")
     if (!"name" %in% colnames(anno_tab)) rownames(anno_tab) -> anno_tab$name
     anno_tab %>% dplyr::select(name, dplyr::everything()) -> anno_tab
+    if (any(duplicated(anno_tab$name))) {
+      stop(
+        "Duplicated name in annotation tables: ",
+        paste0(anno_tab$name[duplicated(anno_tab$name)], collapse = ", ")
+      )
+    }
     # from
     tmp <- anno_tab
     colnames(tmp) <- paste0(colnames(anno_tab), "_from")

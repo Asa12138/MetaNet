@@ -438,6 +438,10 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
     right_leg_y <- right_leg_y - 0.5 * legend_cex
   }
 
+  if (nrow(tmp_e) == 0) {
+    return(invisible())
+  }
+
   if (edge_legend) {
     if ("v_highlight_from" %in% colnames(tmp_e)) {
       tmp_e <- dplyr::arrange(tmp_e, -v_highlight_from, -v_highlight_to)

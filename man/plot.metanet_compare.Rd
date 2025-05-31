@@ -4,10 +4,14 @@
 \alias{plot.metanet_compare}
 \title{Plot a metanet_compare}
 \usage{
-\method{plot}{metanet_compare}(x, ...)
+\method{plot}{metanet_compare}(x, coors_com = NULL, mains = NULL, ...)
 }
 \arguments{
 \item{x}{metanet_compare object}
+
+\item{coors_com}{coors object}
+
+\item{mains}{a vector of two strings for the main titles of the two networks}
 
 \item{...}{add}
 }
