@@ -271,7 +271,7 @@ c_net_compare <- function(g1, g2) {
   g_inter <- suppressMessages(c_net_intersect(g1, g2))
 
   lapply(list(g1, g2, g_union, g_inter), function(g) {
-    net_par(g, mode = "n")$n_index[, -1]
+    net_par(g, mode = "n")$n_index
   }) %>%
     do.call(rbind, .) %>%
     pcutils::t2() -> net_par_df

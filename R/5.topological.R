@@ -138,7 +138,9 @@ net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE, remove_nega
 
   # non-weighted network
   up <- go
-  if (!is.null(igraph::edge_attr(up)[["weight"]])) up <- igraph::delete_edge_attr(up, "weight")
+  if (!is.null(igraph::edge_attr(up)[["weight"]])) {
+    up <- igraph::delete_edge_attr(up, "weight")
+  }
 
   if ("n" %in% mode) {
     # Calculate Network Parameters
@@ -183,17 +185,24 @@ net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE, remove_nega
     n_index <- apply(n_index, 1, FUN = \(x)replace(x, is.nan(x), 0)) %>%
       t() %>%
       as.data.frame()
-    n_index <- cbind_new(get_n(go, simple = TRUE), n_index)
+    # n_index <- cbind_new(get_n(go, simple = TRUE), n_index)
   }
   if ("v" %in% mode) {
+    negative_weight <- FALSE
+    if (!is.null(igraph::edge_attr(go)[["weight"]])) {
+      if (any(igraph::edge_attr(go)[["weight"]] < 0)) {
+        negative_weight <- TRUE
+        warning("Weight vector must be positive, drop the weight.")
+      }
+    }
     # Calculate Vertices Parameters
     v_index <- data.frame(
       check.names = F,
       Degree = igraph::degree(go),
       `Clustering_coefficient` = igraph::transitivity(go, type = "local"), # local clustering coefficient
-      Betweenness = igraph::betweenness(go), # betweenness
+      Betweenness = ifelse(negative_weight, igraph::betweenness(up), igraph::betweenness(go)), # betweenness
       Eccentricity = igraph::eccentricity(go),
-      Closeness = igraph::closeness(go),
+      Closeness = ifelse(negative_weight, igraph::closeness(up), igraph::closeness(go)),
       `Hub_score` = igraph::hub_score(go)[["vector"]]
       # page_rank = page.rank(go)$vector
       # igraph::evcent(go)[["vector"]]
@@ -214,7 +223,7 @@ net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE, remove_nega
     v_index <- apply(v_index, 1, FUN = \(x)replace(x, is.nan(x), 0)) %>%
       t() %>%
       as.data.frame()
-    v_index <- cbind_new(get_v(go), v_index)
+    # v_index <- cbind_new(get_v(go), v_index)
   }
   if ("e" %in% mode) {
     # Calculate Edges Parameters
