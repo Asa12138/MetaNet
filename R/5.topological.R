@@ -195,6 +195,9 @@ net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE, remove_nega
         warning("Weight vector must be positive, drop the weight.")
       }
     }
+    if (is.null(igraph::vertex_attr(go)[["name"]])) {
+      igraph::V(go)$name <- as.character(igraph::V(go))
+    }
     # Calculate Vertices Parameters
     v_index <- data.frame(
       check.names = F,
@@ -331,6 +334,7 @@ fit_power <- function(go, p.value = FALSE) {
 #' @returns ggplot
 #' @export
 plot_net_degree <- function(gols, net_names = NULL) {
+  freq <- net <- degree <- NULL
   if (is.null(names(gols))) {
     names(gols) <- paste0("Network", seq_along(gols))
   }

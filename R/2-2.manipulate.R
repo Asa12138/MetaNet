@@ -613,6 +613,7 @@ summ_2col <- function(df, from = 1, to = 2, count = 3, direct = FALSE) {
 #' data("c_net")
 #' plot_e_type_bar(co_net, degree_threshold = 10)
 plot_e_type_bar <- function(go, mode = c("left", "right")[1], degree_threshold = 0) {
+  from <- e_type <- n <- label <- NULL
   get_e(go) -> tmp_e2
   count(tmp_e2, from, e_type) -> plotdat
   count(tmp_e2, from) -> plotdat2
