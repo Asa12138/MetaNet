@@ -18,7 +18,7 @@ Add topological indexes for a network"><!-- mathjax --><script src="https://cdnj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">MetaNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.7</span>
       </span>
     </div>
 
@@ -160,102 +160,7 @@ Add topological indexes for a network"><!-- mathjax --><script src="https://cdnj
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/make_graph.html" class="external-link">make_graph</a></span><span class="op">(</span><span class="st">"Walther"</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">net_par</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $n_index</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Node_number Edge_number Edge_density Negative_percentage Average_path_length</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1          25          31    0.1033333                  NA            3.586667</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Global_efficiency Average_degree Average_weighted_degree Diameter</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1         0.3679762           2.48                    2.48        8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Clustering_coefficient Centralized_betweenness Natural_connectivity</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1                      0               0.1436084             1.029526</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $v_index</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Degree Clustering_coefficient Betweenness Eccentricity   Closeness</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       1                      0           0            8 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       3                      0           0            7 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       3                      0           0            6 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       3                      0           0            7 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5       2                      0           0            6 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6       3                      0           0            5 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7       3                      0           0            6 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8       2                      0           0            7 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9       3                      0           0            6 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10      3                      0           0            5 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11      3                      0           0            6 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12      2                      0           0            7 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13      1                      0           0            8 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14      3                      0           0            7 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15      3                      0           0            6 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16      3                      0           0            7 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17      2                      0           0            8 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18      2                      0           0            6 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19      3                      0           0            7 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20      2                      0           0            6 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21      3                      0           0            5 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22      1                      0           0            8 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23      2                      0           0            6 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24      3                      0           0            5 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25      3                      0           0            6 0.009009009</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     Hub_score</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.26100067</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0.76475258</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.82460117</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.65139399</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0.38805295</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.48563182</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  0.48420485</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  0.21792635</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  0.87458262</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 0.79784358</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 0.61009626</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12 0.27458636</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13 0.09371295</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14 1.00000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15 0.86397781</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16 0.68757575</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17 0.45697394</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18 0.44141601</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19 0.60580804</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20 0.37249503</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21 0.71520031</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22 0.07437559</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23 0.56032314</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24 0.84394749</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25 0.73887285</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $e_index</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    id from to</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   1    1  2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2    2  3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3    2  9</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   4    3  4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   5    3 14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   6    4  5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   7    4 17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   8    5  6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9   9    6  7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 10    6 20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11 11    7  8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12 12    7 21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13 13    8 22</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14 14    9 10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15 15    9 14</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16 16   10 11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17 17   10 23</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18 18   11 12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19 19   11 21</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20 20   12 13</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21 21   14 15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22 22   15 16</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 23 23   15 24</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 24 24   16 17</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 25 25   16 18</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 26 26   18 19</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 27 27   19 20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 28 28   19 25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 29 29   21 25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 30 30   23 24</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 31 31   24 25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in data.frame(check.names = F, name = igraph::vertex_attr(go, "name"),     Degree = igraph::degree(go), Clustering_coefficient = igraph::transitivity(go,         type = "local"), Betweenness = ifelse(negative_weight,         igraph::betweenness(up), igraph::betweenness(go)), Eccentricity = igraph::eccentricity(go),     Closeness = ifelse(negative_weight, igraph::closeness(up),         igraph::closeness(go)), Hub_score = igraph::hub_score(go)[["vector"]]):</span> arguments imply differing number of rows: 0, 25, 1</span>
 <span class="r-in"><span><span class="fu">c_net_index</span><span class="op">(</span><span class="va">co_net</span><span class="op">)</span> <span class="op">-&gt;</span> <span class="va">co_net_with_par</span></span></span>
 </code></pre></div>
     </div>
