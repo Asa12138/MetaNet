@@ -33,6 +33,10 @@ c_net_layout <- function(go, method = igraph::nicely(), order_by = NULL, order_l
   name <- x <- y <- NULL
   if ("igraph_layout_spec" %in% class(method)) {
     coors <- igraph::layout_(go, method)
+    if (all(is.na(coors))) {
+      go2 <- clean_igraph(go)
+      coors <- igraph::layout_(go2, method)
+    }
   } else if ("poly" %in% class(method)) {
     coors <- method(go, group2 = order_by, group2_order = order_ls)
   } else if ("layout" %in% class(method)) {
@@ -181,6 +185,9 @@ get_coors <- \(coors, go, ...){
 
 rescale_coors <- function(coors, keep_asp = TRUE) {
   stopifnot(inherits(coors, "coors"))
+  if (any(is.na(coors$X)) || any(is.na(coors$Y))) {
+    stop("Some coordinates are NA")
+  }
   if (keep_asp) {
     diff_x <- diff(range(coors$X))
     diff_y <- diff(range(coors$Y))

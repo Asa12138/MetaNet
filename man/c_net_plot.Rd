@@ -46,6 +46,9 @@ c_net_plot(
   pie_legend = FALSE,
   pie_legend_title = "Pie part",
   pie_legend_order = NULL,
+  label_cex = 1,
+  arrow_size_cex = 1,
+  arrow_width_cex = 1,
   params_list = NULL,
   rescale = FALSE,
   seed = 1234
@@ -131,6 +134,12 @@ c_net_plot(
 \item{pie_legend_title}{pie_legend_title}
 
 \item{pie_legend_order}{pie_legend_order}
+
+\item{label_cex}{label cex, default 1, relative to the vertex size}
+
+\item{arrow_size_cex}{arrow size cex, default 1, relative to the vertex size}
+
+\item{arrow_width_cex}{arrow width cex, default 1, relative to the vertex size}
 
 \item{params_list}{a list of parameters, e.g. list(edge_legend = TRUE, lty_legend = FALSE), when the parameter is duplicated, the format argument will be used rather than the argument in params_list.}
 

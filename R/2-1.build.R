@@ -440,10 +440,15 @@ c_net_from_edgelist <- function(edgelist, vertex_df = NULL, direct = FALSE, e_ty
       message("No 'name' in the colnames(vertex_df), use rownames(vertex_df) as the 'name'.")
     }
     vertex_df <- data.frame(vertex_df[, "name", drop = FALSE], vertex_df[, setdiff(colnames(vertex_df), "name"), drop = FALSE])
-    vertices <- dplyr::left_join(vertices, vertex_df)
+    vertices <- dplyr::full_join(vertices, vertex_df, by = "name")
+    # vertices <- vertex_df
   }
 
   go <- igraph::graph_from_data_frame(edgelist, directed = direct, vertices = vertices)
+  if (length(V(go)) == 0) {
+    return(c_net_update(go, initialize = TRUE))
+  }
+
   if (!is.null(e_type)) E(go)$e_type <- edgelist[, e_type]
   if (!is.null(e_class)) E(go)$e_class <- edgelist[, e_class]
   go <- c_net_update(go, initialize = TRUE)

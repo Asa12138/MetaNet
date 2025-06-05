@@ -1,3 +1,9 @@
+# MetaNet v0.2.7 Notes
+
+## Added
+
+- added `c_net_compare` function <2025-06-04, Wed>
+
 # MetaNet v0.2.6 Notes
 
 ## Added

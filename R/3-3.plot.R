@@ -88,7 +88,7 @@ get_net_main <- function(n_index) {
 }
 
 scale_size_width <- function(tmp_v, tmp_e, vertex_size_range, edge_width_range) {
-  {        v_groups <- unique(tmp_v$v_group)
+  {    v_groups <- unique(tmp_v$v_group)
     nice_size <- ceiling(100 / sqrt(nrow(tmp_v))) + 1
 
     vertex_size_range_default <- rep(list(c(max(nice_size * 0.4, 3), min(nice_size * 1.6, 12))), length(v_groups))
@@ -549,6 +549,9 @@ produce_c_net_legends <- function(tmp_v, tmp_e, vertex_frame_width,
 #' @param seed random seed, default:1234, make sure each plot is the same.
 #' @param params_list a list of parameters, e.g. list(edge_legend = TRUE, lty_legend = FALSE), when the parameter is duplicated, the format argument will be used rather than the argument in params_list.
 #' @param rescale Logical constant, whether to rescale the coordinates to the (-1,1).
+#' @param arrow_size_cex arrow size cex, default 1, relative to the vertex size
+#' @param arrow_width_cex arrow width cex, default 1, relative to the vertex size
+#' @param label_cex label cex, default 1, relative to the vertex size
 #'
 #' @family plot
 #' @return a network plot
@@ -576,6 +579,7 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
                        lty_legend = FALSE, lty_legend_title = "Edge class", lty_legend_order = NULL,
                        module_legend = FALSE, module_legend_title = "Module", module_legend_order = NULL,
                        pie_legend = FALSE, pie_legend_title = "Pie part", pie_legend_order = NULL,
+                       label_cex = 1, arrow_size_cex = 1, arrow_width_cex = 1,
                        params_list = NULL, rescale = FALSE,
                        seed = 1234) {
   if (!is.null(params_list)) {
@@ -665,14 +669,15 @@ c_net_plot <- function(go, coors = NULL, ..., labels_num = NULL,
       vertex.pie = pie_value_list,
       vertex.pie.color = pie_color_list,
       ...,
+      vertex.size2 = tmp_v$size / 2,
       vertex.frame.width = 0.5,
       main = main,
       rescale = rescale,
       vertex.label.font = 1,
-      vertex.label.cex = 0.07 * tmp_v$size,
+      vertex.label.cex = label_cex * 0.05 * tmp_v$size,
       vertex.label = tmp_v$label,
-      edge.arrow.size = 0.5 * tmp_e$width,
-      edge.arrow.width = 0.6 * tmp_e$width,
+      edge.arrow.size = arrow_size_cex * 0.2 * tmp_e$width,
+      edge.arrow.width = arrow_width_cex * 1 * tmp_e$width,
       edge.curved = edge_curved,
       margin = c(0, 0, 0, 0)
     )
