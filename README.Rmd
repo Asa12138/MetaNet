@@ -29,6 +29,49 @@ sticker("~/Documents/R/test/icons/网络.png",
   h_fill = "#D8E2DC", h_color = "#83A98C",
   filename = "man/figures/MetaNet.png", dpi = 300
 )
+
+tibble::tribble(
+  ~from, ~to,
+   1L,  2L,
+   2L,  3L,
+   3L,  4L,
+   4L,  5L,
+   5L,  6L,
+   6L,  1L,
+   7L,  1L,
+   7L,  2L,
+   7L,  3L,
+   7L,  4L,
+   7L,  8L,
+   8L,  1L,
+   8L,  4L,
+   8L,  5L
+  )%>%graph_from_data_frame(
+    directed = FALSE
+  ) %>% as.metanet() -> g
+c_net_layout(make_ring(6))->co
+co=rbind(co,
+         data.frame(
+           name=c("7","8"),
+           X=c(-0.3,0.3),
+           Y=c(0.3,-0.1)
+         ))
+png("~/Documents/R/test/icons/test.png",width = 400,height = 400,bg = "transparent")
+c_net_plot(g,co,legend = F,vertex_size_range = list(40),
+           edge_width_range = 10*2,labels_num = 0,vertex.frame.width=0,
+           vertex.color="white",edge.color="white"
+           )
+dev.off()
+
+sticker("~/Documents/R/test/icons/test.png",
+  package = "MetaNet",
+  p_size = 30, p_color = "white", p_y = 1.4,
+  p_fontface = "bold.italic", p_family = "Comic Sans MS",
+  s_x = 1, s_y = .7, s_width = 0.6, s_height = 0.4,asp = 0.8,
+  h_fill = "#1D4A76", h_color = "#4393C3",
+  filename = "man/figures/MetaNet.png", dpi = 300
+)
+
 ```
 
 # MetaNet <img src="man/figures/MetaNet.png" align="right" width="120" />

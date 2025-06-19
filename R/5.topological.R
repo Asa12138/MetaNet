@@ -201,7 +201,6 @@ net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE, remove_nega
     # Calculate Vertices Parameters
     v_index <- data.frame(
       check.names = F,
-      name = igraph::vertex_attr(go, "name"),
       Degree = igraph::degree(go),
       `Clustering_coefficient` = igraph::transitivity(go, type = "local"), # local clustering coefficient
       Betweenness = ifelse(negative_weight, igraph::betweenness(up), igraph::betweenness(go)), # betweenness
@@ -227,6 +226,11 @@ net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE, remove_nega
     v_index <- apply(v_index, 1, FUN = \(x)replace(x, is.nan(x), 0)) %>%
       t() %>%
       as.data.frame()
+    v_index <- data.frame(
+      check.names = F,
+      name = igraph::vertex_attr(go, "name"),
+      v_index
+    )
     # v_index <- cbind_new(get_v(go), v_index)
   }
   if ("e" %in% mode) {
