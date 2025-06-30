@@ -393,7 +393,7 @@ plot.robustness <- function(x, indexes = "Node_number", ...) {
   if (!"group" %in% colnames(robustness_res)) robustness_res$group <- "Network"
   pcutils::group_box(robustness_res[, indexes, drop = FALSE],
     group = "group",
-    metadata = robustness_res, ..., facet = FALSE
+    metadata = robustness_res, ...
   ) + theme_bw()
 }
 
@@ -538,7 +538,7 @@ plot.cohesion <- function(x, group, metadata, mode = 1, ...) {
   if (mode == 1) p <- pcutils::stackplot(abs(t(cohesion_res$Cohesion)), group = group, metadata = metadata, ...)
   if (mode == 2) {
     co <- cohesion_res$Cohesion %>% dplyr::transmute(`neg:pos` = neg / pos)
-    p <- pcutils::group_box(co, group = group, metadata = metadata, p_value2 = TRUE, ...) +
+    p <- pcutils::group_box(co, group = group, metadata = metadata, ...) +
       ylab("neg:pos cohesion") + theme_bw()
   }
   p

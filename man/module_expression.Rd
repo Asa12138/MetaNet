@@ -54,8 +54,8 @@ module_expression(co_net_modu, totu)
 Other module: 
 \code{\link{filter_n_module}()},
 \code{\link{get_community}()},
-\code{\link{get_module_eigen}()},
 \code{\link{get_module}()},
+\code{\link{get_module_eigen}()},
 \code{\link{module_detect}()},
 \code{\link{module_net}()},
 \code{\link{summary_module}()},

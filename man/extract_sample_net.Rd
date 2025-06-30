@@ -46,8 +46,8 @@ Other topological:
 \code{\link{links_stat}()},
 \code{\link{nc}()},
 \code{\link{net_par}()},
-\code{\link{rand_net_par}()},
 \code{\link{rand_net}()},
+\code{\link{rand_net_par}()},
 \code{\link{smallworldness}()}
 }
 \concept{topological}

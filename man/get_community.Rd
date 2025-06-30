@@ -18,8 +18,8 @@ Get community
 \seealso{
 Other module: 
 \code{\link{filter_n_module}()},
-\code{\link{get_module_eigen}()},
 \code{\link{get_module}()},
+\code{\link{get_module_eigen}()},
 \code{\link{module_detect}()},
 \code{\link{module_eigen}()},
 \code{\link{module_net}()},

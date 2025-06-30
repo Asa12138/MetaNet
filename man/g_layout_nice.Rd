@@ -50,8 +50,8 @@ if (requireNamespace("ggraph")) {
 }
 \seealso{
 Other g_layout: 
+\code{\link{g_layout}()},
 \code{\link{g_layout_poly_sector}()},
-\code{\link{g_layout_polygon}()},
-\code{\link{g_layout}()}
+\code{\link{g_layout_polygon}()}
 }
 \concept{g_layout}

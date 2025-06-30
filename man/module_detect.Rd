@@ -35,8 +35,8 @@ module_detect(co_net) -> co_net_modu
 Other module: 
 \code{\link{filter_n_module}()},
 \code{\link{get_community}()},
-\code{\link{get_module_eigen}()},
 \code{\link{get_module}()},
+\code{\link{get_module_eigen}()},
 \code{\link{module_eigen}()},
 \code{\link{module_net}()},
 \code{\link{summary_module}()},

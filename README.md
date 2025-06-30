@@ -6,11 +6,12 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/Asa12138/MetaNet/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Asa12138/MetaNet/actions/workflows/R-CMD-check.yaml)
+[![](https://img.shields.io/badge/doi-10.1101/2025.06.26.661636-yellow.svg)](https://doi.org/10.1101/2025.06.26.661636)
 [![](https://img.shields.io/badge/blog-@asa-blue.svg)](https://asa-blog.netlify.app/)
 [![](http://cranlogs.r-pkg.org/badges/grand-total/MetaNet)](https://cran.r-project.org/package=MetaNet)
 [![](http://cranlogs.r-pkg.org/badges/last-month/MetaNet)](https://cran.r-project.org/package=MetaNet)
 [![](https://www.r-pkg.org/badges/version/MetaNet?color=green)](https://cran.r-project.org/package=MetaNet)
-[![](https://img.shields.io/badge/devel%20version-0.2.6-green.svg)](https://github.com/Asa12138/MetaNet)
+[![](https://img.shields.io/badge/devel%20version-0.2.7-green.svg)](https://github.com/Asa12138/MetaNet)
 <!-- badges: end -->
 
 MetaNet: Network analysis for multi-omics
@@ -93,13 +94,37 @@ without manual adjustment. (E) Modular network visualized using
 using “g_layout_multi_layer”. All networks shown are based on simulated
 data and carry no biological interpretation.
 
+<img src="man/figures/fig3-1.jpeg"  width="500" />
+
+**Figure 4. Diverse specialized network visualizations by MetaNet.** (A)
+Venn-style network: Large nodes represent groups, while smaller nodes
+denote individual elements within each group, enabling visualization of
+shared and unique components. (B) Hierarchical tree network: Nodes are
+organized based on classification hierarchy. Node color corresponds to
+the taxonomic or categorical level. (C) Pie-node network: Each node is
+displayed as a pie chart, where slice colors indicate relative abundance
+across different groups. (D) Protein–protein interaction (PPI) network:
+Extracted from the STRING database, showing experimentally validated and
+predicted molecular interactions among proteins. (E) miRNA–gene
+regulatory network: Sourced from the miRTarBase database, illustrating
+experimentally supported regulatory relationships between miRNAs and
+their target genes. (F) KEGG KO–pathway association network: The network
+shows KEGG orthologs (KOs) involved in selected biological pathways.
+Small nodes represent KOs, and large nodes represent pathways. KO nodes
+are colored by their expression trend. Shaded regions surrounding
+pathways indicate whether the pathway is globally up-regulated (orange)
+or down-regulated (green). (G) KEGG pathway-specific network: Network
+representation of the “EGFR tyrosine kinase inhibitor resistance”
+pathway. Rectangular nodes denote KEGG orthologs, circular nodes
+indicate compounds, and edge colors reflect interaction types.
+
 ## Citation
 
 Please cite:
 
-Chen Peng (2025). MetaNet: A Comprehensive R Package for Network
-Analysis of Omics Data. *R package*,
-<https://github.com/Asa12138/MetaNet>.
+1.  Peng, C. et al. MetaNet: a scalable and integrated tool for
+    reproducible omics network analysis. 2025.06.26.661636 Preprint at
+    <https://doi.org/10.1101/2025.06.26.661636> (2025).
 
 ## Need helps?
 

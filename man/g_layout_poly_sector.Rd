@@ -49,8 +49,8 @@ Layout with group
 }
 \seealso{
 Other g_layout: 
+\code{\link{g_layout}()},
 \code{\link{g_layout_nice}()},
-\code{\link{g_layout_polygon}()},
-\code{\link{g_layout}()}
+\code{\link{g_layout_polygon}()}
 }
 \concept{g_layout}

@@ -28,8 +28,8 @@ Other topological:
 \code{\link{get_group_skeleton}()},
 \code{\link{links_stat}()},
 \code{\link{net_par}()},
-\code{\link{rand_net_par}()},
 \code{\link{rand_net}()},
+\code{\link{rand_net_par}()},
 \code{\link{smallworldness}()}
 }
 \concept{topological}

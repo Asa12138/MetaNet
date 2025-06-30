@@ -32,52 +32,57 @@ sticker("~/Documents/R/test/icons/网络.png",
 
 tibble::tribble(
   ~from, ~to,
-   1L,  2L,
-   2L,  3L,
-   3L,  4L,
-   4L,  5L,
-   5L,  6L,
-   6L,  1L,
-   7L,  1L,
-   7L,  2L,
-   7L,  3L,
-   7L,  4L,
-   7L,  8L,
-   8L,  1L,
-   8L,  4L,
-   8L,  5L
-  )%>%graph_from_data_frame(
+  1L, 2L,
+  2L, 3L,
+  3L, 4L,
+  4L, 5L,
+  5L, 6L,
+  6L, 1L,
+  7L, 1L,
+  7L, 2L,
+  7L, 3L,
+  7L, 4L,
+  7L, 8L,
+  8L, 1L,
+  8L, 4L,
+  8L, 5L
+) %>%
+  graph_from_data_frame(
     directed = FALSE
-  ) %>% as.metanet() -> g
-c_net_layout(make_ring(6))->co
-co=rbind(co,
-         data.frame(
-           name=c("7","8"),
-           X=c(-0.3,0.3),
-           Y=c(0.3,-0.1)
-         ))
-png("~/Documents/R/test/icons/test.png",width = 400,height = 400,bg = "transparent")
-c_net_plot(g,co,legend = F,vertex_size_range = list(40),
-           edge_width_range = 10*2,labels_num = 0,vertex.frame.width=0,
-           vertex.color="white",edge.color="white"
-           )
+  ) %>%
+  as.metanet() -> g
+c_net_layout(make_ring(6)) -> co
+co <- rbind(
+  co,
+  data.frame(
+    name = c("7", "8"),
+    X = c(-0.3, 0.3),
+    Y = c(0.3, -0.1)
+  )
+)
+png("~/Documents/R/test/icons/test.png", width = 400, height = 400, bg = "transparent")
+c_net_plot(g, co,
+  legend = F, vertex_size_range = list(40),
+  edge_width_range = 10 * 2, labels_num = 0, vertex.frame.width = 0,
+  vertex.color = "white", edge.color = "white"
+)
 dev.off()
 
 sticker("~/Documents/R/test/icons/test.png",
   package = "MetaNet",
   p_size = 30, p_color = "white", p_y = 1.4,
   p_fontface = "bold.italic", p_family = "Comic Sans MS",
-  s_x = 1, s_y = .7, s_width = 0.6, s_height = 0.4,asp = 0.8,
+  s_x = 1, s_y = .7, s_width = 0.6, s_height = 0.4, asp = 0.8,
   h_fill = "#1D4A76", h_color = "#4393C3",
   filename = "man/figures/MetaNet.png", dpi = 300
 )
-
 ```
 
 # MetaNet <img src="man/figures/MetaNet.png" align="right" width="120" />
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/Asa12138/MetaNet/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Asa12138/MetaNet/actions/workflows/R-CMD-check.yaml)
+`r badger::badge_doi("10.1101/2025.06.26.661636","yellow")`
 `r badge_custom("blog", "@asa", "blue", "https://asa-blog.netlify.app/")`
 `r badge_cran_download("MetaNet", type = "grand-total")`
 `r badge_cran_download("MetaNet", type = "last-month")`
@@ -144,11 +149,25 @@ devtools::install_github("Asa12138/MetaNet")
 (E) Modular network visualized using "g_layout_circlepack".
 (F) Three-layer modular structure visualized using "g_layout_multi_layer". All networks shown are based on simulated data and carry no biological interpretation.
 
+
+<img src="man/figures/fig3-1.jpeg"  width="500" />
+
+**Figure 4. Diverse specialized network visualizations by MetaNet.**
+(A) Venn-style network: Large nodes represent groups, while smaller nodes denote individual elements within each group, enabling visualization of shared and unique components.
+(B) Hierarchical tree network: Nodes are organized based on classification hierarchy. Node color corresponds to the taxonomic or categorical level.
+(C) Pie-node network: Each node is displayed as a pie chart, where slice colors indicate relative abundance across different groups.
+(D) Protein–protein interaction (PPI) network: Extracted from the STRING database, showing experimentally validated and predicted molecular interactions among proteins.
+(E) miRNA–gene regulatory network: Sourced from the miRTarBase database, illustrating experimentally supported regulatory relationships between miRNAs and their target genes.
+(F) KEGG KO–pathway association network: The network shows KEGG orthologs (KOs) involved in selected biological pathways. Small nodes represent KOs, and large nodes represent pathways. KO nodes are colored by their expression trend. Shaded regions surrounding pathways indicate whether the pathway is globally up-regulated (orange) or down-regulated (green).
+(G) KEGG pathway-specific network: Network representation of the “EGFR tyrosine kinase inhibitor resistance” pathway. Rectangular nodes denote KEGG orthologs, circular nodes indicate compounds, and edge colors reflect interaction types.
+
+
 ## Citation
 
 Please cite:
 
-Chen Peng (2025). MetaNet: A Comprehensive R Package for Network Analysis of Omics Data. _R package_, <https://github.com/Asa12138/MetaNet>.
+1. Peng, C. et al. MetaNet: a scalable and integrated tool for reproducible omics network analysis. 2025.06.26.661636 Preprint at https://doi.org/10.1101/2025.06.26.661636 (2025).
+
 
 ## Need helps?
 

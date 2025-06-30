@@ -52,8 +52,8 @@ if (requireNamespace("ggtree") && requireNamespace("treeio")) plot_module_tree(c
 \seealso{
 Other module: 
 \code{\link{get_community}()},
-\code{\link{get_module_eigen}()},
 \code{\link{get_module}()},
+\code{\link{get_module_eigen}()},
 \code{\link{module_detect}()},
 \code{\link{module_eigen}()},
 \code{\link{module_net}()},
