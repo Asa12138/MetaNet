@@ -151,12 +151,16 @@
 <p><strong>Figure 2. MetaNet supports flexible and intuitive network manipulation.</strong> (A) Initial multi-omics network constructed without annotations. (B) Annotated multi-omics network using the “c_net_set” function. Node shape indicates omics type, color represents omics subtypes, size denotes average abundance, edge color indicates positive or negative correlation, edge type distinguishes intra- and inter-omics connections, and edge width reflects the absolute value of the correlation coefficient. (C) Subnetwork filtered from intra-omics interactions between the Microbiome and Metabolome layers using “c_net_filter”. (D) Highlighted nodes centered on “s__Dongia_mobilis” and its neighbors using “c_net_highlight”. (E) Community detection and modular visualization using “c_net_module”. (F) Chord diagram displaying the proportion of edges between modules. (G) Skeleton network across omics subtypes at a grouped level using “c_net_skeleton”. (H) Operations among networks: “c_net_union” merges net1 and net2, “c_net_intersect” extracts shared nodes and edges, and “c_net_difference” isolates net1-specific nodes and edges. All networks shown are based on simulated data and are for illustrative purposes only.</p>
 <p><img src="reference/figures/fig3.jpeg" width="500"></p>
 <p><strong>Figure 3. MetaNet enables diverse and powerful network layout strategies.</strong> (A) Application of 24 out of more than 40 built-in layout algorithms from “c_net_layout” on the Zachary Karate Club network. (B) Layout generated within a star using “spatstat_layout”. (C) Layout applied within the map of Australia using “spatstat_layout”. (D) Grouped network layout consisting of four subgroups arranged with “with_fr()”, “on_grid()”, “as_polycircle(3)”, and “as_polygon(3)” within a human-body schematic. All visualization elements were rendered entirely in MetaNet without manual adjustment. (E) Modular network visualized using “g_layout_circlepack”. (F) Three-layer modular structure visualized using “g_layout_multi_layer”. All networks shown are based on simulated data and carry no biological interpretation.</p>
+<p><img src="reference/figures/fig3-1.jpeg" width="500"></p>
+<p><strong>Figure 4. Diverse specialized network visualizations by MetaNet.</strong> (A) Venn-style network: Large nodes represent groups, while smaller nodes denote individual elements within each group, enabling visualization of shared and unique components. (B) Hierarchical tree network: Nodes are organized based on classification hierarchy. Node color corresponds to the taxonomic or categorical level. (C) Pie-node network: Each node is displayed as a pie chart, where slice colors indicate relative abundance across different groups. (D) Protein–protein interaction (PPI) network: Extracted from the STRING database, showing experimentally validated and predicted molecular interactions among proteins. (E) miRNA–gene regulatory network: Sourced from the miRTarBase database, illustrating experimentally supported regulatory relationships between miRNAs and their target genes. (F) KEGG KO–pathway association network: The network shows KEGG orthologs (KOs) involved in selected biological pathways. Small nodes represent KOs, and large nodes represent pathways. KO nodes are colored by their expression trend. Shaded regions surrounding pathways indicate whether the pathway is globally up-regulated (orange) or down-regulated (green). (G) KEGG pathway-specific network: Network representation of the “EGFR tyrosine kinase inhibitor resistance” pathway. Rectangular nodes denote KEGG orthologs, circular nodes indicate compounds, and edge colors reflect interaction types.</p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
 <p>Please cite:</p>
-<p>Chen Peng (2025). MetaNet: A Comprehensive R Package for Network Analysis of Omics Data. <em>R package</em>, <a href="https://github.com/Asa12138/MetaNet" class="external-link uri">https://github.com/Asa12138/MetaNet</a>.</p>
+<ol style="list-style-type: decimal">
+<li>Peng, C. et al. MetaNet: a scalable and integrated tool for reproducible omics network analysis. 2025.06.26.661636 Preprint at <a href="https://doi.org/10.1101/2025.06.26.661636" class="external-link uri">https://doi.org/10.1101/2025.06.26.661636</a> (2025).</li>
+</ol>
 </div>
 <div class="section level2">
 <h2 id="need-helps">Need helps?<a class="anchor" aria-label="anchor" href="#need-helps"></a>
@@ -202,11 +206,12 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://github.com/Asa12138/MetaNet/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/Asa12138/MetaNet/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://doi.org/10.1101/2025.06.26.661636" class="external-link"><img src="https://img.shields.io/badge/doi-10.1101/2025.06.26.661636-yellow.svg"></a></li>
 <li><a href="https://asa-blog.netlify.app/" class="external-link"><img src="https://img.shields.io/badge/blog-@asa-blue.svg"></a></li>
 <li><a href="https://cran.r-project.org/package=MetaNet" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/grand-total/MetaNet"></a></li>
 <li><a href="https://cran.r-project.org/package=MetaNet" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/last-month/MetaNet"></a></li>
 <li><a href="https://cran.r-project.org/package=MetaNet" class="external-link"><img src="https://www.r-pkg.org/badges/version/MetaNet?color=green"></a></li>
-<li><a href="https://github.com/Asa12138/MetaNet" class="external-link"><img src="https://img.shields.io/badge/devel%20version-0.2.6-green.svg"></a></li>
+<li><a href="https://github.com/Asa12138/MetaNet" class="external-link"><img src="https://img.shields.io/badge/devel%20version-0.2.7-green.svg"></a></li>
 </ul>
 </div>
 
