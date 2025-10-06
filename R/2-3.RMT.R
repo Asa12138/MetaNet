@@ -6,6 +6,7 @@
 #' @param min_threshold min_threshold
 #' @param max_threshold max_threshold
 #' @param step step
+#' @param plot plot pngs?
 #' @param gif render a .gif file?
 #' @param verbose verbose
 #' @param out_dir output dir
@@ -25,13 +26,15 @@
 #' c_net_build(corr, r_threshold = 0.69) -> co_net_rmt
 #' }
 RMT_threshold <- function(occor.r, out_dir, min_threshold = 0.5, max_threshold = 0.8,
-                          step = 0.02, gif = FALSE, verbose = FALSE) {
+                          step = 0.02, plot = FALSE, gif = FALSE, verbose = FALSE) {
   nwd <- getwd()
   on.exit(setwd(nwd))
 
   setwd(out_dir)
   if (inherits(occor.r, "corr")) occor.r <- occor.r$r
-  if (!dir.exists("./RMT_temp")) dir.create("./RMT_temp")
+  if (plot) {
+    if (!dir.exists("./RMT_temp")) dir.create("./RMT_temp")
+  }
   diag(occor.r) <- 0
 
   if (max_threshold >= max(abs(occor.r))) max_threshold <- (max(abs(occor.r)) - step)
@@ -76,7 +79,7 @@ RMT_threshold <- function(occor.r, out_dir, min_threshold = 0.5, max_threshold =
     log_LW <- log(pi / 2) + sum(log(evs)) / N - 0.25 * pi * sum(evs^2) / N
 
     # save png
-    {
+    if (plot) {
       histo <- hist(ev.spacing, breaks = seq(min(ev.spacing), max(ev.spacing), len = 51), plot = FALSE)
       grDevices::png(paste0("RMT_temp/rmt_nnsd", i, ".png"), height = 600, width = 700, res = 130)
       nnsd_plot(
@@ -87,7 +90,11 @@ RMT_threshold <- function(occor.r, out_dir, min_threshold = 0.5, max_threshold =
     }
     res <- rbind(res, data.frame(threshold, p_ks_test, log_sse, log_LW, log_LE))
   }
-  message("The Intermediate files saved in ", out_dir, "/RMT_temp/.")
+  if (plot) {
+    message("The Intermediate files saved in ", out_dir, "/RMT_temp/.")
+  } else {
+    gif <- FALSE
+  }
   # transfer to gif
   if (gif) {
     lib_ps("gifski", library = FALSE)

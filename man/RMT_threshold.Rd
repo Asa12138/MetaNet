@@ -11,6 +11,7 @@ RMT_threshold(
   min_threshold = 0.5,
   max_threshold = 0.8,
   step = 0.02,
+  plot = FALSE,
   gif = FALSE,
   verbose = FALSE
 )
@@ -27,6 +28,8 @@ rmt(occor.r, min_threshold = 0.5, max_threshold = 0.85, step = 0.01)
 \item{max_threshold}{max_threshold}
 
 \item{step}{step}
+
+\item{plot}{plot pngs?}
 
 \item{gif}{render a .gif file?}
 

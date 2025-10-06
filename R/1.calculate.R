@@ -190,6 +190,64 @@ read_corr <- function(filename) {
   return(in_corr)
 }
 
+#' Plot a correlation heatmap
+#'
+#' @param corr a corr object, must contain 'r' and 'p.value' matrices.
+#' @param show.p whether to show p-values as significance stars on the heatmap.
+#' @param cluster_rows whether to cluster rows.
+#' @param cluster_cols whether to cluster columns.
+#' @param ... additional arguments passed to `pheatmap::pheatmap`.
+#' @return plot of the correlation heatmap.
+#' @export
+plot_corr_heatmap <- function(corr,
+                              show.p = FALSE,
+                              cluster_rows = TRUE,
+                              cluster_cols = TRUE,
+                              ...) {
+  # 检查必要包
+  lib_ps(pheatmap, library = FALSE)
+
+  # 检查输入结构
+  if (!inherits(corr, "corr") ||
+    !all(c("r", "p.value") %in% names(corr))) {
+    stop("`corr` must be a corr object with 'r' and 'p.value' matrices.")
+  }
+  p.mat <- corr$p.value
+
+  # 准备显著性标记（可选）
+  if (show.p) {
+    # 定义显著性符号
+    signif_codes <- cut(
+      p.mat,
+      breaks = c(0, 0.001, 0.01, 0.05, 1),
+      labels = c("***", "**", "*", ""),
+      include.lowest = TRUE
+    )
+
+    # 将相关系数矩阵转换为带标记的字符矩阵
+    r_with_stars <- matrix(
+      # sprintf("%.2f%s", corr$r, signif_codes),
+      signif_codes,
+      nrow = nrow(corr$r),
+      dimnames = dimnames(corr$r)
+    )
+
+    # 移除多余的+号（如0.10* -> 0.1*）
+    r_with_stars <- gsub("0\\.(\\d)", ".\\1", r_with_stars)
+  }
+
+  # 绘制热图
+  pheatmap::pheatmap(
+    mat = corr$r,
+    display_numbers = if (show.p) r_with_stars else FALSE,
+    cluster_rows = cluster_rows,
+    cluster_cols = cluster_cols,
+    number_color = "black",
+    border_color = if (nrow(corr$r) < 20) "gray60" else NA,
+    fontsize_number = 10,
+    ...
+  )
+}
 
 #' Fast correlation calculation
 #'
