@@ -205,7 +205,7 @@ plot_corr_heatmap <- function(corr,
                               cluster_cols = TRUE,
                               ...) {
   # 检查必要包
-  lib_ps(pheatmap, library = FALSE)
+  lib_ps("pheatmap", library = FALSE)
 
   # 检查输入结构
   if (!inherits(corr, "corr") ||
