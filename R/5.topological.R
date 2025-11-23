@@ -108,6 +108,7 @@ nc <- function(p) {
 #' @param fast less indexes for faster calculate ?
 #' @param mode calculate what? c("v", "e", "n", "all")
 #' @param remove_negative remove negative edge or not? default: FALSE
+#' @param only_topological only return topological indexes
 #'
 #' @return a 3-elements list
 #' \item{n_index}{indexs of the whole network}
@@ -118,7 +119,7 @@ nc <- function(p) {
 #' @examples
 #' igraph::make_graph("Walther") %>% net_par()
 #' c_net_index(co_net) -> co_net_with_par
-net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE, remove_negative = FALSE) {
+net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE, remove_negative = FALSE, only_topological = FALSE) {
   from <- to <- NULL
   stopifnot(is_igraph(go))
   if ("all" %in% mode) mode <- c("v", "e", "n")
@@ -185,7 +186,7 @@ net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE, remove_nega
     n_index <- apply(n_index, 1, FUN = \(x)replace(x, is.nan(x), 0)) %>%
       t() %>%
       as.data.frame()
-    # n_index <- cbind_new(get_n(go, simple = TRUE), n_index)
+    if (!only_topological) n_index <- cbind_new(get_n(go, simple = TRUE), n_index)
   }
   if ("v" %in% mode) {
     negative_weight <- FALSE
@@ -231,7 +232,7 @@ net_par <- function(go, mode = c("v", "e", "n", "all"), fast = TRUE, remove_nega
       name = igraph::vertex_attr(go, "name"),
       v_index
     )
-    # v_index <- cbind_new(get_v(go), v_index)
+    if (!only_topological) v_index <- cbind_new(get_v(go), v_index)
   }
   if ("e" %in% mode) {
     # Calculate Edges Parameters

@@ -30,4 +30,5 @@ show_MetaNet_logo <- function() {
 # Load the value of the option on package startup
 .onAttach <- function(libname, pkgname) {
   add_metanet_shapes()
+  packageStartupMessage("\033[38;5;246mIf you use the MetaNet package in published research, please cite:\n\nPeng, C., Huang, Z., Wei, X., Jiang, L., Zhu, X., Liu, Z., Chen, Q., Shen, X., Gao, P., and Jiang, C. (2025). MetaNet: a scalable and integrated tool for reproducible omics network analysis. Preprint at bioRxiv, https://doi.org/10.1101/2025.06.26.661636 https://doi.org/10.1101/2025.06.26.661636. \033[39m")
 }

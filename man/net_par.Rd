@@ -9,7 +9,8 @@ net_par(
   go,
   mode = c("v", "e", "n", "all"),
   fast = TRUE,
-  remove_negative = FALSE
+  remove_negative = FALSE,
+  only_topological = FALSE
 )
 
 c_net_index(go, force = FALSE)
@@ -22,6 +23,8 @@ c_net_index(go, force = FALSE)
 \item{fast}{less indexes for faster calculate ?}
 
 \item{remove_negative}{remove negative edge or not? default: FALSE}
+
+\item{only_topological}{only return topological indexes}
 
 \item{force}{replace existed net_par}
 }

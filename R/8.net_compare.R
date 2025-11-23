@@ -271,14 +271,14 @@ c_net_compare <- function(g1, g2) {
   g_inter <- suppressMessages(c_net_intersect(g1, g2))
 
   lapply(list(g1, g2, g_union, g_inter), function(g) {
-    net_par(g, mode = "n")$n_index
+    net_par(g, mode = "n", only_topological = TRUE)$n_index
   }) %>%
     do.call(rbind, .) %>%
     pcutils::t2() -> net_par_df
   colnames(net_par_df) <- c("g1", "g2", "g_union", "g_inter")
 
   # 计算相似性
-  net_similarity <- c(net_par_df[1:2, 4] / net_par_df[1:2, 3], adjacency_similarity(g1, g2))
+  net_similarity <- c(net_par_df[c("Node_number", "Edge_number"), 4] / net_par_df[c("Node_number", "Edge_number"), 3], adjacency_similarity(g1, g2))
   names(net_similarity) <- c("node_jaccard", "edge_jaccard", "adjacency_similarity")
 
   res <- list(
