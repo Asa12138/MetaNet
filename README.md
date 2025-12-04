@@ -43,7 +43,7 @@ You can install the development version of `MetaNet` from
 devtools::install_github("Asa12138/MetaNet")
 ```
 
-<img src="man/figures/MetaNet_GA.jpg"  width="500" />
+![](man/figures/MetaNet_GA.jpg)
 
 ## Workflow overview
 
