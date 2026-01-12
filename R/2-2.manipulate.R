@@ -702,7 +702,7 @@ get_group_skeleton <- function(go, Group = "v_class", count = NULL, top_N = 8) {
     .[V(tmp_go)$name, "x"]
   suppressWarnings({
     V(tmp_go)$count <- tmp_v %>%
-      dplyr::group_by_(Group) %>%
+      dplyr::group_by(dplyr::pick(dplyr::all_of(Group))) %>%
       dplyr::count() %>%
       tibble::column_to_rownames(Group) %>%
       .[V(tmp_go)$name, "n"]
