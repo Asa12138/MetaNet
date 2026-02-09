@@ -1,3 +1,9 @@
+# MetaNet v0.2.8 Notes
+
+## Others
+
+- submitted to CRAN <2026-02-09, Mon>
+
 # MetaNet v0.2.7 Notes
 
 ## Added

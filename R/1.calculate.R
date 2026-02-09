@@ -101,7 +101,7 @@ check_tabs <- function(...) {
     } else {
       message("All features are OK.")
     }
-    tables <- lapply(tables, \(i)i[comm, ])
+    tables <- lapply(tables, \(i)i[comm, , drop = FALSE])
   }
 
   if (length(tables) == 1) tables <- tables[[1]]

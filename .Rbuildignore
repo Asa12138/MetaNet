@@ -6,3 +6,4 @@ temp*
 ^docs$
 ^pkgdown$
 ^\.github$
+^CRAN-SUBMISSION$

@@ -11,7 +11,7 @@
 [![](http://cranlogs.r-pkg.org/badges/grand-total/MetaNet)](https://cran.r-project.org/package=MetaNet)
 [![](http://cranlogs.r-pkg.org/badges/last-month/MetaNet)](https://cran.r-project.org/package=MetaNet)
 [![](https://www.r-pkg.org/badges/version/MetaNet?color=green)](https://cran.r-project.org/package=MetaNet)
-[![](https://img.shields.io/badge/devel%20version-0.2.8-green.svg)](https://github.com/Asa12138/MetaNet)
+[![](https://img.shields.io/badge/devel%20version-0.2.9-green.svg)](https://github.com/Asa12138/MetaNet)
 <!-- badges: end -->
 
 MetaNet: Network analysis for multi-omics

@@ -700,13 +700,11 @@ get_group_skeleton <- function(go, Group = "v_class", count = NULL, top_N = 8) {
   V(tmp_go)$size <- stats::aggregate(tmp_v$size, by = list(tmp_v[, Group]), sum) %>%
     tibble::column_to_rownames("Group.1") %>%
     .[V(tmp_go)$name, "x"]
-  suppressWarnings({
-    V(tmp_go)$count <- tmp_v %>%
-      dplyr::group_by_(Group) %>%
-      dplyr::count() %>%
-      tibble::column_to_rownames(Group) %>%
-      .[V(tmp_go)$name, "n"]
-  })
+  V(tmp_go)$count <- tmp_v %>%
+    dplyr::group_by(!!rlang::sym(Group)) %>%
+    dplyr::count() %>%
+    tibble::column_to_rownames(Group) %>%
+    .[V(tmp_go)$name, "n"]
 
   tmp_go <- c_net_update(tmp_go, initialize = TRUE)
   get_e(tmp_go) -> tmp_e

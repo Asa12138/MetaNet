@@ -88,6 +88,7 @@ sticker("~/Documents/R/test/icons/test.png",
 `r badge_cran_download("MetaNet", type = "last-month")`
 `r badge_cran_release("MetaNet","green")`
 `r badge_devel("Asa12138/MetaNet", color = "green")`
+
 <!-- badges: end -->
 
 MetaNet: Network analysis for multi-omics 
