@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">MetaNet</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.1</span>
       </span>
     </div>
 
@@ -138,18 +138,20 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 a a     1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 a b     1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 a d     1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 c b     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 d a     1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6 d b     2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 b c     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 c a     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 c b     1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7 d c     2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8 d d     2</span>
 <span class="r-in"><span><span class="fu">summ_2col</span><span class="op">(</span><span class="va">test</span>, direct <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   a b count</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 a a     1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 a b     1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3 a d     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4 b c     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5 b d     2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 a c     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 a d     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 b c     2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6 c d     2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7 d d     2</span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"circlize"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu">summ_2col</span><span class="op">(</span><span class="va">test</span>, direct <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="pipe.html">%&gt;%</a></span> <span class="fu">pcutils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pcutils/man/my_circo.html" class="external-link">my_circo</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
