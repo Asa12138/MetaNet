@@ -14,7 +14,7 @@ add_metanet_shape_diamond <- function() {
     if (length(vertex.frame.width) != 1 && !is.null(v)) {
       vertex.frame.width <- vertex.frame.width[v]
     }
-    vertex.size <- 1 / 200 * sqrt(2) * params("vertex", "size")
+    vertex.size <- params("vertex", "size")
     if (length(vertex.size) != 1 && !is.null(v)) {
       vertex.size <- vertex.size[v]
     }
@@ -56,7 +56,7 @@ add_metanet_shape_triangle1 <- function() {
     if (length(vertex.frame.width) != 1 && !is.null(v)) {
       vertex.frame.width <- vertex.frame.width[v]
     }
-    vertex.size <- 1 / 200 * 1.2 * params("vertex", "size")
+    vertex.size <- params("vertex", "size")
     if (length(vertex.size) != 1 && !is.null(v)) {
       vertex.size <- vertex.size[v]
     }
@@ -98,7 +98,7 @@ add_metanet_shape_triangle2 <- function() {
     if (length(vertex.frame.width) != 1 && !is.null(v)) {
       vertex.frame.width <- vertex.frame.width[v]
     }
-    vertex.size <- 1 / 200 * 1.2 * params("vertex", "size")
+    vertex.size <- params("vertex", "size")
     if (length(vertex.size) != 1 && !is.null(v)) {
       vertex.size <- vertex.size[v]
     }
@@ -140,7 +140,7 @@ add_metanet_shape_star <- function() {
     if (length(vertex.frame.width) != 1 && !is.null(v)) {
       vertex.frame.width <- vertex.frame.width[v]
     }
-    vertex.size <- 1 / 150 * params("vertex", "size")
+    vertex.size <- params("vertex", "size")
     if (length(vertex.size) != 1 && !is.null(v)) {
       vertex.size <- vertex.size[v]
     }
@@ -199,7 +199,7 @@ add_metanet_shape_polygon <- function() {
     if (length(vertex.frame.width) != 1 && !is.null(v)) {
       vertex.frame.width <- vertex.frame.width[v]
     }
-    vertex.size <- 1 / 200 * params("vertex", "size")
+    vertex.size <- params("vertex", "size")
     if (length(vertex.size) != 1 && !is.null(v)) {
       vertex.size <- vertex.size[v]
     }

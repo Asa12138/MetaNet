@@ -1,7 +1,7 @@
 Package: MetaNet
 Type: Package
 Title: Network Analysis for Omics Data
-Version: 0.2.9
+Version: 0.3.1
 Authors@R:
     person("Chen", "Peng", email ="bfzede@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9449-7606"))
 Description: Comprehensive network analysis package.

@@ -1,3 +1,9 @@
+# MetaNet v0.3.1 Notes
+
+## Fixed
+
+- fixed the added shapes <2026-04-22, Wed>
+
 # MetaNet v0.2.8 Notes
 
 ## Others

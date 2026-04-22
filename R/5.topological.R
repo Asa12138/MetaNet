@@ -37,7 +37,7 @@ extract_sample_net <- function(whole_net, otutab, threads = 1, save_net = FALSE,
     spe_sub <- sub_nets[[i]]
     indexs <- net_par(spe_sub, mode = "n", fast = fast, remove_negative = remove_negative)[["n_index"]]
     wc <- igraph::cluster_fast_greedy(spe_sub, weights = abs(igraph::E(spe_sub)$weight))
-    indexs$modularity <- igraph::modularity(wc)
+    indexs$Modularity <- igraph::modularity(wc)
     indexs
   }
   {

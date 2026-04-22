@@ -16,7 +16,7 @@
 #' g1 <- module_net()
 #' get_n(g1)
 #' plot(g1, mark_module = TRUE)
-#' plot(g1, coors = g_layout(g1, zoom2 = 20))
+#' plot(g1, coors = g_layout(g1, zoom2 = 15))
 #' plot(g1, coors = g_layout_polyarc(g1, group = "module"))
 #' plot(g1, coors = g_layout_polygon(g1, group = "module"))
 module_net <- function(module_number = 3, n_node_in_module = 30,
@@ -279,7 +279,7 @@ plot_module_tree <- function(go_m, module = "module", community = NULL, label.si
     community %>% treeio::as.phylo() -> mcl
   }
   mcl <- dplyr::left_join(mcl, mdata, by = c("label" = "name"))
-  p <- ggtree::ggtree(mcl, size = 0.3) +
+  p <- ggtree::ggtree(mcl, linewidth = 0.3) +
     ggtree::geom_tiplab(aes(color = module), show.legend = FALSE, size = label.size) +
     scale_color_manual(values = pcutils::get_cols(length(unique(mdata$module)), "col3"))
 
