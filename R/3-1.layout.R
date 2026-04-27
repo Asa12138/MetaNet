@@ -1067,7 +1067,6 @@ create_sector_window <- function(r0 = 0, r1 = 1, theta_start = 0, theta_end = pi
 }
 
 
-
 #' Layout with group
 #'
 #' @param go igraph

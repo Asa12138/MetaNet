@@ -30,7 +30,7 @@ this is just a random generation method, the module number of result is not exac
 g1 <- module_net()
 get_n(g1)
 plot(g1, mark_module = TRUE)
-plot(g1, coors = g_layout(g1, zoom2 = 20))
+plot(g1, coors = g_layout(g1, zoom2 = 15))
 plot(g1, coors = g_layout_polyarc(g1, group = "module"))
 plot(g1, coors = g_layout_polygon(g1, group = "module"))
 }

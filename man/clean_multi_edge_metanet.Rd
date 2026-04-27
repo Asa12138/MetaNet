@@ -17,7 +17,7 @@ Clean multi edge metanet to plot
 }
 \examples{
 g <- igraph::make_ring(2)
-g <- igraph::add.edges(g, c(1, 1, 1, 1, 2, 1))
+g <- igraph::add_edges(g, c(1, 1, 1, 1, 2, 1))
 plot(g)
 plot(clean_multi_edge_metanet(g))
 }

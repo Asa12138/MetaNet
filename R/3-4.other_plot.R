@@ -195,7 +195,7 @@ plot.ggig <- function(x, coors = NULL, ..., labels_num = NULL,
 
     ggnewscale::new_scale("size") +
     geom_text(aes(X, Y, size = size, label = label), col = "black", data = tmp_v, show.legend = FALSE) +
-    scale_size(range = range(unlist(vertex_size_range)/5), guide = "none") +
+    scale_size(range = range(unlist(vertex_size_range) / 5), guide = "none") +
     guides(
       fill = guide_legend(override.aes = list(shape = node_shapes[vclass])),
       shape = "none"

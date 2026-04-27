@@ -32,6 +32,29 @@ memory usage compared to existing R packages.
 The HTML documentation of the latest version is available at [Github
 page](https://asa12138.github.io/MetaNet/).
 
+- [Installation](#installation)
+- [Tutorial](#tutorial)
+- [Quick Start](#quick-start)
+- [Detailed usage](#detailed-usage)
+  - [Overview](#overview)
+    - [Network construction](#network-construction)
+    - [Network annotation and
+      filtering](#network-annotation-and-filtering)
+    - [Module detection](#module-detection)
+    - [Network comparison](#network-comparison)
+  - [Layout and Visualization](#layout-and-visualization)
+    - [Basic layouts](#basic-layouts)
+    - [spatstat layouts](#spatstat-layouts)
+    - [Group and multi-level layouts](#group-and-multi-level-layouts)
+  - [Biological network](#biological-networks)
+    - [Venn diagram](#venn)
+    - [Tree diagram](#tree)
+    - [Pie node](#pie-node)
+    - [SRTING database](#string-database)
+    - [miRNA-Gene networks](#mirna-gene-networks)
+    - [Enrichment](#enrichment)
+    - [KEGG pathway](#kegg-pathway)
+
 ## Citation
 
 Please cite:
@@ -57,7 +80,7 @@ You can install the development version of `MetaNet` from
 devtools::install_github("Asa12138/MetaNet")
 ```
 
-## Tutorial📖
+## Tutorial
 
 Please go to **<https://bookdown.org/Asa12138/metanet_book/>** for the
 full vignette.
@@ -499,7 +522,7 @@ types frequently used in bioinformatics workflows, enabling researchers
 to visualize and explore biological relationships beyond conventional
 correlation or interaction networks.
 
-#### venn
+#### Venn
 
 MetaNet allows the construction of Venn-style networks to illustrate set
 relationships across sample groups. These provide a more informative
@@ -518,7 +541,7 @@ plot(v_net, vertex_size_range=list("Group" = c(18, 18),"elements" = c(4, 4)),
 dev.off()
 ```
 
-#### tree
+#### Tree
 
 Tree-structured data, such as taxonomies or gene ontology hierarchies,
 can be visualized using the built-in “as_circle_tree” layout, offering a
@@ -539,7 +562,7 @@ plot(ttt, coors = as_circle_tree(), legend = F, main = "Circle tree network",
 dev.off()
 ```
 
-#### pie
+#### Pie node
 
 MetaNet further supports pie-node visualization, where each node encodes
 multivariate annotations, such as group-specific abundances. This

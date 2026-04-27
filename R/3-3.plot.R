@@ -88,7 +88,8 @@ get_net_main <- function(n_index) {
 }
 
 scale_size_width <- function(tmp_v, tmp_e, vertex_size_range, edge_width_range) {
-  {    v_groups <- unique(tmp_v$v_group)
+  {
+    v_groups <- unique(tmp_v$v_group)
     nice_size <- ceiling(100 / sqrt(nrow(tmp_v))) + 1
 
     vertex_size_range_default <- rep(list(c(max(nice_size * 0.4, 3), min(nice_size * 1.6, 12))), length(v_groups))
@@ -115,7 +116,8 @@ scale_size_width <- function(tmp_v, tmp_e, vertex_size_range, edge_width_range) 
         list(tmp_v[tmp_v$v_group == i, "size"]),
         as.list(sort(vertex_size_range[[i]][1:2]))
       ))
-    }    }
+    }
+  }
 
   {
     edge_width_range_default <- vertex_size_range_default[[1]] / 6
