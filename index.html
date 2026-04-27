@@ -128,6 +128,45 @@
 <p>MetaNet enables fast and scalable correlation-based network construction for datasets with more than 10,000 features, providing over 40 layout algorithms, rich annotation utilities, and visualization options compatible with both static and interactive platforms. It further offers comprehensive topological and stability metrics for in-depth network characterization. Benchmarking shows that MetaNet delivers up to a 100-fold improvement in computation time and a 50-fold reduction in memory usage compared to existing R packages.</p>
 <p><img src="reference/figures/MetaNet_GA.jpg"></p>
 <p>The HTML documentation of the latest version is available at <a href="https://asa12138.github.io/MetaNet/" class="external-link">Github page</a>.</p>
+<ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#tutorial">Tutorial</a></li>
+<li><a href="#quick-start">Quick Start</a></li>
+<li>
+<a href="#detailed-usage">Detailed usage</a>
+<ul>
+<li>
+<a href="#overview">Overview</a>
+<ul>
+<li><a href="#network-construction">Network construction</a></li>
+<li><a href="#network-annotation-and-filtering">Network annotation and filtering</a></li>
+<li><a href="#module-detection">Module detection</a></li>
+<li><a href="#network-comparison">Network comparison</a></li>
+</ul>
+</li>
+<li>
+<a href="#layout-and-visualization">Layout and Visualization</a>
+<ul>
+<li><a href="#basic-layouts">Basic layouts</a></li>
+<li><a href="#spatstat-layouts">spatstat layouts</a></li>
+<li><a href="#group-and-multi-level-layouts">Group and multi-level layouts</a></li>
+</ul>
+</li>
+<li>
+<a href="#biological-networks">Biological network</a>
+<ul>
+<li><a href="#venn">Venn diagram</a></li>
+<li><a href="#tree">Tree diagram</a></li>
+<li><a href="#pie-node">Pie node</a></li>
+<li><a href="#string-database">SRTING database</a></li>
+<li><a href="#mirna-gene-networks">miRNA-Gene networks</a></li>
+<li><a href="#enrichment">Enrichment</a></li>
+<li><a href="#kegg-pathway">KEGG pathway</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
@@ -148,7 +187,7 @@
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"Asa12138/MetaNet"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="tutorial">Tutorial📖<a class="anchor" aria-label="anchor" href="#tutorial"></a>
+<h2 id="tutorial">Tutorial<a class="anchor" aria-label="anchor" href="#tutorial"></a>
 </h2>
 <p>Please go to <strong><a href="https://bookdown.org/Asa12138/metanet_book/" class="external-link uri">https://bookdown.org/Asa12138/metanet_book/</a></strong> for the full vignette.</p>
 <p><img src="reference/figures/cover1.jpeg" width="250"></p>
@@ -482,7 +521,7 @@
 </h3>
 <p>MetaNet provides native support for a variety of specialized network types frequently used in bioinformatics workflows, enabling researchers to visualize and explore biological relationships beyond conventional correlation or interaction networks.</p>
 <div class="section level4">
-<h4 id="venn">venn<a class="anchor" aria-label="anchor" href="#venn"></a>
+<h4 id="venn">Venn<a class="anchor" aria-label="anchor" href="#venn"></a>
 </h4>
 <p>MetaNet allows the construction of Venn-style networks to illustrate set relationships across sample groups. These provide a more informative alternative to traditional Venn diagrams by displaying explicit connections and network structure (Figure 4A).</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
@@ -497,7 +536,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="tree">tree<a class="anchor" aria-label="anchor" href="#tree"></a>
+<h4 id="tree">Tree<a class="anchor" aria-label="anchor" href="#tree"></a>
 </h4>
 <p>Tree-structured data, such as taxonomies or gene ontology hierarchies, can be visualized using the built-in “as_circle_tree” layout, offering a clear and compact representation of hierarchical relationships (Figure 4B).</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
@@ -514,7 +553,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="pie">pie<a class="anchor" aria-label="anchor" href="#pie"></a>
+<h4 id="pie-node">Pie node<a class="anchor" aria-label="anchor" href="#pie-node"></a>
 </h4>
 <p>MetaNet further supports pie-node visualization, where each node encodes multivariate annotations, such as group-specific abundances. This approach allows compositional data to be embedded directly in the network structure (Figure 4C).</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
