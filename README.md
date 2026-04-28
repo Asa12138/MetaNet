@@ -27,7 +27,7 @@ characterization. Benchmarking shows that MetaNet delivers up to a
 100-fold improvement in computation time and a 50-fold reduction in
 memory usage compared to existing R packages.
 
-![](man/figures/MetaNet_GA.jpg)
+![](man/figures/MetaNet_GA_v2.png)
 
 The HTML documentation of the latest version is available at [Github
 page](https://asa12138.github.io/MetaNet/).
